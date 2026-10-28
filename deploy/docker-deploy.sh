@@ -1,16 +1,15 @@
 #!/bin/bash
 # =============================================================================
-# Sub2API (tokenpolit) Docker Deployment Preparation Script
+# Sub2API Docker Deployment Preparation Script
 # =============================================================================
 # This script prepares deployment files for Sub2API:
 #   - Downloads docker-compose.local.yml and .env.example
-#   - Downloads the docs page (data/pages/docs.md served at /docs)
 #   - Generates secure secrets (JWT_SECRET, TOTP_ENCRYPTION_KEY, POSTGRES_PASSWORD)
 #   - Generates a random admin login email (ADMIN_EMAIL)
 #   - Creates necessary data directories
 #
 # After running this script, you can start services with:
-#   docker compose up -d
+#   docker-compose up -d
 # =============================================================================
 
 set -e
@@ -22,8 +21,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# GitHub raw content base URL (this fork, which publishes ghcr.io/xinglong-xl/sub2api)
-GITHUB_RAW_URL="https://raw.githubusercontent.com/xingLong-xl/sub2api/main/deploy"
+# GitHub raw content base URL
+GITHUB_RAW_URL="https://raw.githubusercontent.com/Wei-Shaw/sub2api/main/deploy"
 
 # Print colored message
 print_info() {
@@ -136,27 +135,8 @@ main() {
 
     # Create data directories
     print_info "Creating data directories..."
-    mkdir -p data/pages postgres_data redis_data
+    mkdir -p data postgres_data redis_data
     print_success "Created data directories"
-
-    # Download the built-in docs page (served at /docs by the backend)
-    print_info "Downloading docs page..."
-    mkdir -p data/pages
-    if command_exists curl; then
-        if curl -sSfL "${GITHUB_RAW_URL}/pages/docs.md" -o data/pages/docs.md; then
-            print_success "Downloaded data/pages/docs.md"
-        else
-            print_warning "Could not download docs.md, /docs page will be unavailable."
-            rm -f data/pages/docs.md
-        fi
-    elif command_exists wget; then
-        if wget -q "${GITHUB_RAW_URL}/pages/docs.md" -O data/pages/docs.md; then
-            print_success "Downloaded data/pages/docs.md"
-        else
-            print_warning "Could not download docs.md, /docs page will be unavailable."
-            rm -f data/pages/docs.md
-        fi
-    fi
 
     # Set secure permissions for .env file (readable/writable only by owner)
     chmod 600 .env
@@ -181,17 +161,16 @@ main() {
     echo "  .env                      - Environment variables (generated secrets)"
     echo "  .env.example              - Example template (for reference)"
     echo "  data/                     - Application data (will be created on first run)"
-    echo "  data/pages/docs.md        - Built-in documentation served at /docs"
     echo "  postgres_data/            - PostgreSQL data"
     echo "  redis_data/               - Redis data"
     echo ""
     echo "Next steps:"
     echo "  1. (Optional) Edit .env to customize configuration"
     echo "  2. Start services:"
-    echo "     docker compose up -d"
+    echo "     docker-compose up -d"
     echo ""
     echo "  3. View logs:"
-    echo "     docker compose logs -f sub2api"
+    echo "     docker-compose logs -f sub2api"
     echo ""
     echo "  4. Access Web UI:"
     echo "     http://localhost:8080"
