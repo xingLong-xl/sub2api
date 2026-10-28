@@ -16,9 +16,7 @@ services:
   # Sub2API Application
   # ===========================================================================
   sub2api:
-    # Image built from this repository by .github/workflows/docker-publish.yml
-    image: ghcr.io/xinglong-xl/sub2api:latest
-    pull_policy: always
+    image: weishaw/sub2api:latest
     container_name: sub2api
     restart: unless-stopped
     security_opt:
