@@ -24,7 +24,7 @@ services:
   # Sub2API Application
   # ===========================================================================
   sub2api:
-    # Built from this repository by .github/workflows/docker-publish.yml
+    # linux/arm64 image built from this repository by .github/workflows/docker-publish.yml
     image: ghcr.io/xinglong-xl/sub2api:latest
     pull_policy: always
     container_name: sub2api
