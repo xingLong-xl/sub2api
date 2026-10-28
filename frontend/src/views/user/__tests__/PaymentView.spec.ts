@@ -382,7 +382,7 @@ describe('PaymentView recharge rate preview', () => {
     getCheckoutInfo.mockReset().mockResolvedValue(checkoutInfoFixture({
       balance_recharge_multiplier: 0.5,
       methods: {
-        stripe: {
+        wxpay: {
           ...checkoutInfoFixture().data.methods.wxpay,
           currency: 'USD',
         },
@@ -407,7 +407,7 @@ describe('PaymentView recharge rate preview', () => {
       usd: '0.50',
     })
     expect(en.payment.rechargeRatePreview).toBe('Current rate: 1 {currency} = {usd} USD')
-    expect(zh.payment.rechargeRatePreview).toBe('当前倍率：1 {currency} = {usd} USD')
+    expect(zh.payment.rechargeRatePreview).toBe('当前倍率：1 {currency} = {usd} 元')
   })
 })
 

@@ -77,7 +77,7 @@
         <!-- Insufficient balance warning -->
         <div
           v-if="form.deduct_balance && balanceInsufficient"
-          class="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-700 dark:bg-amber-900/20 dark:text-amber-300"
+          class="mt-2 rounded-lg bg-yellow-50 p-3 text-sm text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300"
         >
           {{ t('payment.admin.insufficientBalance') }}
         </div>
@@ -187,7 +187,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-const creditedAmountSymbol = currencySymbol('USD')
+const creditedAmountSymbol = currencySymbol('CNY')
 
 const paymentAmountSymbol = computed(() => currencySymbol(props.order?.currency))
 

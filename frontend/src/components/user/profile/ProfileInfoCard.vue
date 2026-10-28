@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <section
       data-testid="profile-overview-hero"
-      class="card overflow-hidden border border-primary-100/80 bg-gradient-to-br from-primary-50 via-white to-amber-50/70 dark:border-primary-900/40 dark:from-primary-950/40 dark:via-dark-900 dark:to-dark-950"
+      class="card overflow-hidden border border-primary-100/80 bg-gradient-to-br from-primary-50 via-white to-yellow-50/70 dark:border-primary-900/40 dark:from-primary-950/40 dark:via-dark-900 dark:to-dark-950"
     >
       <div class="px-6 py-6 md:px-8">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -273,7 +273,7 @@ const providerLabels = computed<Record<UserAuthProvider, string>>(() => ({
 }))
 
 function formatCurrency(value: number): string {
-  return `$${value.toFixed(2)}`
+  return `¥${value.toFixed(2)}`
 }
 
 function normalizeProvider(value: string): UserAuthProvider | null {

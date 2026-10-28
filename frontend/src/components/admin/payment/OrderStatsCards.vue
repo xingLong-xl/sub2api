@@ -52,8 +52,8 @@
     <!-- Average Amount -->
     <div class="card p-4">
       <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/30">
-          <Icon name="chart" size="md" class="text-amber-600 dark:text-amber-400" :stroke-width="2" />
+        <div class="rounded-lg bg-yellow-100 p-2 dark:bg-yellow-900/30">
+          <Icon name="chart" size="md" class="text-yellow-600 dark:text-yellow-400" :stroke-width="2" />
         </div>
         <div>
           <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('payment.admin.avgAmount') }}</p>

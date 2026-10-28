@@ -61,15 +61,15 @@
             <div class="space-y-4 p-6">
               <!-- Security Warning -->
               <div
-                class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+                class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20"
               >
                 <div class="flex items-start">
                   <Icon
                     name="exclamationTriangle"
                     size="md"
-                    class="mt-0.5 flex-shrink-0 text-amber-500"
+                    class="mt-0.5 flex-shrink-0 text-yellow-500"
                   />
-                  <p class="ml-3 text-sm text-amber-700 dark:text-amber-300">
+                  <p class="ml-3 text-sm text-yellow-700 dark:text-yellow-300">
                     {{ t("admin.settings.adminApiKey.securityWarning") }}
                   </p>
                 </div>
@@ -1633,7 +1633,7 @@
                   <!-- Warning when encryption key not configured -->
                   <p
                     v-if="!form.totp_encryption_key_configured"
-                    class="mt-2 text-sm text-amber-600 dark:text-amber-400"
+                    class="mt-2 text-sm text-yellow-600 dark:text-yellow-400"
                   >
                     {{ t("admin.settings.registration.totpKeyNotConfigured") }}
                   </p>
@@ -1669,7 +1669,7 @@
                   :class="
                     form.passkey_configured
                       ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300'
-                      : 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300'
+                      : 'border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950/40 dark:text-yellow-300'
                   "
                   data-testid="passkey-config-status"
                 >
@@ -3045,7 +3045,7 @@
                     (form.wechat_connect_mp_enabled ||
                       form.wechat_connect_mobile_enabled)
                   "
-                  class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-900/40 dark:bg-amber-900/10 dark:text-amber-300"
+                  class="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-700 dark:border-yellow-900/40 dark:bg-yellow-900/10 dark:text-yellow-300"
                 >
                   {{
                     localText(
@@ -3326,7 +3326,7 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">
                           {{ t("admin.settings.dingtalk.syncCorpEmailHint") }}
                         </p>
-                        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
                           {{ t("admin.settings.dingtalk.syncCorpEmailPermissionHint") }}
                         </p>
                       </div>
@@ -3372,7 +3372,7 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">
                           {{ t("admin.settings.dingtalk.syncDeptHint") }}
                         </p>
-                        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
                           {{ t("admin.settings.dingtalk.syncDeptPermissionHint") }}
                         </p>
                       </div>
@@ -4040,7 +4040,7 @@
                   <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     {{ t("admin.settings.defaults.defaultPlatformQuotasHint") }}
                   </p>
-                  <p class="mt-0.5 text-xs text-amber-600 dark:text-amber-400">
+                  <p class="mt-0.5 text-xs text-yellow-600 dark:text-yellow-400">
                     {{ t("admin.settings.defaults.platformQuotaNotice") }}
                   </p>
                 </div>
@@ -4590,7 +4590,7 @@
                   </button>
                   <p
                     v-if="codexFingerprintNoRequired"
-                    class="mt-2 text-xs text-amber-600 dark:text-amber-500"
+                    class="mt-2 text-xs text-yellow-600 dark:text-yellow-500"
                   >
                     {{ t("admin.settings.gatewayForwarding.codexFingerprintNoRequiredWarn") }}
                   </p>
@@ -5044,7 +5044,7 @@
                       )
                     }}
                   </p>
-                  <p class="mt-0.5 text-xs text-amber-600 dark:text-amber-400">
+                  <p class="mt-0.5 text-xs text-yellow-600 dark:text-yellow-400">
                     {{
                       t(
                         "admin.settings.scheduling.accountSchedulingThresholdsDisabledHint",
@@ -6401,7 +6401,7 @@
             <div class="space-y-6 p-6">
               <!-- Backend Mode -->
               <div
-                class="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+                class="flex items-center justify-between rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20"
               >
                 <div>
                   <h3 class="text-sm font-medium text-gray-900 dark:text-white">
@@ -6718,7 +6718,7 @@
                   {{ t("admin.settings.site.homeContentHint") }}
                 </p>
                 <!-- iframe CSP Warning -->
-                <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                <p class="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
                   {{ t("admin.settings.site.homeContentIframeWarning") }}
                 </p>
               </div>
@@ -8786,7 +8786,7 @@
                 <div class="relative">
                   <span
                     class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    >$</span
+                    >¥</span
                   >
                   <input
                     v-model.number="form.balance_low_notify_threshold"
@@ -13385,7 +13385,7 @@ watch(
   height: 2px;
   border-radius: 9999px;
   content: "";
-  background: linear-gradient(90deg, #14b8a6, #0ea5e9);
+  background: linear-gradient(90deg, #6366f1, #0ea5e9);
 }
 
 .settings-tab-icon {

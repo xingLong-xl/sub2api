@@ -1,4 +1,8 @@
 export default {
+  docs: {
+    title: '配置文档',
+    unavailableDesc: '配置文档暂未发布，请联系管理员。'
+  },
   batchImageGuide: {
     title: '图片批量生成',
     description: '一次提交多条提示词，任务完成后可统一下载图片结果'
@@ -6,7 +10,7 @@ export default {
   // Home Page
   home: {
     viewOnGithub: '在 GitHub 上查看',
-    viewDocs: '查看文档',
+    viewDocs: '配置文档',
     docs: '文档',
     switchToLight: '切换到浅色模式',
     switchToDark: '切换到深色模式',

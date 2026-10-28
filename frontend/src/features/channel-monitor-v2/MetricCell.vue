@@ -65,15 +65,15 @@ const resolvedState = computed(() => (missingValue.value ? undefined : props.sta
 
 const stateClass = computed(() => {
   if (!resolvedState.value) return missingValue.value ? 'text-gray-500 dark:text-dark-400' : 'text-gray-900 dark:text-white'
-  if (resolvedState.value === 'healthy') return 'text-emerald-600 dark:text-emerald-400'
-  if (resolvedState.value === 'warning') return 'text-amber-600 dark:text-amber-400'
+  if (resolvedState.value === 'healthy') return 'text-green-600 dark:text-green-400'
+  if (resolvedState.value === 'warning') return 'text-yellow-600 dark:text-yellow-400'
   if (resolvedState.value === 'critical') return 'text-red-600 dark:text-red-400'
   return 'text-gray-500 dark:text-dark-400'
 })
 
 const dotClass = computed(() => {
-  if (resolvedState.value === 'healthy') return 'bg-emerald-500'
-  if (resolvedState.value === 'warning') return 'bg-amber-500'
+  if (resolvedState.value === 'healthy') return 'bg-green-500'
+  if (resolvedState.value === 'warning') return 'bg-yellow-500'
   if (resolvedState.value === 'critical') return 'bg-red-500'
   return 'bg-gray-300 dark:bg-dark-600'
 })

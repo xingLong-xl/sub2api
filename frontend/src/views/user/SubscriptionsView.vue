@@ -51,7 +51,7 @@
                 </p>
                 <div class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-gray-400 dark:text-gray-500">
                   <span>{{ t('payment.planCard.rate') }}: ×{{ subscription.group?.rate_multiplier ?? 1 }}</span>
-                  <span v-if="subscriptionHasPeakRate(subscription)" class="text-amber-700 dark:text-amber-300">
+                  <span v-if="subscriptionHasPeakRate(subscription)" class="text-yellow-700 dark:text-yellow-300">
                     {{ t('payment.planCard.peakRate') }}: {{ subscriptionPeakRateLabel(subscription) }}
                   </span>
                 </div>
@@ -62,7 +62,7 @@
                 :class="[
                   'rounded-full px-2 py-0.5 text-xs font-medium',
                   subscription.status === 'active'
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
                     : subscription.status === 'expired'
                       ? 'bg-gray-100 text-gray-600 dark:bg-dark-700 dark:text-gray-400'
                       : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
@@ -107,7 +107,7 @@
                   {{ t('userSubscriptions.daily') }}
                 </span>
                 <span class="text-sm text-gray-500 dark:text-dark-400">
-                  ${{ (subscription.daily_usage_usd || 0).toFixed(2) }} / ${{
+                  ¥{{ (subscription.daily_usage_usd || 0).toFixed(2) }} / ¥{{
                     subscription.group.daily_limit_usd.toFixed(2)
                   }}
                 </span>
@@ -144,7 +144,7 @@
                   {{ t('userSubscriptions.weekly') }}
                 </span>
                 <span class="text-sm text-gray-500 dark:text-dark-400">
-                  ${{ (subscription.weekly_usage_usd || 0).toFixed(2) }} / ${{
+                  ¥{{ (subscription.weekly_usage_usd || 0).toFixed(2) }} / ¥{{
                     subscription.group.weekly_limit_usd.toFixed(2)
                   }}
                 </span>
@@ -185,7 +185,7 @@
                   {{ t('userSubscriptions.monthly') }}
                 </span>
                 <span class="text-sm text-gray-500 dark:text-dark-400">
-                  ${{ (subscription.monthly_usage_usd || 0).toFixed(2) }} / ${{
+                  ¥{{ (subscription.monthly_usage_usd || 0).toFixed(2) }} / ¥{{
                     subscription.group.monthly_limit_usd.toFixed(2)
                   }}
                 </span>
@@ -226,15 +226,15 @@
                 !subscription.group?.weekly_limit_usd &&
                 !subscription.group?.monthly_limit_usd
               "
-              class="flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 py-6 dark:from-emerald-900/20 dark:to-teal-900/20"
+              class="flex items-center justify-center rounded-xl bg-gradient-to-r from-primary-50 to-primary-100 py-6 dark:from-primary-900/20 dark:to-primary-900/20"
             >
               <div class="flex items-center gap-3">
-                <span class="text-4xl text-emerald-600 dark:text-emerald-400">∞</span>
+                <span class="text-4xl text-gray-900 dark:text-white">∞</span>
                 <div>
-                  <p class="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">
                     {{ t('userSubscriptions.unlimited') }}
                   </p>
-                  <p class="text-xs text-emerald-600/70 dark:text-emerald-400/70">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
                     {{ t('userSubscriptions.unlimitedDesc') }}
                   </p>
                 </div>
@@ -269,7 +269,7 @@ import {
 function platformAccentDotClass(p: string): string {
   switch (p) {
     case 'anthropic': return 'bg-orange-500'
-    case 'openai': return 'bg-emerald-500'
+    case 'openai': return 'bg-slate-700'
     case 'antigravity': return 'bg-purple-500'
     case 'gemini': return 'bg-blue-500'
     default: return 'bg-gray-400'

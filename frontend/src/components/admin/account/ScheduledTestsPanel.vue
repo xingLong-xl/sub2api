@@ -180,7 +180,7 @@
               <!-- Auto Recover Badge -->
               <span
                 v-if="plan.auto_recover"
-                class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/20 dark:text-green-400"
               >
                 {{ t('admin.scheduledTests.autoRecover') }}
               </span>

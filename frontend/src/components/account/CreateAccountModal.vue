@@ -208,7 +208,7 @@
             :class="[
               'flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-all',
               form.platform === 'deepseek'
-                ? 'bg-white text-teal-600 shadow-sm dark:bg-dark-600 dark:text-teal-400'
+                ? 'bg-white text-primary-600 shadow-sm dark:bg-dark-600 dark:text-primary-400'
                 : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
             ]"
           >
@@ -239,7 +239,7 @@
             :class="[
               'flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-all',
               form.platform === 'opencode_go'
-                ? 'bg-white text-amber-700 shadow-sm dark:bg-dark-600 dark:text-amber-300'
+                ? 'bg-white text-yellow-700 shadow-sm dark:bg-dark-600 dark:text-yellow-300'
                 : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
             ]"
           >
@@ -336,15 +336,15 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
               accountCategory === 'bedrock'
-                ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                : 'border-gray-200 hover:border-amber-300 dark:border-dark-600 dark:hover:border-amber-700'
+                ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                : 'border-gray-200 hover:border-yellow-300 dark:border-dark-600 dark:hover:border-yellow-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'bedrock'
-                  ? 'bg-amber-500 text-white'
+                  ? 'bg-yellow-500 text-white'
                   : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
               ]"
             >
@@ -903,7 +903,7 @@
                     {{ t('admin.accounts.gemini.oauthType.badges.individuals') }}
                   </span>
                   <span
-                    class="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    class="rounded bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-300"
                   >
                     {{ t('admin.accounts.gemini.oauthType.badges.noGcp') }}
                   </span>
@@ -957,7 +957,7 @@
                     {{ t('admin.accounts.gemini.oauthType.badges.enterprise') }}
                   </span>
                   <span
-                    class="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    class="rounded bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-300"
                   >
                     {{ t('admin.accounts.gemini.oauthType.badges.highConcurrency') }}
                   </span>
@@ -1002,15 +1002,15 @@
                 'flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
                 !geminiAIStudioOAuthEnabled ? 'cursor-not-allowed opacity-60' : '',
                 geminiOAuthType === 'ai_studio'
-                  ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                  : 'border-gray-200 hover:border-amber-300 dark:border-dark-600 dark:hover:border-amber-700'
+                  ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                  : 'border-gray-200 hover:border-yellow-300 dark:border-dark-600 dark:hover:border-yellow-700'
               ]"
             >
               <div
                 :class="[
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                   geminiOAuthType === 'ai_studio'
-                    ? 'bg-amber-500 text-white'
+                    ? 'bg-yellow-500 text-white'
                     : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
                 ]"
               >
@@ -1040,12 +1040,12 @@
                 </div>
                 <div class="mt-2 flex flex-wrap gap-1">
                   <span
-                    class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    class="rounded bg-yellow-100 px-2 py-0.5 text-[10px] font-semibold text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
                   >
                     {{ t('admin.accounts.gemini.oauthType.badges.orgManaged') }}
                   </span>
                   <span
-                    class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    class="rounded bg-yellow-100 px-2 py-0.5 text-[10px] font-semibold text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
                   >
                     {{ t('admin.accounts.gemini.oauthType.badges.adminRequired') }}
                   </span>
@@ -1053,7 +1053,7 @@
               </div>
               <span
                 v-if="!geminiAIStudioOAuthEnabled"
-                class="ml-auto shrink-0 rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                class="ml-auto shrink-0 rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
               >
                 {{ t('admin.accounts.oauth.gemini.aiStudioNotConfiguredShort') }}
               </span>
@@ -1061,7 +1061,7 @@
 
             <div
               v-if="!geminiAIStudioOAuthEnabled"
-              class="pointer-events-none absolute right-0 top-full z-50 mt-2 w-80 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+              class="pointer-events-none absolute right-0 top-full z-50 mt-2 w-80 rounded-md border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:border-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-200"
             >
               {{ t('admin.accounts.oauth.gemini.aiStudioNotConfiguredTip') }}
             </div>
@@ -1595,9 +1595,9 @@
 
           <div
             v-if="isOpenAIModelRestrictionDisabled"
-            class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
+            class="mb-3 rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20"
           >
-            <p class="text-xs text-amber-700 dark:text-amber-400">
+            <p class="text-xs text-yellow-700 dark:text-yellow-400">
               {{ t('admin.accounts.openai.modelRestrictionDisabledByPassthrough') }}
             </p>
           </div>
@@ -1914,8 +1914,8 @@
           </div>
 
           <div v-if="customErrorCodesEnabled" class="space-y-3">
-            <div class="rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20">
-              <p class="text-xs text-amber-700 dark:text-amber-400">
+            <div class="rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20">
+              <p class="text-xs text-yellow-700 dark:text-yellow-400">
                 <Icon name="exclamationTriangle" size="sm" class="mr-1 inline" :stroke-width="2" />
                 {{ t('admin.accounts.customErrorCodesWarning') }}
               </p>
@@ -2493,9 +2493,9 @@
 
         <div
           v-if="isOpenAIModelRestrictionDisabled"
-          class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
+          class="mb-3 rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20"
         >
-          <p class="text-xs text-amber-700 dark:text-amber-400">
+          <p class="text-xs text-yellow-700 dark:text-yellow-400">
             {{ t('admin.accounts.openai.modelRestrictionDisabledByPassthrough') }}
           </p>
         </div>
@@ -2886,7 +2886,7 @@
             <div>
               <label class="input-label">{{ t('admin.accounts.quotaControl.windowCost.limit') }}</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">¥</span>
                 <input
                   v-model.number="windowCostLimit"
                   type="number"
@@ -2901,7 +2901,7 @@
             <div>
               <label class="input-label">{{ t('admin.accounts.quotaControl.windowCost.stickyReserve') }}</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">¥</span>
                 <input
                   v-model.number="windowCostStickyReserve"
                   type="number"
@@ -3604,7 +3604,7 @@
         </div>
         <p
           v-if="!openAITextGenerationCapabilityEnabled"
-          class="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-300"
+          class="rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300"
           data-testid="openai-responses-mode-not-applicable"
         >
           {{ t('admin.accounts.openai.responsesModeTextDisabledHint') }}
@@ -3958,7 +3958,7 @@
         <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
           {{ t('admin.accounts.gemini.quotaPolicy.title') }}
         </h3>
-        <p class="mb-4 text-xs text-amber-600 dark:text-amber-400">
+        <p class="mb-4 text-xs text-yellow-600 dark:text-yellow-400">
           {{ t('admin.accounts.gemini.quotaPolicy.note') }}
         </p>
         <div class="overflow-x-auto">
@@ -4474,11 +4474,11 @@ const cnAccentActiveClass = computed(() => {
     case 'zhipu':
       return 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
     case 'deepseek':
-      return 'border-teal-500 bg-teal-50 dark:bg-teal-900/20'
+      return 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
     case 'minimax':
       return 'border-rose-500 bg-rose-50 dark:bg-rose-900/20'
     case 'opencode_go':
-      return 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
+      return 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
     default:
       return 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
   }
@@ -4490,11 +4490,11 @@ const cnAccentIconClass = computed(() => {
     case 'zhipu':
       return 'bg-indigo-500 text-white'
     case 'deepseek':
-      return 'bg-teal-500 text-white'
+      return 'bg-primary-500 text-white'
     case 'minimax':
       return 'bg-rose-500 text-white'
     case 'opencode_go':
-      return 'bg-amber-500 text-white'
+      return 'bg-yellow-500 text-white'
     default:
       return 'bg-primary-500 text-white'
   }

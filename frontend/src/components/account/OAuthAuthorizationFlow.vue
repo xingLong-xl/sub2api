@@ -587,13 +587,13 @@
             <!-- Help Section -->
             <div
               v-if="showHelpDialog && showHelp"
-              class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-900/30"
+              class="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-700 dark:bg-yellow-900/30"
             >
-              <h5 class="mb-2 font-semibold text-amber-800 dark:text-amber-200">
+              <h5 class="mb-2 font-semibold text-yellow-800 dark:text-yellow-200">
                 {{ t('admin.accounts.oauth.howToGetSessionKey') }}
               </h5>
               <ol
-                class="list-inside list-decimal space-y-1 text-xs text-amber-700 dark:text-amber-300"
+                class="list-inside list-decimal space-y-1 text-xs text-yellow-700 dark:text-yellow-300"
               >
                 <li>{{ t('admin.accounts.oauth.step1') }}</li>
                 <li>{{ t('admin.accounts.oauth.step2') }}</li>
@@ -603,7 +603,7 @@
                 <li>{{ t('admin.accounts.oauth.step6') }}</li>
               </ol>
               <p
-                class="mt-2 text-xs text-amber-600 dark:text-amber-400"
+                class="mt-2 text-xs text-yellow-600 dark:text-yellow-400"
                 v-text="t('admin.accounts.oauth.sessionKeyFormat')"
               ></p>
             </div>
@@ -800,10 +800,10 @@
                 <!-- Local callback notice -->
                 <div
                   v-if="showLocalCallbackNotice"
-                  class="mt-2 rounded border border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-900/30"
+                  class="mt-2 rounded border border-yellow-300 bg-yellow-50 p-3 dark:border-yellow-700 dark:bg-yellow-900/30"
                 >
                   <p
-                    class="text-xs text-amber-800 dark:text-amber-300"
+                    class="text-xs text-yellow-800 dark:text-yellow-300"
                     v-text="oauthImportantNotice"
                   ></p>
                 </div>
@@ -858,16 +858,16 @@
                   <!-- Gemini-specific state parameter warning -->
                   <div
                     v-if="platform === 'gemini'"
-                    class="mt-3 rounded-lg border-2 border-amber-400 bg-amber-50 p-3 dark:border-amber-600 dark:bg-amber-900/30"
+                    class="mt-3 rounded-lg border-2 border-yellow-400 bg-yellow-50 p-3 dark:border-yellow-600 dark:bg-yellow-900/30"
                   >
                     <div class="flex items-start gap-2">
                       <Icon
                         name="exclamationTriangle"
                         size="md"
-                        class="flex-shrink-0 text-amber-600 dark:text-amber-400"
+                        class="flex-shrink-0 text-yellow-600 dark:text-yellow-400"
                         :stroke-width="2"
                       />
-                      <div class="text-sm text-amber-800 dark:text-amber-300">
+                      <div class="text-sm text-yellow-800 dark:text-yellow-300">
                         <p class="font-semibold">{{ $t('admin.accounts.oauth.gemini.stateWarningTitle') }}</p>
                         <p class="mt-1">{{ $t('admin.accounts.oauth.gemini.stateWarningDesc') }}</p>
                       </div>

@@ -138,7 +138,7 @@ describe('OpenCodeGoUsageCell', () => {
     })
     const badge = wrapper.get('[data-testid="opencode-go-status-badge"]')
     expect(badge.text()).toBe('unauthorized')
-    expect(badge.classes()).toEqual(expect.arrayContaining(['bg-amber-100', 'text-amber-700']))
+    expect(badge.classes()).toEqual(expect.arrayContaining(['bg-yellow-100', 'text-yellow-700']))
   })
 
   it('shows a red badge for failed snapshots', () => {

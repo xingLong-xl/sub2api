@@ -11,7 +11,7 @@
         {{ t('admin.proxies.dataImportHint') }}
       </div>
       <div
-        class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-600 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400"
+        class="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-xs text-yellow-600 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
       >
         {{ t('admin.proxies.dataImportWarning') }}
       </div>

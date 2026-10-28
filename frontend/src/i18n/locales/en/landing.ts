@@ -1,4 +1,8 @@
 export default {
+  docs: {
+    title: 'Documentation',
+    unavailableDesc: 'Documentation has not been published yet. Please contact the administrator.'
+  },
   batchImageGuide: {
     title: 'Batch Image Generation',
     description: 'Submit multiple prompts in one job and download the generated images when complete'

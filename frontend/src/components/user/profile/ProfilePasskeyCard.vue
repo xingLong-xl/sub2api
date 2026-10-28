@@ -24,7 +24,7 @@
       <div v-if="!enabled" class="mb-5 text-sm text-gray-500 dark:text-gray-400">
         {{ t('profile.passkey.featureDisabled') }}
       </div>
-      <div v-if="enabled && !supported" class="mb-5 text-sm text-amber-600 dark:text-amber-400">
+      <div v-if="enabled && !supported" class="mb-5 text-sm text-yellow-600 dark:text-yellow-400">
         {{ t('profile.passkey.unsupported') }}
       </div>
       <div>

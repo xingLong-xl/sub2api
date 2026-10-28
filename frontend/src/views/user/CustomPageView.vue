@@ -336,7 +336,7 @@ async function fetchAndRenderMarkdown(slug: string) {
     tocItems.value = toc
   } catch {
     if (version === markdownRequestVersion) {
-      renderedHtml.value = '<p class="text-red-500">Failed to load page</p>'
+      renderedHtml.value = '<p class="text-red-500">页面加载失败</p>'
     }
   } finally {
     if (version === markdownRequestVersion) {

@@ -68,7 +68,7 @@
             class="h-4 w-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"
           ></span>
           <span v-else class="font-semibold text-gray-900 dark:text-white" data-test="withdraw-available-quota">
-            ${{ formatPreciseAmount(availableQuota) }}
+            ¥{{ formatPreciseAmount(availableQuota) }}
           </span>
         </div>
         <p class="mt-1 text-xs text-gray-500 dark:text-dark-400">{{ t('admin.affiliates.withdraw.frozenHint') }}</p>
@@ -109,7 +109,7 @@
         {{ t('admin.affiliates.withdraw.uncertainHint') }}
       </div>
 
-      <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700/50 dark:bg-amber-900/20 dark:text-amber-300">
+      <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-700/50 dark:bg-yellow-900/20 dark:text-yellow-300">
         {{ t('admin.affiliates.withdraw.warning') }}
       </div>
     </form>
@@ -323,8 +323,8 @@ async function submit() {
     pendingOperation.value = null
     appStore.showSuccess(
       t(replayed ? 'admin.affiliates.withdraw.replayed' : 'admin.affiliates.withdraw.success', {
-        amount: `$${formatPreciseAmount(result.amount)}`,
-        remaining: `$${formatPreciseAmount(result.available_quota_after)}`,
+        amount: `¥${formatPreciseAmount(result.amount)}`,
+        remaining: `¥${formatPreciseAmount(result.available_quota_after)}`,
       }),
     )
     emit('success', result)

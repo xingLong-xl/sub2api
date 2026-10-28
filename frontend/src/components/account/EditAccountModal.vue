@@ -86,14 +86,14 @@
               :class="[
                 'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
                 editOpenCodeAccountMode === 'zen'
-                  ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
+                  ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
                   : 'border-gray-200 hover:border-gray-400 dark:border-dark-600 dark:hover:border-gray-600'
               ]"
             >
               <div
                 :class="[
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-                  editOpenCodeAccountMode === 'zen' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  editOpenCodeAccountMode === 'zen' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
                 ]"
               >
                 <Icon name="creditCard" size="sm" />
@@ -109,14 +109,14 @@
               :class="[
                 'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
                 editOpenCodeAccountMode === 'go'
-                  ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
+                  ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
                   : 'border-gray-200 hover:border-gray-400 dark:border-dark-600 dark:hover:border-gray-600'
               ]"
             >
               <div
                 :class="[
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-                  editOpenCodeAccountMode === 'go' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  editOpenCodeAccountMode === 'go' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
                 ]"
               >
                 <Icon name="bolt" size="sm" />
@@ -256,9 +256,9 @@
 
           <div
             v-if="isOpenAIModelRestrictionDisabled"
-            class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
+            class="mb-3 rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20"
           >
-            <p class="text-xs text-amber-700 dark:text-amber-400">
+            <p class="text-xs text-yellow-700 dark:text-yellow-400">
               {{ t('admin.accounts.openai.modelRestrictionDisabledByPassthrough') }}
             </p>
           </div>
@@ -569,8 +569,8 @@
           </div>
 
           <div v-if="customErrorCodesEnabled" class="space-y-3">
-            <div class="rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20">
-              <p class="text-xs text-amber-700 dark:text-amber-400">
+            <div class="rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20">
+              <p class="text-xs text-yellow-700 dark:text-yellow-400">
                 <Icon name="exclamationTriangle" size="sm" class="mr-1 inline" :stroke-width="2" />
                 {{ t('admin.accounts.customErrorCodesWarning') }}
               </p>
@@ -700,9 +700,9 @@
           </div>
           <div
             v-if="grokMediaEligibilityMode === 'enabled'"
-            class="rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
+            class="rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20"
           >
-            <p class="text-xs text-amber-700 dark:text-amber-400">
+            <p class="text-xs text-yellow-700 dark:text-yellow-400">
               <Icon name="exclamationTriangle" size="sm" class="mr-1 inline" :stroke-width="2" />
               {{ t('admin.accounts.grokMediaEligibility.forceEnableWarning') }}
             </p>
@@ -804,9 +804,9 @@
 
         <div
           v-if="isOpenAIModelRestrictionDisabled"
-          class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
+          class="mb-3 rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20"
         >
-          <p class="text-xs text-amber-700 dark:text-amber-400">
+          <p class="text-xs text-yellow-700 dark:text-yellow-400">
             {{ t('admin.accounts.openai.modelRestrictionDisabledByPassthrough') }}
           </p>
         </div>
@@ -1429,7 +1429,7 @@
               type="button"
               @click="syncAntigravityUpstreamModels"
               :disabled="isSyncingAntigravityUpstream || !account?.id"
-              class="rounded-lg border border-emerald-200 px-3 py-1.5 text-sm text-emerald-600 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
+              class="rounded-lg border border-green-200 px-3 py-1.5 text-sm text-green-600 hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/30"
             >
               {{ isSyncingAntigravityUpstream ? t('admin.accounts.syncUpstreamModelsLoading') : t('admin.accounts.syncUpstreamModels') }}
             </button>
@@ -2033,7 +2033,7 @@
         </div>
         <div
           v-else
-          class="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-300"
+          class="rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300"
           data-testid="openai-responses-mode-not-applicable"
         >
           {{ t('admin.accounts.openai.responsesModeTextDisabledHint') }}
@@ -2132,7 +2132,7 @@
           <span
             class="whitespace-nowrap rounded px-2 py-1 text-xs font-medium"
             :class="opencodeGoStatusOk
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
               : 'bg-gray-100 text-gray-600 dark:bg-dark-700 dark:text-gray-300'"
           >
             {{ opencodeGoStatusLabel }}
@@ -2162,7 +2162,7 @@
             </div>
             <p
               v-if="opencodeGoSnapshot.last_error"
-              class="mt-2 break-words border-t border-gray-100 pt-2 text-xs text-amber-700 dark:border-dark-700 dark:text-amber-300"
+              class="mt-2 break-words border-t border-gray-100 pt-2 text-xs text-yellow-700 dark:border-dark-700 dark:text-yellow-300"
             >
               {{ t(`admin.accounts.opencodeGo.errors.${opencodeGoSnapshot.last_error}`, opencodeGoSnapshot.last_error) }}
             </p>
@@ -2761,7 +2761,7 @@
             <div>
               <label class="input-label">{{ t('admin.accounts.quotaControl.windowCost.limit') }}</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">¥</span>
                 <input
                   v-model.number="windowCostLimit"
                   type="number"
@@ -2776,7 +2776,7 @@
             <div>
               <label class="input-label">{{ t('admin.accounts.quotaControl.windowCost.stickyReserve') }}</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">¥</span>
                 <input
                   v-model.number="windowCostStickyReserve"
                   type="number"
@@ -3940,15 +3940,15 @@ const codexImageToolOptions = computed<Array<{
     value: 'enabled',
     label: t('admin.accounts.openai.codexImageToolEnabled'),
     description: t('admin.accounts.openai.codexImageToolEnabledDesc'),
-    selectedCardClass: 'border-emerald-300 bg-emerald-50 text-emerald-900 shadow-sm ring-1 ring-emerald-200 dark:border-emerald-700 dark:bg-emerald-900/25 dark:text-emerald-100 dark:ring-emerald-800',
-    selectedDotClass: 'border-emerald-500 bg-emerald-500 text-white'
+    selectedCardClass: 'border-green-300 bg-green-50 text-green-900 shadow-sm ring-1 ring-green-200 dark:border-green-700 dark:bg-green-900/25 dark:text-green-100 dark:ring-green-800',
+    selectedDotClass: 'border-green-500 bg-green-500 text-white'
   },
   {
     value: 'disabled',
     label: t('admin.accounts.openai.codexImageToolDisabled'),
     description: t('admin.accounts.openai.codexImageToolDisabledDesc'),
-    selectedCardClass: 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm ring-1 ring-amber-200 dark:border-amber-700 dark:bg-amber-900/25 dark:text-amber-100 dark:ring-amber-800',
-    selectedDotClass: 'border-amber-500 bg-amber-500 text-white'
+    selectedCardClass: 'border-yellow-300 bg-yellow-50 text-yellow-900 shadow-sm ring-1 ring-yellow-200 dark:border-yellow-700 dark:bg-yellow-900/25 dark:text-yellow-100 dark:ring-yellow-800',
+    selectedDotClass: 'border-yellow-500 bg-yellow-500 text-white'
   },
   {
     value: 'block',
@@ -3973,9 +3973,9 @@ const codexImageToolBadgeLabel = computed(() => {
 const codexImageToolBadgeClass = computed(() => {
   switch (codexImageToolMode.value) {
     case 'enabled':
-      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+      return 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
     case 'disabled':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'
     case 'block':
       return 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
     default:

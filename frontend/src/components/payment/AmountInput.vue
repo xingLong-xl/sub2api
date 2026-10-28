@@ -11,12 +11,12 @@
           :key="amt"
           type="button"
           :class="[
-            'relative rounded-lg border-2 px-3 py-3 text-center font-medium transition-colors',
+            'relative rounded-lg border-2 px-3 py-3 text-center font-medium transition-all',
             modelValue === amt
-              ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-300'
+              ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm ring-2 ring-primary-500/15 dark:border-primary-400 dark:bg-primary-500/15 dark:text-primary-300'
               : quoteFor(amt).percent > 0
-                ? 'border-red-200 bg-white text-gray-700 hover:border-red-300 dark:border-red-500/40 dark:bg-dark-800 dark:text-gray-200 dark:hover:border-red-400/60'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 dark:border-dark-600 dark:bg-dark-800 dark:text-gray-200 dark:hover:border-dark-500',
+                ? 'border-orange-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50/60 dark:border-orange-500/30 dark:bg-dark-800 dark:text-gray-200 dark:hover:border-orange-400/50 dark:hover:bg-orange-500/5'
+                : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50/40 dark:border-dark-600 dark:bg-dark-800 dark:text-gray-200 dark:hover:border-primary-500/40 dark:hover:bg-primary-500/5',
           ]"
           :data-testid="`quick-amount-${amt}`"
           @click="selectAmount(amt)"
@@ -28,7 +28,7 @@
             data-testid="quick-amount-bonus-badge"
           >
             <span
-              class="relative flex items-center gap-1 whitespace-nowrap rounded bg-red-600 py-0.5 pl-1.5 pr-1 text-[11px] font-extrabold leading-tight tracking-tight text-white shadow-md ring-2 ring-white before:pointer-events-none before:absolute before:inset-[2px] before:rounded-sm before:border before:border-dotted before:border-white/70 dark:bg-red-500 dark:ring-dark-800"
+              class="relative flex items-center gap-1 whitespace-nowrap rounded bg-gradient-to-r from-orange-500 to-amber-500 py-0.5 pl-1.5 pr-1 text-[11px] font-extrabold leading-tight tracking-tight text-white shadow-md ring-2 ring-white before:pointer-events-none before:absolute before:inset-[2px] before:rounded-sm before:border before:border-dotted before:border-white/70 dark:ring-dark-800"
             >
               <span>{{ badgeText(amt) }}</span>
               <span class="h-1 w-1 shrink-0 rounded-full bg-white"></span>
@@ -40,7 +40,7 @@
             v-if="showSecondLine"
             :class="[
               'mt-0.5 block text-[11px] font-normal leading-tight',
-              quoteFor(amt).percent > 0 ? 'text-red-600 dark:text-red-300' : 'text-gray-400 dark:text-gray-500',
+              quoteFor(amt).percent > 0 ? 'text-orange-600 dark:text-orange-300' : 'text-gray-400 dark:text-gray-500',
             ]"
             data-testid="quick-amount-credited"
           >{{ secondLine(amt) }}</span>
@@ -55,7 +55,7 @@
       </label>
       <div class="relative">
         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500">
-          $
+          ¥
         </span>
         <input
           type="text"
@@ -143,7 +143,7 @@ function secondLine(amt: number): string {
   if (props.bonusMode === 'discount') {
     return t('payment.rechargeBonus.payShort', { amount: formatPaymentAmount(quote.payBase, props.currency) })
   }
-  return t('payment.rechargeBonus.creditedShort', { amount: '$' + quote.credited.toFixed(2) })
+  return t('payment.rechargeBonus.creditedShort', { amount: '¥' + quote.credited.toFixed(2) })
 }
 
 const placeholderText = computed(() => {

@@ -323,7 +323,7 @@
                 <li>{{ t('admin.backup.r2Guide.step2.line3') }}</li>
                 <li>{{ t('admin.backup.r2Guide.step2.line4') }}</li>
               </ol>
-              <div class="mt-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+              <div class="mt-2 rounded-lg bg-yellow-50 p-3 text-xs text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300">
                 {{ t('admin.backup.r2Guide.step2.warning') }}
               </div>
             </div>

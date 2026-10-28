@@ -19,6 +19,9 @@ var validSlugPattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]*$`)
 
 const maxPageFileSize = 1 << 20 // 1MB
 
+// docsPageSlug is the reserved, publicly readable documentation page.
+const docsPageSlug = "docs"
+
 type PageHandler struct {
 	pagesDir       string
 	settingService *service.SettingService
@@ -46,6 +49,17 @@ func (h *PageHandler) GetPageContent(c *gin.Context) {
 		return
 	}
 
+	h.servePageMarkdown(c, slug)
+}
+
+// GetDocsContent serves the public site documentation page.
+// GET /api/v1/docs
+func (h *PageHandler) GetDocsContent(c *gin.Context) {
+	h.servePageMarkdown(c, docsPageSlug)
+}
+
+// servePageMarkdown writes data/pages/{slug}.md as text/markdown.
+func (h *PageHandler) servePageMarkdown(c *gin.Context, slug string) {
 	filePath := filepath.Join(h.pagesDir, slug+".md")
 	cleaned := filepath.Clean(filePath)
 	if !strings.HasPrefix(cleaned, filepath.Clean(h.pagesDir)) {
@@ -260,6 +274,9 @@ func (h *PageHandler) checkImageSlugVisibility(c *gin.Context, slug string) bool
 // RegisterPageRoutes registers page routes on a router group.
 func RegisterPageRoutes(v1 *gin.RouterGroup, dataDir string, jwtAuth gin.HandlerFunc, adminAuth gin.HandlerFunc, settingService *service.SettingService) {
 	h := NewPageHandler(dataDir, settingService)
+
+	// Public documentation page (no JWT, not gated by custom_menu_items)
+	v1.GET("/docs", h.GetDocsContent)
 
 	// Authenticated page content (JWT required + visibility check)
 	pages := v1.Group("/pages")

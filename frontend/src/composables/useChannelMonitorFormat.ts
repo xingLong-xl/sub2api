@@ -56,9 +56,9 @@ export function useChannelMonitorFormat() {
   function statusBadgeClass(s: MonitorStatus | ''): string {
     switch (s) {
       case STATUS_OPERATIONAL:
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+        return 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300'
       case STATUS_DEGRADED:
-        return 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'
+        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-300'
       case STATUS_FAILED:
         return 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300'
       case STATUS_ERROR:
@@ -99,7 +99,7 @@ export function useChannelMonitorFormat() {
   function providerBadgeClass(p: Provider | string): string {
     switch (p) {
       case PROVIDER_OPENAI:
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+        return 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300'
       case PROVIDER_ANTHROPIC:
         return 'bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300'
       case PROVIDER_GEMINI:
@@ -115,11 +115,11 @@ export function useChannelMonitorFormat() {
       case PROVIDER_ZHIPU:
         return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'
       case PROVIDER_DEEPSEEK:
-        return 'bg-teal-100 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300'
+        return 'bg-primary-100 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300'
       case PROVIDER_MINIMAX:
         return 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'
       case PROVIDER_OPENCODE_GO:
-        return 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300'
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300'
       default:
         return NEUTRAL_BADGE
     }
@@ -150,8 +150,8 @@ export function useChannelMonitorFormat() {
     switch (p) {
       case PROVIDER_OPENAI:
         return active
-          ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-400'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-emerald-300 hover:text-emerald-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-emerald-500/50'
+          ? 'border-green-500 bg-green-50 text-green-700 dark:bg-green-500/15 dark:text-green-300 dark:border-green-400'
+          : 'border-gray-200 bg-white text-gray-600 hover:border-green-300 hover:text-green-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-green-500/50'
       case PROVIDER_ANTHROPIC:
         return active
           ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-400'
@@ -178,16 +178,16 @@ export function useChannelMonitorFormat() {
           : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:text-indigo-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-indigo-500/50'
       case PROVIDER_DEEPSEEK:
         return active
-          ? 'border-teal-500 bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300 dark:border-teal-400'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-teal-300 hover:text-teal-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-teal-500/50'
+          ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300 dark:border-primary-400'
+          : 'border-gray-200 bg-white text-gray-600 hover:border-primary-300 hover:text-primary-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-primary-500/50'
       case PROVIDER_MINIMAX:
         return active
           ? 'border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-400'
           : 'border-gray-200 bg-white text-gray-600 hover:border-rose-300 hover:text-rose-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-rose-500/50'
       case PROVIDER_OPENCODE_GO:
         return active
-          ? 'border-amber-500 bg-amber-50 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-400'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-amber-300 hover:text-amber-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-amber-500/50'
+          ? 'border-yellow-500 bg-yellow-50 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300 dark:border-yellow-400'
+          : 'border-gray-200 bg-white text-gray-600 hover:border-yellow-300 hover:text-yellow-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-yellow-500/50'
       default:
         return active
           ? 'border-gray-400 bg-gray-50 text-gray-700 dark:border-dark-500 dark:bg-dark-700 dark:text-gray-200'
@@ -257,9 +257,9 @@ export function hslForPct(pct: number | null | undefined): string | undefined {
 export function providerGradient(provider: string): string {
   switch (provider) {
     case PROVIDER_OPENAI:
-      return 'bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-500/10 dark:to-emerald-500/20'
+      return 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-500/10 dark:to-green-500/20'
     case PROVIDER_ANTHROPIC:
-      return 'bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-500/10 dark:to-amber-500/20'
+      return 'bg-gradient-to-br from-orange-50 to-yellow-100 dark:from-orange-500/10 dark:to-yellow-500/20'
     case PROVIDER_GEMINI:
       return 'bg-gradient-to-br from-sky-50 to-indigo-100 dark:from-sky-500/10 dark:to-indigo-500/20'
     case PROVIDER_GROK:
@@ -271,11 +271,11 @@ export function providerGradient(provider: string): string {
     case PROVIDER_ZHIPU:
       return 'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-500/10 dark:to-indigo-500/20'
     case PROVIDER_DEEPSEEK:
-      return 'bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-500/10 dark:to-teal-500/20'
+      return 'bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-500/10 dark:to-primary-500/20'
     case PROVIDER_MINIMAX:
       return 'bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-500/10 dark:to-rose-500/20'
     case PROVIDER_OPENCODE_GO:
-      return 'bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-500/10 dark:to-amber-500/20'
+      return 'bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-500/10 dark:to-yellow-500/20'
     default:
       return 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-dark-700 dark:to-dark-600'
   }

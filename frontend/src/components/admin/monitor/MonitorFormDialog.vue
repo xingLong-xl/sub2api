@@ -67,13 +67,13 @@
           />
         </div>
         <p class="mt-1 text-xs text-gray-400">{{ t('admin.channelMonitor.form.linkedAccountHint') }}</p>
-        <p v-if="form.provider === PROVIDER_OPENAI" class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+        <p v-if="form.provider === PROVIDER_OPENAI" class="mt-1 text-xs text-yellow-600 dark:text-yellow-400">
           {{ t('admin.channelMonitor.form.openAIQuotaProbeHint') }}
         </p>
-        <p v-if="accountHydrationFailed" class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+        <p v-if="accountHydrationFailed" class="mt-1 text-xs text-yellow-600 dark:text-yellow-400">
           {{ t('admin.channelMonitor.form.linkedAccountMissing') }}
         </p>
-        <p v-if="accountOptions.length === 0 && !accountsLoading && !accountSearchQuery" class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+        <p v-if="accountOptions.length === 0 && !accountsLoading && !accountSearchQuery" class="mt-1 text-xs text-yellow-600 dark:text-yellow-400">
           {{ t('admin.channelMonitor.form.linkedAccountEmpty') }}
         </p>
       </div>

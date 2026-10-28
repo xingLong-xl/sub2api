@@ -65,7 +65,7 @@
       <button
         type="button"
         data-testid="codex-credits"
-        class="inline-flex max-w-full items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
+        class="inline-flex max-w-full items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium text-green-700 transition-colors hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50 dark:text-green-400 dark:hover:bg-green-900/30"
         :disabled="loading || resetting"
         :title="creditsButtonTitle"
         @click="handleQuery()"
@@ -76,7 +76,7 @@
       <OpenAIReferralCell :account="account" />
     </div>
 
-    <div v-if="creditsCacheWarning" class="text-[10px] text-amber-600 dark:text-amber-400">
+    <div v-if="creditsCacheWarning" class="text-[10px] text-yellow-600 dark:text-yellow-400">
       {{ t('admin.accounts.openaiQuotaReset.pointsCachePersistFailed') }}
     </div>
 
@@ -156,13 +156,13 @@
     </div>
     <div
       v-else-if="resetWarning"
-      class="text-[10px] text-amber-600 dark:text-amber-400"
+      class="text-[10px] text-yellow-600 dark:text-yellow-400"
     >
       {{ resetWarning }}
     </div>
     <div
       v-else-if="resetMessage"
-      class="text-[10px] text-emerald-600 dark:text-emerald-400"
+      class="text-[10px] text-green-600 dark:text-green-400"
     >
       {{ resetMessage }}
     </div>
@@ -273,7 +273,7 @@ const autoResetStateClass = computed(() => {
     case 'available':
       return 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
     case 'success':
-      return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+      return 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
     case 'no_credit':
     case 'failed':
       return 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'

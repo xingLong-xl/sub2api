@@ -20,7 +20,7 @@
         </span>
         <div v-if="row.amount !== row.pay_amount || (row.bonus_amount ?? 0) > 0" class="text-xs text-gray-500">
           {{ t('payment.orders.creditedAmount') }}: {{ creditedAmountSymbol }}{{ row.amount.toFixed(2) }}
-          <span v-if="(row.bonus_amount ?? 0) > 0" class="ml-1 text-amber-600 dark:text-amber-400">
+          <span v-if="(row.bonus_amount ?? 0) > 0" class="ml-1 text-yellow-600 dark:text-yellow-400">
             ({{ t('payment.orders.bonusIncluded', { amount: creditedAmountSymbol + (row.bonus_amount ?? 0).toFixed(2) }) }})
           </span>
         </div>
@@ -60,7 +60,7 @@ const props = defineProps<{
 
 function formatDate(dateStr: string) { return new Date(dateStr).toLocaleString() }
 
-const creditedAmountSymbol = currencySymbol('USD')
+const creditedAmountSymbol = currencySymbol('CNY')
 
 function paymentAmountSymbol(order: PaymentOrder): string {
   return currencySymbol(order.currency)

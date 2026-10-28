@@ -18,7 +18,7 @@
           'font-medium',
           isUrgent
             ? 'text-red-600 dark:text-red-400 animate-pulse'
-            : 'text-amber-600 dark:text-amber-400'
+            : 'text-yellow-600 dark:text-yellow-400'
         ]"
       >
         {{ t('admin.accounts.gemini.rateLimit.limited', { time: resetCountdown }) }}

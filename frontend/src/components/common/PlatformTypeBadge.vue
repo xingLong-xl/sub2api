@@ -180,7 +180,7 @@ const platformClass = computed(() => {
     return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
   }
   if (props.platform === 'openai') {
-    return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+    return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400'
   }
   if (props.platform === 'antigravity') {
     return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
@@ -195,7 +195,7 @@ const platformClass = computed(() => {
     return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
   }
   if (props.platform === 'deepseek') {
-    return 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400'
+    return 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
   }
   if (props.platform === 'minimax') {
     return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
@@ -208,7 +208,7 @@ const typeClass = computed(() => {
     return 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'
   }
   if (props.platform === 'openai') {
-    return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
+    return 'bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-400'
   }
   if (props.platform === 'antigravity') {
     return 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
@@ -223,7 +223,7 @@ const typeClass = computed(() => {
     return 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
   }
   if (props.platform === 'deepseek') {
-    return 'bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400'
+    return 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
   }
   if (props.platform === 'minimax') {
     return 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'
@@ -253,7 +253,7 @@ const planBadgeClass = computed(() => {
       return 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300'
     }
     // Any other non-free Grok plan (future tiers) → amber so it still stands out
-    return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+    return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
   }
   // OpenAI / other paid plan labels: keep readable distinction from free gray
   if (normalizedPlanType.value === 'plus') {

@@ -103,7 +103,7 @@
           <div
             v-if="codexAuthMode === 'api-key'"
             data-testid="codex-api-key-restart-notice"
-            class="mt-3 flex items-start gap-2 border-l-2 border-amber-400 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-200"
+            class="mt-3 flex items-start gap-2 border-l-2 border-yellow-400 bg-yellow-50 px-3 py-2 text-xs leading-5 text-yellow-800 dark:border-yellow-500 dark:bg-yellow-950/30 dark:text-yellow-200"
           >
             <Icon name="exclamationCircle" size="sm" class="mt-0.5 flex-shrink-0" />
             <p>{{ t('keys.useKeyModal.openai.authModeApiKeyRestartNotice') }}</p>
@@ -141,7 +141,7 @@
             class="relative"
           >
             <!-- File Hint (if exists) -->
-            <p v-if="file.hint" class="text-xs text-amber-600 dark:text-amber-400 mb-1.5 flex items-center gap-1">
+            <p v-if="file.hint" class="text-xs text-yellow-600 dark:text-yellow-400 mb-1.5 flex items-center gap-1">
               <Icon name="exclamationCircle" size="sm" class="flex-shrink-0" />
               {{ file.hint }}
             </p>
@@ -197,7 +197,7 @@
                 <option value="remote" :disabled="codexModelCatalogOversized">{{ t('keys.useKeyModal.codexModelCatalog.remote') }}</option>
                 <option value="file">{{ t('keys.useKeyModal.codexModelCatalog.local') }}</option>
               </select>
-              <p v-if="codexModelCatalogOversized" class="mt-2 text-xs text-amber-700 dark:text-amber-300">
+              <p v-if="codexModelCatalogOversized" class="mt-2 text-xs text-yellow-700 dark:text-yellow-300">
                 {{ t('keys.useKeyModal.codexModelCatalog.oversized') }}
               </p>
             </div>
@@ -231,7 +231,7 @@
           </div>
           <p
             v-if="codexModelManifestState === 'ready'"
-            class="border-t border-gray-200 px-4 py-2 text-xs text-emerald-700 dark:border-dark-700 dark:text-emerald-300"
+            class="border-t border-gray-200 px-4 py-2 text-xs text-green-700 dark:border-dark-700 dark:text-green-300"
           >
             {{ t('keys.useKeyModal.codexModelCatalog.modelsCount', { count: codexModelManifestModelCount }) }}
           </p>
@@ -727,10 +727,10 @@ const escapeHtml = (value: string) => value
 const wrapToken = (className: string, value: string) =>
   `<span class="${className}">${escapeHtml(value)}</span>`
 
-const keyword = (value: string) => wrapToken('text-emerald-300', value)
+const keyword = (value: string) => wrapToken('text-green-300', value)
 const variable = (value: string) => wrapToken('text-sky-200', value)
 const operator = (value: string) => wrapToken('text-slate-400', value)
-const string = (value: string) => wrapToken('text-amber-200', value)
+const string = (value: string) => wrapToken('text-yellow-200', value)
 const comment = (value: string) => wrapToken('text-slate-500', value)
 
 // Syntax highlighting helpers

@@ -62,7 +62,7 @@ const chartColors = computed(() => ({
   text: isDarkMode.value ? '#e5e7eb' : '#374151',
   grid: isDarkMode.value ? '#374151' : '#e5e7eb',
   input: '#3b82f6',
-  output: '#10b981',
+  output: '#0ea5e9',
   cacheCreation: '#f59e0b',
   cacheRead: '#06b6d4',
   cacheHitRate: '#8b5cf6'
@@ -155,7 +155,7 @@ const lineOptions = computed(() => ({
           const dataIndex = tooltipItems[0]?.dataIndex
           if (dataIndex !== undefined && props.trendData[dataIndex]) {
             const data = props.trendData[dataIndex]
-            return `Actual: $${formatCost(data.actual_cost)} | Standard: $${formatCost(data.cost)}`
+            return `Actual: ¥${formatCost(data.actual_cost)} | Standard: ¥${formatCost(data.cost)}`
           }
           return ''
         }

@@ -62,10 +62,10 @@
               <!-- Unlimited subscription badge -->
               <div
                 v-if="isUnlimited(subscription)"
-                class="flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 px-2.5 py-1.5 dark:from-emerald-900/20 dark:to-teal-900/20"
+                class="flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary-50 to-primary-100 px-2.5 py-1.5 dark:from-primary-900/20 dark:to-primary-900/20"
               >
-                <span class="text-lg text-emerald-600 dark:text-emerald-400">∞</span>
-                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span class="text-lg text-green-600 dark:text-green-400">∞</span>
+                <span class="text-xs font-medium text-green-700 dark:text-green-300">
                   {{ t('subscriptionProgress.unlimited') }}
                 </span>
               </div>
@@ -233,7 +233,7 @@ function isUnlimited(sub: UserSubscription): boolean {
 function getProgressDotClass(sub: UserSubscription): string {
   // Unlimited subscriptions get a special color
   if (isUnlimited(sub)) {
-    return 'bg-emerald-500'
+    return 'bg-green-500'
   }
   const maxPercentage = getMaxUsagePercentage(sub)
   if (maxPercentage >= 90) return 'bg-red-500'
@@ -258,7 +258,7 @@ function getProgressWidth(used: number | undefined, limit: number | null | undef
 function formatUsage(used: number | undefined, limit: number | null | undefined): string {
   const usedValue = (used || 0).toFixed(2)
   const limitValue = limit?.toFixed(2) || '∞'
-  return `$${usedValue}/$${limitValue}`
+  return `¥${usedValue}/¥${limitValue}`
 }
 
 function formatDaysRemaining(expiresAt: string): string {

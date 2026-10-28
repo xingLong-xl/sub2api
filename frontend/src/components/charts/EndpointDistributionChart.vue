@@ -107,10 +107,10 @@
                   {{ formatTokens(item.total_tokens) }}
                 </td>
                 <td class="py-1.5 text-right text-green-600 dark:text-green-400">
-                  ${{ formatCost(item.actual_cost) }}
+                  ¥{{ formatCost(item.actual_cost) }}
                 </td>
                 <td class="py-1.5 text-right text-gray-400 dark:text-gray-500">
-                  ${{ formatCost(item.cost) }}
+                  ¥{{ formatCost(item.cost) }}
                 </td>
               </tr>
               <tr v-if="expandedKey === item.endpoint">
@@ -213,12 +213,12 @@ const toggleBreakdown = async (endpoint: string) => {
 
 const chartColors = [
   '#3b82f6',
-  '#10b981',
+  '#0ea5e9',
   '#f59e0b',
   '#ef4444',
   '#8b5cf6',
   '#ec4899',
-  '#14b8a6',
+  '#a78bfa',
   '#f97316',
   '#6366f1',
   '#84cc16',
@@ -269,7 +269,7 @@ const doughnutOptions = computed(() => ({
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
           const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
           const formattedValue = props.metric === 'actual_cost'
-            ? `$${formatCost(value)}`
+            ? `¥${formatCost(value)}`
             : formatTokens(value)
           return `${context.label}: ${formattedValue} (${percentage}%)`
         }

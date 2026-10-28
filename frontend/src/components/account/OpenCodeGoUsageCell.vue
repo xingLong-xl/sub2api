@@ -32,7 +32,7 @@
       v-if="snapshot && snapshot.status !== 'ok'"
       class="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium"
       :class="snapshot.status === 'unauthorized'
-        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+        ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'
         : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'"
       data-testid="opencode-go-status-badge"
     >

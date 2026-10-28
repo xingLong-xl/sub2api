@@ -80,10 +80,10 @@
       >
         {{ t('admin.accounts.claudeResetCredits.notUsableNow') }}
       </span>
-      <span v-if="!status.eligible" class="text-[10px] text-amber-600 dark:text-amber-400">
+      <span v-if="!status.eligible" class="text-[10px] text-yellow-600 dark:text-yellow-400">
         {{ t('admin.accounts.claudeResetCredits.ineligible') }}
       </span>
-      <span v-if="cooldownActive" data-testid="claude-reset-cooldown" class="text-[10px] text-amber-600 dark:text-amber-400">
+      <span v-if="cooldownActive" data-testid="claude-reset-cooldown" class="text-[10px] text-yellow-600 dark:text-yellow-400">
         {{ t('admin.accounts.claudeResetCredits.cooldown', { time: formatTime(status.cooldown_until!, 'short') }) }}
       </span>
     </div>
@@ -232,8 +232,8 @@ const confirmMessage = computed(() => {
 
 const feedbackClass = computed(() => {
   switch (redeemFeedback.value?.kind) {
-    case 'success': return 'text-emerald-600 dark:text-emerald-400'
-    case 'warning': return 'text-amber-600 dark:text-amber-400'
+    case 'success': return 'text-green-600 dark:text-green-400'
+    case 'warning': return 'text-yellow-600 dark:text-yellow-400'
     default: return 'text-red-600 dark:text-red-400'
   }
 })

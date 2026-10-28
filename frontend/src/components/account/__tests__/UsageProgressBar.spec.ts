@@ -175,14 +175,14 @@ describe('UsageProgressBar', () => {
 
     // 条形配色：74 绿 / 75 与 89 黄 / 90 红
     expect(mountAt(74).get('.h-1\\.5 > div').classes()).toContain('bg-green-500')
-    expect(mountAt(75).get('.h-1\\.5 > div').classes()).toContain('bg-amber-500')
-    expect(mountAt(89).get('.h-1\\.5 > div').classes()).toContain('bg-amber-500')
+    expect(mountAt(75).get('.h-1\\.5 > div').classes()).toContain('bg-yellow-500')
+    expect(mountAt(89).get('.h-1\\.5 > div').classes()).toContain('bg-yellow-500')
     expect(mountAt(90).get('.h-1\\.5 > div').classes()).toContain('bg-red-500')
 
     // 百分比文本同步分级
     expect(mountAt(74).get('.h-1\\.5 + span').classes()).toContain('text-gray-600')
-    expect(mountAt(75).get('.h-1\\.5 + span').classes()).toContain('text-amber-600')
-    expect(mountAt(89).get('.h-1\\.5 + span').classes()).toContain('text-amber-600')
+    expect(mountAt(75).get('.h-1\\.5 + span').classes()).toContain('text-yellow-600')
+    expect(mountAt(89).get('.h-1\\.5 + span').classes()).toContain('text-yellow-600')
     expect(mountAt(90).get('.h-1\\.5 + span').classes()).toContain('text-red-600')
   })
 

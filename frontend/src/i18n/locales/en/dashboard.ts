@@ -207,7 +207,7 @@ export default {
         claudeDescription: 'Configure Claude Code to send Messages API traffic through your Sub2API Grok group.',
         codexDescription: 'Configure Codex to send Responses API traffic through your Sub2API Grok group.',
         configTomlHint:
-          'Official path: ~/.grok/config.toml (or $GROK_HOME). Fill [endpoints] (models_base_url / models_list_url / xai_api_base_url / cli_chat_proxy_base_url), [auth] preferred_method=api_key, [models], [session], and [features] image/video overrides. Prefer env_key over api_key; every text model needs api_backend=responses. Back up before merge, then run grok inspect.',
+          'Official path: ~/.grok/config.toml (or ). Fill [endpoints] (models_base_url / models_list_url / xai_api_base_url / cli_chat_proxy_base_url), [auth] preferred_method=api_key, [models], [session], and [features] image/video overrides. Prefer env_key over api_key; every text model needs api_backend=responses. Back up before merge, then run grok inspect.',
         codexConfigTomlHint:
           'Official Codex: wire_api = "responses" only; prefer env_key over experimental_bearer_token; supports_websockets = false for non-OpenAI gateways (Sub2API can still accept client WS and bridge to HTTP/SSE). Back up ~/.codex/config.toml before merge.',
         note:
@@ -295,7 +295,7 @@ export default {
     reset: 'Reset',
     resetQuotaUsed: 'Reset used quota to 0',
     resetQuotaTitle: 'Confirm Reset Quota',
-    resetQuotaConfirmMessage: 'Are you sure you want to reset the used quota (${used}) for key "{name}" to 0? This action cannot be undone.',
+    resetQuotaConfirmMessage: 'Are you sure you want to reset the used quota (¥{used}) for key "{name}" to 0? This action cannot be undone.',
     quotaResetSuccess: 'Quota reset successfully',
     failedToResetQuota: 'Failed to reset quota',
     rateLimitColumn: 'Rate Limit',
@@ -699,7 +699,7 @@ export default {
       paidPrice: 'Your Price (Discounted)',
       officialPrice: 'Official Price',
       rate: 'Rate',
-      unitPerMillion: '$ / 1M tokens',
+      unitPerMillion: '¥ / 1M tokens',
       perUnitRequest: '/ request',
       perUnitImage: '/ image',
       perRequest: 'Per request',

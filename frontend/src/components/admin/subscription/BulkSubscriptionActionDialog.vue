@@ -68,7 +68,7 @@
           </p>
         </template>
 
-        <p v-else class="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+        <p v-else class="rounded-lg bg-yellow-50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">
           {{ t(`admin.subscriptions.bulk.${currentAction}Hint`) }}
         </p>
       </fieldset>

@@ -13,14 +13,14 @@
           {{ formatTokens }}
         </span>
         <span class="rounded bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800" :title="t('usage.accountBilled')">
-          A ${{ formatAccountCost }}
+          A ¥{{ formatAccountCost }}
         </span>
         <span
           v-if="windowStats?.user_cost != null"
           class="rounded bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
           :title="t('usage.userBilled')"
         >
-          U ${{ formatUserCost }}
+          U ¥{{ formatUserCost }}
         </span>
         <span
           v-if="estimatedTotalCost != null"
@@ -118,9 +118,9 @@ watch(
 const labelClass = computed(() => {
   const colors = {
     indigo: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
-    emerald: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+    emerald: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
     purple: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
-    amber: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+    amber: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'
   }
   return colors[props.color]
 })
@@ -139,14 +139,14 @@ const barClass = computed(() => {
     if (props.utilization <= 20) {
       return 'bg-red-500'
     } else if (props.utilization <= 50) {
-      return 'bg-amber-500'
+      return 'bg-yellow-500'
     }
     return 'bg-green-500'
   }
   if (props.utilization >= 90) {
     return 'bg-red-500'
   } else if (props.utilization >= 75) {
-    return 'bg-amber-500'
+    return 'bg-yellow-500'
   } else {
     return 'bg-green-500'
   }
@@ -158,14 +158,14 @@ const textClass = computed(() => {
     if (props.utilization <= 20) {
       return 'text-red-600 dark:text-red-400'
     } else if (props.utilization <= 50) {
-      return 'text-amber-600 dark:text-amber-400'
+      return 'text-yellow-600 dark:text-yellow-400'
     }
     return 'text-gray-600 dark:text-gray-400'
   }
   if (props.utilization >= 90) {
     return 'text-red-600 dark:text-red-400'
   } else if (props.utilization >= 75) {
-    return 'text-amber-600 dark:text-amber-400'
+    return 'text-yellow-600 dark:text-yellow-400'
   } else {
     return 'text-gray-600 dark:text-gray-400'
   }

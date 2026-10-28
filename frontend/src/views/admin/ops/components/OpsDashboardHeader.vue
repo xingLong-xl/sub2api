@@ -654,7 +654,7 @@ const cpuPercentClass = computed(() => {
   if (v == null) return 'text-gray-900 dark:text-white'
   if (v >= 95) return 'text-rose-600 dark:text-rose-400'
   if (v >= 80) return 'text-yellow-600 dark:text-yellow-400'
-  return 'text-emerald-600 dark:text-emerald-400'
+  return 'text-green-600 dark:text-green-400'
 })
 
 const memPercentValue = computed<number | null>(() => {
@@ -667,7 +667,7 @@ const memPercentClass = computed(() => {
   if (v == null) return 'text-gray-900 dark:text-white'
   if (v >= 95) return 'text-rose-600 dark:text-rose-400'
   if (v >= 85) return 'text-yellow-600 dark:text-yellow-400'
-  return 'text-emerald-600 dark:text-emerald-400'
+  return 'text-green-600 dark:text-green-400'
 })
 
 const dbConnActiveValue = computed<number | null>(() => {
@@ -712,9 +712,9 @@ const dbMiddleClass = computed(() => {
   if (dbUsagePercent.value != null) {
     if (dbUsagePercent.value >= 90) return 'text-rose-600 dark:text-rose-400'
     if (dbUsagePercent.value >= 70) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-emerald-600 dark:text-emerald-400'
+    return 'text-green-600 dark:text-green-400'
   }
-  if (systemMetrics.value?.db_ok === true) return 'text-emerald-600 dark:text-emerald-400'
+  if (systemMetrics.value?.db_ok === true) return 'text-green-600 dark:text-green-400'
   return 'text-gray-900 dark:text-white'
 })
 
@@ -755,9 +755,9 @@ const redisMiddleClass = computed(() => {
   if (redisUsagePercent.value != null) {
     if (redisUsagePercent.value >= 90) return 'text-rose-600 dark:text-rose-400'
     if (redisUsagePercent.value >= 70) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-emerald-600 dark:text-emerald-400'
+    return 'text-green-600 dark:text-green-400'
   }
-  if (systemMetrics.value?.redis_ok === true) return 'text-emerald-600 dark:text-emerald-400'
+  if (systemMetrics.value?.redis_ok === true) return 'text-green-600 dark:text-green-400'
   return 'text-gray-900 dark:text-white'
 })
 
@@ -793,7 +793,7 @@ const goroutineStatusLabel = computed(() => {
 const goroutineStatusClass = computed(() => {
   switch (goroutineStatus.value) {
     case 'ok':
-      return 'text-emerald-600 dark:text-emerald-400'
+      return 'text-green-600 dark:text-green-400'
     case 'warning':
       return 'text-yellow-600 dark:text-yellow-400'
     case 'critical':
@@ -838,7 +838,7 @@ const jobsStatusLabel = computed(() => {
 const jobsStatusClass = computed(() => {
   switch (jobsStatus.value) {
     case 'ok':
-      return 'text-emerald-600 dark:text-emerald-400'
+      return 'text-green-600 dark:text-green-400'
     case 'warn':
       return 'text-yellow-600 dark:text-yellow-400'
     default:

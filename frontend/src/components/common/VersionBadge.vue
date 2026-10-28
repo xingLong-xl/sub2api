@@ -7,7 +7,7 @@
         class="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs transition-colors"
         :class="[
           hasUpdate
-            ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
+            ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50'
             : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-800 dark:text-dark-400 dark:hover:bg-dark-700'
         ]"
         :title="hasUpdate ? t('version.updateAvailable') : t('version.upToDate')"
@@ -20,9 +20,9 @@
         <!-- Update indicator -->
         <span v-if="hasUpdate" class="relative flex h-2 w-2">
           <span
-            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-75"
           ></span>
-          <span class="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
         </span>
       </button>
 
@@ -238,28 +238,28 @@
                   :href="releaseInfo.html_url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="group flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 transition-colors hover:bg-amber-100 dark:border-amber-800/50 dark:bg-amber-900/20 dark:hover:bg-amber-900/30"
+                  class="group flex items-center gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 transition-colors hover:bg-yellow-100 dark:border-yellow-800/50 dark:bg-yellow-900/20 dark:hover:bg-yellow-900/30"
                 >
                   <div
-                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50"
+                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50"
                   >
                     <Icon
                       name="download"
                       size="sm"
                       :stroke-width="2"
-                      class="text-amber-600 dark:text-amber-400"
+                      class="text-yellow-600 dark:text-yellow-400"
                     />
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-sm font-medium text-amber-700 dark:text-amber-300">
+                    <p class="text-sm font-medium text-yellow-700 dark:text-yellow-300">
                       {{ t('version.updateAvailable') }}
                     </p>
-                    <p class="text-xs text-amber-600/70 dark:text-amber-400/70">
+                    <p class="text-xs text-yellow-600/70 dark:text-yellow-400/70">
                       v{{ latestVersion }}
                     </p>
                   </div>
                   <svg
-                    class="h-4 w-4 text-amber-500 transition-transform group-hover:translate-x-0.5 dark:text-amber-400"
+                    class="h-4 w-4 text-yellow-500 transition-transform group-hover:translate-x-0.5 dark:text-yellow-400"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -295,23 +295,23 @@
               <div v-else-if="hasUpdate && isReleaseBuild" class="space-y-2">
                 <!-- Update info card -->
                 <div
-                  class="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800/50 dark:bg-amber-900/20"
+                  class="flex items-center gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800/50 dark:bg-yellow-900/20"
                 >
                 <div
-                  class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50"
+                  class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50"
                 >
                   <Icon
                     name="download"
                     size="sm"
                     :stroke-width="2"
-                    class="text-amber-600 dark:text-amber-400"
+                    class="text-yellow-600 dark:text-yellow-400"
                   />
                 </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-sm font-medium text-amber-700 dark:text-amber-300">
+                    <p class="text-sm font-medium text-yellow-700 dark:text-yellow-300">
                       {{ t('version.updateAvailable') }}
                     </p>
-                    <p class="text-xs text-amber-600/70 dark:text-amber-400/70">
+                    <p class="text-xs text-yellow-600/70 dark:text-yellow-400/70">
                       v{{ latestVersion }}
                     </p>
                   </div>
@@ -481,7 +481,7 @@
                           class="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60"
                           :class="
                             selectedRollbackVersion === item.version
-                              ? 'border-amber-300 bg-amber-50 shadow-sm dark:border-amber-700 dark:bg-amber-900/20'
+                              ? 'border-yellow-300 bg-yellow-50 shadow-sm dark:border-yellow-700 dark:bg-yellow-900/20'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 dark:border-dark-700 dark:hover:border-dark-600 dark:hover:bg-dark-700/40'
                           "
                         >
@@ -490,20 +490,20 @@
                               class="flex h-3.5 w-3.5 items-center justify-center rounded-full border transition-colors"
                               :class="
                                 selectedRollbackVersion === item.version
-                                  ? 'border-amber-500'
+                                  ? 'border-yellow-500'
                                   : 'border-gray-300 dark:border-dark-500'
                               "
                             >
                               <span
                                 v-if="selectedRollbackVersion === item.version"
-                                class="h-1.5 w-1.5 rounded-full bg-amber-500"
+                                class="h-1.5 w-1.5 rounded-full bg-yellow-500"
                               ></span>
                             </span>
                             <span
                               class="text-sm font-semibold"
                               :class="
                                 selectedRollbackVersion === item.version
-                                  ? 'text-amber-700 dark:text-amber-300'
+                                  ? 'text-yellow-700 dark:text-yellow-300'
                                   : 'text-gray-700 dark:text-dark-200'
                               "
                               >v{{ item.version }}</span
@@ -565,7 +565,7 @@
                             </div>
 
                             <p
-                              class="flex items-start gap-1.5 px-0.5 text-[11px] leading-4 text-amber-600 dark:text-amber-400"
+                              class="flex items-start gap-1.5 px-0.5 text-[11px] leading-4 text-yellow-600 dark:text-yellow-400"
                             >
                               <Icon
                                 name="exclamationTriangle"
@@ -586,7 +586,7 @@
                             <button
                               @click="handleRollback"
                               :disabled="rollingBack"
-                              class="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+                              class="flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-yellow-600 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               <svg
                                 v-if="rollingBack"

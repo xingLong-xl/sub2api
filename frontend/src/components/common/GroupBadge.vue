@@ -145,7 +145,7 @@ const labelClass = computed(() => {
     }
     if (props.daysRemaining <= 7) {
       // 警告（<=7天）：橙色
-      return `${base} bg-amber-200/80 text-amber-800 dark:bg-amber-800/50 dark:text-amber-300`
+      return `${base} bg-yellow-200/80 text-yellow-800 dark:bg-yellow-800/50 dark:text-yellow-300`
     }
   }
 
@@ -154,7 +154,7 @@ const labelClass = computed(() => {
     return `${base} bg-orange-200/60 text-orange-800 dark:bg-orange-800/40 dark:text-orange-300`
   }
   if (props.platform === 'openai') {
-    return `${base} bg-emerald-200/60 text-emerald-800 dark:bg-emerald-800/40 dark:text-emerald-300`
+    return `${base} bg-green-200/60 text-green-800 dark:bg-green-800/40 dark:text-green-300`
   }
   if (props.platform === 'gemini') {
     return `${base} bg-blue-200/60 text-blue-800 dark:bg-blue-800/40 dark:text-blue-300`
@@ -172,7 +172,7 @@ const labelClass = computed(() => {
     return `${base} bg-indigo-200/60 text-indigo-800 dark:bg-indigo-800/40 dark:text-indigo-300`
   }
   if (props.platform === 'deepseek') {
-    return `${base} bg-teal-200/60 text-teal-800 dark:bg-teal-800/40 dark:text-teal-300`
+    return `${base} bg-primary-200/60 text-primary-800 dark:bg-primary-800/40 dark:text-primary-300`
   }
   if (props.platform === 'minimax') {
     return `${base} bg-rose-200/60 text-rose-800 dark:bg-rose-800/40 dark:text-rose-300`
@@ -184,7 +184,7 @@ const labelClass = computed(() => {
 })
 
 const peakRateClass = computed(() => {
-  return 'px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+  return 'px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
 })
 
 // Badge color based on platform and subscription type
@@ -193,11 +193,11 @@ const badgeClass = computed(() => {
     // Claude: orange theme
     return isSubscription.value
       ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-      : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+      : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400'
   } else if (props.platform === 'openai') {
     // OpenAI: green theme
     return isSubscription.value
-      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
       : 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
   }
   if (props.platform === 'gemini') {
@@ -227,8 +227,8 @@ const badgeClass = computed(() => {
   }
   if (props.platform === 'deepseek') {
     return isSubscription.value
-      ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400'
-      : 'bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400'
+      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
+      : 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
   }
   if (props.platform === 'minimax') {
     return isSubscription.value
@@ -243,6 +243,6 @@ const badgeClass = computed(() => {
   // Fallback: original colors
   return isSubscription.value
     ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
-    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+    : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
 })
 </script>

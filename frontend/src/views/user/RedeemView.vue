@@ -11,7 +11,7 @@
           </div>
           <p class="text-sm font-medium text-primary-100">{{ t('redeem.currentBalance') }}</p>
           <p class="mt-2 text-4xl font-bold text-white">
-            ${{ user?.balance?.toFixed(2) || '0.00' }}
+            ¥{{ user?.balance?.toFixed(2) || '0.00' }}
           </p>
           <p class="mt-2 text-sm text-primary-100">
             {{ t('redeem.concurrency') }}: {{ user?.concurrency || 0 }} {{ t('redeem.requests') }}
@@ -82,24 +82,24 @@
       <transition name="fade">
         <div
           v-if="redeemResult"
-          class="card border-emerald-200 bg-emerald-50 dark:border-emerald-800/50 dark:bg-emerald-900/20"
+          class="card border-green-200 bg-green-50 dark:border-green-800/50 dark:bg-green-900/20"
         >
           <div class="p-6">
             <div class="flex items-start gap-4">
               <div
-                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30"
+                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30"
               >
-                <Icon name="checkCircle" size="md" class="text-emerald-600 dark:text-emerald-400" />
+                <Icon name="checkCircle" size="md" class="text-green-600 dark:text-green-400" />
               </div>
               <div class="flex-1">
-                <h3 class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                <h3 class="text-sm font-semibold text-green-800 dark:text-green-300">
                   {{ t('redeem.redeemSuccess') }}
                 </h3>
-                <div class="mt-2 text-sm text-emerald-700 dark:text-emerald-400">
+                <div class="mt-2 text-sm text-green-700 dark:text-green-400">
                   <p>{{ redeemResult.message }}</p>
                   <div class="mt-3 space-y-1">
                     <p v-if="redeemResult.type === 'balance'" class="font-medium">
-                      {{ t('redeem.added') }}: ${{ redeemResult.value.toFixed(2) }}
+                      {{ t('redeem.added') }}: ¥{{ redeemResult.value.toFixed(2) }}
                     </p>
                     <p v-else-if="redeemResult.type === 'concurrency'" class="font-medium">
                       {{ t('redeem.added') }}: {{ redeemResult.value }}
@@ -116,7 +116,7 @@
                     </p>
                     <p v-if="redeemResult.new_balance !== undefined">
                       {{ t('redeem.newBalance') }}:
-                      <span class="font-semibold">${{ redeemResult.new_balance.toFixed(2) }}</span>
+                      <span class="font-semibold">¥{{ redeemResult.new_balance.toFixed(2) }}</span>
                     </p>
                     <p v-if="redeemResult.new_concurrency !== undefined">
                       {{ t('redeem.newConcurrency') }}:
@@ -238,7 +238,7 @@
                     'flex h-10 w-10 items-center justify-center rounded-xl',
                     isBalanceType(item.type)
                       ? item.value >= 0
-                        ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                        ? 'bg-green-100 dark:bg-green-900/30'
                         : 'bg-red-100 dark:bg-red-900/30'
                       : isSubscriptionType(item.type)
                         ? 'bg-purple-100 dark:bg-purple-900/30'
@@ -254,7 +254,7 @@
                     size="md"
                     :class="
                       item.value >= 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
+                        ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400'
                     "
                   />
@@ -292,7 +292,7 @@
                     'text-sm font-semibold',
                     isBalanceType(item.type)
                       ? item.value >= 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
+                        ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400'
                       : isSubscriptionType(item.type)
                         ? 'text-purple-600 dark:text-purple-400'
@@ -437,7 +437,7 @@ const getHistoryItemTitle = (item: RedeemHistoryItem) => {
 const formatHistoryValue = (item: RedeemHistoryItem) => {
   if (isBalanceType(item.type)) {
     const sign = item.value >= 0 ? '+' : ''
-    return `${sign}$${item.value.toFixed(2)}`
+    return `${sign}¥${item.value.toFixed(2)}`
   } else if (isSubscriptionType(item.type)) {
     // 订阅类型显示有效天数和分组名称
     const days = item.validity_days || Math.round(item.value)

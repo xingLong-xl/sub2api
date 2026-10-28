@@ -27,7 +27,7 @@
 
     <div
       v-if="!systemModeV2"
-      class="rounded-2xl border border-amber-200 bg-amber-50/90 px-4 py-3 text-sm text-amber-900 dark:border-amber-800/50 dark:bg-amber-900/20 dark:text-amber-100"
+      class="rounded-2xl border border-yellow-200 bg-yellow-50/90 px-4 py-3 text-sm text-yellow-900 dark:border-yellow-800/50 dark:bg-yellow-900/20 dark:text-yellow-100"
       role="status"
     >
       {{

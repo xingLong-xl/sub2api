@@ -21,7 +21,7 @@
       {{ t('admin.accounts.openaiReferral.invite') }}
     </button>
     <span v-if="error && !show" class="max-w-48 truncate text-[10px] text-red-600" :title="error">{{ error }}</span>
-    <span v-if="warning && !show" class="max-w-48 truncate text-[10px] text-amber-700 dark:text-amber-400" :title="warning">{{ warning }}</span>
+    <span v-if="warning && !show" class="max-w-48 truncate text-[10px] text-yellow-700 dark:text-yellow-400" :title="warning">{{ warning }}</span>
     <BaseDialog
       v-if="show"
       :show="show"
@@ -50,7 +50,7 @@
             <li v-for="(rule, index) in eligibility.rules" :key="index">{{ rule }}</li>
           </ul>
         </div>
-        <p v-if="fresh && (!eligibility?.should_show || count === null || count <= 0)" class="text-sm text-amber-700 dark:text-amber-400">
+        <p v-if="fresh && (!eligibility?.should_show || count === null || count <= 0)" class="text-sm text-yellow-700 dark:text-yellow-400">
           {{ t('admin.accounts.openaiReferral.unavailable') }}
         </p>
         <div>
@@ -73,10 +73,10 @@
           {{ t('admin.accounts.openaiReferral.consent') }}
         </label>
         <p v-if="error" role="alert" class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
-        <p v-if="sentEmail" role="status" class="text-sm text-emerald-700 dark:text-emerald-400">
+        <p v-if="sentEmail" role="status" class="text-sm text-green-700 dark:text-green-400">
           {{ t('admin.accounts.openaiReferral.sent', { email: sentEmail }) }}
         </p>
-        <p v-if="warning" role="status" class="text-sm text-amber-700 dark:text-amber-400">{{ warning }}</p>
+        <p v-if="warning" role="status" class="text-sm text-yellow-700 dark:text-yellow-400">{{ warning }}</p>
       </form>
       <template #footer>
         <button type="button" class="btn btn-secondary" :disabled="sending" @click="closeDialog">{{ t('common.close') }}</button>

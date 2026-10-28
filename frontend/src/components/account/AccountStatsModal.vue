@@ -46,15 +46,15 @@
         <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <!-- 30-Day Total Cost -->
           <div
-            class="card border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4 dark:border-emerald-800/30 dark:from-emerald-900/10 dark:to-dark-700"
+            class="card border-green-200 bg-gradient-to-br from-green-50 to-white p-4 dark:border-green-800/30 dark:from-green-900/10 dark:to-dark-700"
           >
             <div class="mb-2 flex items-center justify-between">
               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{
                 t('admin.accounts.stats.totalCost')
               }}</span>
-              <div class="rounded-lg bg-emerald-100 p-1.5 dark:bg-emerald-900/30">
+              <div class="rounded-lg bg-green-100 p-1.5 dark:bg-green-900/30">
                 <svg
-                  class="h-4 w-4 text-emerald-600 dark:text-emerald-400"
+                  class="h-4 w-4 text-green-600 dark:text-green-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -69,13 +69,13 @@
               </div>
             </div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
-              ${{ formatCost(stats.summary.total_cost) }}
+              ¥{{ formatCost(stats.summary.total_cost) }}
             </p>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               {{ t('admin.accounts.stats.accumulatedCost') }}
               <span class="text-gray-400 dark:text-gray-500">
-                ({{ t('usage.userBilled') }}: ${{ formatCost(stats.summary.total_user_cost) }} ·
-                {{ t('admin.accounts.stats.standardCost') }}: ${{
+                ({{ t('usage.userBilled') }}: ¥{{ formatCost(stats.summary.total_user_cost) }} ·
+                {{ t('admin.accounts.stats.standardCost') }}: ¥{{
                   formatCost(stats.summary.total_standard_cost)
                 }})
               </span>
@@ -104,23 +104,23 @@
 
           <!-- Daily Average Cost -->
           <div
-            class="card border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 dark:border-amber-800/30 dark:from-amber-900/10 dark:to-dark-700"
+            class="card border-yellow-200 bg-gradient-to-br from-yellow-50 to-white p-4 dark:border-yellow-800/30 dark:from-yellow-900/10 dark:to-dark-700"
           >
             <div class="mb-2 flex items-center justify-between">
               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{
                 t('admin.accounts.stats.avgDailyCost')
               }}</span>
-              <div class="rounded-lg bg-amber-100 p-1.5 dark:bg-amber-900/30">
+              <div class="rounded-lg bg-yellow-100 p-1.5 dark:bg-yellow-900/30">
                 <Icon
                   name="calculator"
                   size="sm"
-                  class="text-amber-600 dark:text-amber-400"
+                  class="text-yellow-600 dark:text-yellow-400"
                   :stroke-width="2"
                 />
               </div>
             </div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
-              ${{ formatCost(stats.summary.avg_daily_cost) }}
+              ¥{{ formatCost(stats.summary.avg_daily_cost) }}
             </p>
              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               {{
@@ -129,7 +129,7 @@
                 })
               }}
               <span class="text-gray-400 dark:text-gray-500">
-                ({{ t('usage.userBilled') }}: ${{ formatCost(stats.summary.avg_daily_user_cost) }})
+                ({{ t('usage.userBilled') }}: ¥{{ formatCost(stats.summary.avg_daily_user_cost) }})
               </span>
             </p>
           </div>
@@ -195,13 +195,13 @@
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.accountBilled') }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white"
-                  >${{ formatCost(stats.summary.today?.cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.today?.cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.userBilled') }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white"
-                  >${{ formatCost(stats.summary.today?.user_cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.today?.user_cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
@@ -250,13 +250,13 @@
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.accountBilled') }}</span>
                 <span class="text-sm font-semibold text-orange-600 dark:text-orange-400"
-                  >${{ formatCost(stats.summary.highest_cost_day?.cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.highest_cost_day?.cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.userBilled') }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white"
-                  >${{ formatCost(stats.summary.highest_cost_day?.user_cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.highest_cost_day?.user_cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
@@ -305,13 +305,13 @@
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.accountBilled') }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white"
-                  >${{ formatCost(stats.summary.highest_request_day?.cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.highest_request_day?.cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.userBilled') }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white"
-                  >${{ formatCost(stats.summary.highest_request_day?.user_cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.highest_request_day?.user_cost || 0) }}</span
                 >
               </div>
             </div>
@@ -323,8 +323,8 @@
           <!-- Accumulated Tokens -->
           <div class="card p-4">
             <div class="mb-3 flex items-center gap-2">
-              <div class="rounded-lg bg-teal-100 p-1.5 dark:bg-teal-900/30">
-                <Icon name="cube" size="sm" class="text-teal-600 dark:text-teal-400" :stroke-width="2" />
+              <div class="rounded-lg bg-primary-100 p-1.5 dark:bg-primary-900/30">
+                <Icon name="cube" size="sm" class="text-primary-600 dark:text-primary-400" :stroke-width="2" />
               </div>
               <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
                 t('admin.accounts.stats.accumulatedTokens')
@@ -415,13 +415,13 @@
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.accountBilled') }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white"
-                  >${{ formatCost(stats.summary.today?.cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.today?.cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.userBilled') }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white"
-                  >${{ formatCost(stats.summary.today?.user_cost || 0) }}</span
+                  >¥{{ formatCost(stats.summary.today?.user_cost || 0) }}</span
                 >
               </div>
             </div>
@@ -608,7 +608,7 @@ const lineChartOptions = computed(() => ({
           const label = context.dataset.label || ''
           const value = context.raw
           if (label.includes('USD')) {
-            return `${label}: $${formatCost(value)}`
+            return `${label}: ¥${formatCost(value)}`
           }
           return `${label}: ${formatNumber(value)}`
         }
@@ -641,7 +641,7 @@ const lineChartOptions = computed(() => ({
         font: {
           size: 10
         },
-        callback: (value: string | number) => '$' + formatCost(Number(value))
+        callback: (value: string | number) => '¥' + formatCost(Number(value))
       },
       title: {
         display: true,
