@@ -80,7 +80,9 @@ const handleUpdateProfile = async () => {
     })
     if (username.value === submittedUsername) username.value = updatedUser.username
     savedUsername = updatedUser.username
-    authStore.user = updatedUser
+    // 合并而不是整体覆盖：响应里可能缺少某些字段（例如只改用户名时的头像），
+    // 整体赋值会把本地已保存的头像等信息清空。
+    authStore.user = authStore.user ? { ...authStore.user, ...updatedUser } : updatedUser
     appStore.showSuccess(t('profile.updateSuccess'))
   } catch (error: unknown) {
     appStore.showError(extractApiErrorMessage(error, t('profile.updateFailed')))

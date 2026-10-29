@@ -501,6 +501,14 @@ func (s *UserService) updateProfile(ctx context.Context, userID int64, req Updat
 	}
 	oldConcurrency := user.Concurrency
 
+	// users 表不存头像，仓库层 GetByID 不会带回头像信息。这里先补一次，
+	// 保证只改用户名时响应里仍带 avatar_url（前端会用响应整体覆盖本地用户）。
+	if req.AvatarURL == nil {
+		if err := s.hydrateUserAvatar(ctx, user); err != nil {
+			return nil, oldConcurrency, fmt.Errorf("get user avatar: %w", err)
+		}
+	}
+
 	// fields 只登记本次请求真正带上的字段。余额、状态等列不由这里回写，
 	// 否则并发的扣费与状态变更会被这份快照回滚。
 	var fields UserUpdateFields
