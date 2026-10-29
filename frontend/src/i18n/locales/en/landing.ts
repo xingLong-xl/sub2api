@@ -105,6 +105,7 @@ export default {
       claude: 'Claude',
       gemini: 'Gemini',
       antigravity: 'Antigravity',
+      deepseek: 'DeepSeek',
       more: 'More'
     },
     // CTA section
