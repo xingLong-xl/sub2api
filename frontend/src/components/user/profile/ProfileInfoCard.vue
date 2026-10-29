@@ -232,7 +232,7 @@ function isEmailBound(user: User | null | undefined): boolean {
   return normalized ?? false
 }
 
-const avatarUrl = computed(() => props.user?.avatar_url?.trim() || '')
+const avatarUrl = computed(() => props.user?.avatar_url?.trim() || '/default-avatar.png')
 const displayName = computed(() => props.user?.username?.trim() || props.user?.email?.trim() || t('profile.user'))
 const primaryEmailDisplay = computed(() => {
   const email = props.user?.email?.trim() || ''
