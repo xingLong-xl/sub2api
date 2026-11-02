@@ -23,7 +23,7 @@ services:
   # ===========================================================================
   # Sub2API Application
   # ===========================================================================
-  sub2api:
+  tokenpilot:
     image: 682821438397.dkr.ecr.us-east-2.amazonaws.com/xl/tokenpilot:v1.0.0
     container_name: TokenPilot
     restart: unless-stopped
