@@ -1,16 +1,6 @@
 <template>
   <AppLayout>
     <div class="space-y-4">
-      <!-- 页头 -->
-      <div>
-        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-          {{ t('tools.image.title') }}
-        </h1>
-        <p class="mt-1 text-sm text-gray-500 dark:text-dark-400">
-          {{ t('tools.image.description') }}
-        </p>
-      </div>
-
       <!-- 密钥面板 -->
       <ToolsApiKeyPanel />
 
