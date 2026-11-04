@@ -1,23 +1,12 @@
 <template>
   <AppLayout>
-    <div class="space-y-4">
-      <!-- 页头 -->
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-            {{ t('tools.chat.title') }}
-          </h1>
-          <p class="mt-1 text-sm text-gray-500 dark:text-dark-400">
-            {{ t('tools.chat.description') }}
-          </p>
-        </div>
-      </div>
-
+    <!-- 整页不滚动：高度 = 视口 - 顶栏(64px) - main padding(16/24/32px)，仅消息区内部滚动 -->
+    <div class="flex h-[calc(100dvh-99px)] flex-col gap-3 overflow-hidden md:h-[calc(100dvh-115px)] lg:h-[calc(100dvh-131px)]">
       <!-- 密钥面板 -->
-      <ToolsApiKeyPanel />
+      <ToolsApiKeyPanel class="shrink-0" />
 
       <!-- 模型选择 -->
-      <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
+      <div class="shrink-0 rounded-xl border border-gray-200 bg-white p-3 dark:border-dark-700 dark:bg-dark-800">
         <div class="flex flex-wrap items-center gap-3">
           <label class="text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-chat-model">
             {{ t('tools.chat.model') }}
@@ -51,9 +40,9 @@
       </div>
 
       <!-- 对话窗口 -->
-      <div class="flex h-[calc(100vh-19rem)] min-h-[420px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-dark-700 dark:bg-dark-800">
-        <!-- 消息区 -->
-        <div ref="messagesContainer" class="flex-1 space-y-4 overflow-y-auto p-4">
+      <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-dark-700 dark:bg-dark-800">
+        <!-- 消息区：唯一可滚动区域 -->
+        <div ref="messagesContainer" class="min-h-0 flex-1 space-y-4 overflow-y-auto p-3">
           <div v-if="messages.length === 0" class="flex h-full flex-col items-center justify-center gap-2 text-gray-400 dark:text-dark-500">
             <Icon name="chat" size="xl" />
             <p class="text-sm">{{ t('tools.chat.empty') }}</p>
@@ -98,7 +87,7 @@
         </div>
 
         <!-- 输入区 -->
-        <div class="border-t border-gray-200 p-3 dark:border-dark-700">
+        <div class="shrink-0 border-t border-gray-200 p-2.5 dark:border-dark-700">
           <div class="flex items-end gap-2">
             <textarea
               v-model="input"
