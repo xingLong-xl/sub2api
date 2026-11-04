@@ -243,6 +243,64 @@ git add ent/       # 生成的文件也要提交
 - [ ] 所有 test stub 补全新接口方法（如果改了 interface）
 - [ ] Ent 生成的代码已提交（如果改了 schema）
 
+---
+
+### 坑 12：重跑 docker-deploy.sh 会重掷数据库密码，导致应用永久连不上
+
+**典型现象**：
+- 安装向导/初始化报 `Connection failed: ping target database failed: pq: password authentication failed for user "sub2api"`；
+- 但在服务器上 `docker exec -it sub2api-postgres-dev psql -U sub2api -d sub2api` **能正常进去**；
+- 改了 `.env` 里的 `POSTGRES_PASSWORD` 再重启，**毫无效果**；
+- `docker logs sub2api-postgres-dev` 里能看到成串的 `FATAL: password authentication failed`。
+
+**根因**（三个事实叠在一起）：
+
+1. **`POSTGRES_PASSWORD` 只在 initdb 那一秒有效**。官方 postgres 镜像的 entrypoint 逻辑是：`$PGDATA/PG_VERSION` 已存在 → 跳过 initdb → 环境变量从此成为死变量。改 `.env`、重启容器、`docker compose down && up` 全都不会改数据库里的密码。
+2. **`docker-deploy.sh` 每次运行都重掷密码**。它用 `openssl rand -hex 32` 生成新的 `POSTGRES_PASSWORD` / `JWT_SECRET` / `TOTP_ENCRYPTION_KEY` 并写进 `.env`，且**不检查数据库是否已存在**。所以只要跑第二次，`.env` 里的密码就是数据库从没见过的值。
+3. **"服务器上能登录"是假象**。`pg_hba.conf` 里 `local all all trust`、`host all all 127.0.0.1/32 trust`，容器内 psql 走 unix socket **根本不校验密码**；而应用容器是跨容器 TCP，命中 `host all all all scram-sha-256`，真校验。两者结论可以完全相反。
+
+**排查**：
+
+```bash
+cd deploy
+
+# 1. 谁更老？数据库比 .env 老 = .env 里的密码不是数据库的密码
+stat -c '%y  %n' postgres_data/PG_VERSION .env
+
+# 2. 验证密码是否真的匹配（必须 -h 127.0.0.1 强制走 TCP，
+#    否则被 trust 放行，测了等于没测）
+PW=$(grep '^POSTGRES_PASSWORD=' .env | cut -d= -f2-)
+docker exec -e PGPASSWORD="$PW" sub2api-postgres-dev \
+  psql -h 127.0.0.1 -U sub2api -d sub2api -tAc "select 'PASSWORD OK'"
+```
+
+**修复**（二选一）：
+
+```bash
+# 方案 A：保数据，把数据库密码改成 .env 里的值
+#（容器内 local 为 trust，不需要旧密码）
+docker exec -it sub2api-postgres-dev psql -U sub2api -d sub2api \
+  -c "ALTER USER sub2api WITH PASSWORD '<.env 里的 POSTGRES_PASSWORD>';"
+
+# 方案 B：彻底重来（会清空数据！）
+# 注意 postgres_data 是 bind mount，docker compose down -v 对它无效，
+# 必须真正删掉目录才会重新 initdb
+docker compose -p sub2api-dev -f docker-compose.dev.yml down
+rm -rf postgres_data
+```
+
+**现状与防护**：
+
+- 现在 `docker-deploy.sh` 已加防护：检测到 `postgres_data/PG_VERSION` 或 `.env` 存在时**不再重掷任何密钥**，只复用 `.env` 里的旧值（改前自动备份为 `.env.bak.YYYYmmdd-HHMMSS`）；有库但 `.env` 丢了时，会生成新密码并自动 `ALTER USER` 同步数据库，避免再出不一致。
+- `--force-secrets` 在已存在数据库时会被拒绝执行。
+
+**关键经验**：
+
+- **`docker-deploy.sh` 只在新部署时跑一次**；已有部署重跑不会再破坏密码（防护已加），但不要手动改 `.env` 里的 `POSTGRES_PASSWORD`。
+- **换密码必须两步一起做**：先 `ALTER USER`，再改 `.env`，顺序反了就会有一段时间连不上。
+- `JWT_SECRET` 重掷 = 所有用户掉登录；`TOTP_ENCRYPTION_KEY` 重掷 = **已绑定的 2FA 密钥全部解不开且不可逆**。这两个比数据库密码更危险。
+- 原始密码一旦被覆盖就**无法找回**（`pg_authid` 只存 SCRAM 单向哈希），只能 `ALTER USER` 重设。
+
 ## 五、常用命令速查
 
 ### 数据库操作
