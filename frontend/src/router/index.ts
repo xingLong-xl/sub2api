@@ -239,6 +239,42 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/tools/chat',
+    name: 'ToolsChat',
+    component: () => import('@/views/tools/ChatToolsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'AI Chat',
+      titleKey: 'tools.chat.title',
+      descriptionKey: 'tools.chat.description'
+    }
+  },
+  {
+    path: '/tools/image',
+    name: 'ToolsImage',
+    component: () => import('@/views/tools/ImageToolsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Image Generation',
+      titleKey: 'tools.image.title',
+      descriptionKey: 'tools.image.description'
+    }
+  },
+  {
+    path: '/tools/video',
+    name: 'ToolsVideo',
+    component: () => import('@/views/tools/VideoToolsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Video Generation',
+      titleKey: 'tools.video.title',
+      descriptionKey: 'tools.video.description'
+    }
+  },
+  {
     path: '/usage',
     name: 'Usage',
     component: () => import('@/views/user/UsageView.vue'),

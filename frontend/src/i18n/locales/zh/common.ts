@@ -214,6 +214,11 @@ export default {
     contentModeration: '内容审计',
     promptAudit: '提示词审计',
     auditLogs: '操作日志',
+    tools: '工具',
+    console: '控制台',
+    toolsChat: 'AI 聊天',
+    toolsImage: '图像生成',
+    toolsVideo: '视频生成',
   },
 
   // Auth

@@ -214,6 +214,11 @@ export default {
     contentModeration: 'Content Moderation',
     promptAudit: 'Prompt Audit',
     auditLogs: 'Audit Logs',
+    tools: 'Tools',
+    console: 'Console',
+    toolsChat: 'AI Chat',
+    toolsImage: 'Image Generation',
+    toolsVideo: 'Video Generation',
   },
 
   // Auth
