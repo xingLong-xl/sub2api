@@ -1,167 +1,170 @@
 <template>
-  <div class="space-y-4">
-    <!-- 页头 -->
-    <div>
-      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-        {{ t('tools.video.title') }}
-      </h1>
-      <p class="mt-1 text-sm text-gray-500 dark:text-dark-400">
-        {{ t('tools.video.description') }}
-      </p>
-    </div>
-
-    <!-- 密钥面板 -->
-    <ToolsApiKeyPanel />
-
-    <div class="grid gap-4 lg:grid-cols-3">
-      <!-- 参数表单 -->
-      <div class="space-y-4 lg:col-span-1">
-        <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
-          <!-- 模型 -->
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-video-model">
-              {{ t('tools.video.model') }}
-            </label>
-            <input
-              id="tools-video-model"
-              v-model="videoModel"
-              list="tools-video-models"
-              type="text"
-              :placeholder="t('tools.video.modelPlaceholder')"
-              class="input h-[38px]"
-              autocomplete="off"
-              spellcheck="false"
-            />
-            <datalist id="tools-video-models">
-              <option v-for="m in availableModels" :key="m" :value="m" />
-            </datalist>
-          </div>
-
-          <!-- 提示词 -->
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-video-prompt">
-              {{ t('tools.video.prompt') }}
-            </label>
-            <textarea
-              id="tools-video-prompt"
-              v-model="prompt"
-              rows="5"
-              :placeholder="t('tools.video.promptPlaceholder')"
-              class="input resize-none"
-            ></textarea>
-          </div>
-
-          <button
-            type="button"
-            class="btn btn-primary w-full"
-            :disabled="!canGenerate || submitting"
-            @click="submitTask"
-          >
-            <Icon v-if="submitting" name="sync" size="sm" class="animate-spin" />
-            {{ submitting ? t('tools.video.submitting') : t('tools.video.generate') }}
-          </button>
-
-          <p class="text-xs leading-5 text-gray-400 dark:text-dark-500">
-            {{ t('tools.video.asyncHint') }}
-          </p>
-        </div>
-
-        <!-- 错误提示 -->
-        <div
-          v-if="error"
-          class="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400"
-        >
-          {{ error }}
-        </div>
+  <AppLayout>
+    <div class="space-y-4">
+      <!-- 页头 -->
+      <div>
+        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+          {{ t('tools.video.title') }}
+        </h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-dark-400">
+          {{ t('tools.video.description') }}
+        </p>
       </div>
 
-      <!-- 任务列表 -->
-      <div class="lg:col-span-2">
-        <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
-          <div class="mb-3 flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-900 dark:text-white">
-              {{ t('tools.video.tasks') }}
-            </span>
+      <!-- 密钥面板 -->
+      <ToolsApiKeyPanel />
+
+      <div class="grid gap-4 lg:grid-cols-3">
+        <!-- 参数表单 -->
+        <div class="space-y-4 lg:col-span-1">
+          <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
+            <!-- 模型 -->
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-video-model">
+                {{ t('tools.video.model') }}
+              </label>
+              <input
+                id="tools-video-model"
+                v-model="videoModel"
+                list="tools-video-models"
+                type="text"
+                :placeholder="t('tools.video.modelPlaceholder')"
+                class="input h-[38px]"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <datalist id="tools-video-models">
+                <option v-for="m in availableModels" :key="m" :value="m" />
+              </datalist>
+            </div>
+
+            <!-- 提示词 -->
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-video-prompt">
+                {{ t('tools.video.prompt') }}
+              </label>
+              <textarea
+                id="tools-video-prompt"
+                v-model="prompt"
+                rows="5"
+                :placeholder="t('tools.video.promptPlaceholder')"
+                class="input resize-none"
+              ></textarea>
+            </div>
+
             <button
-              v-if="tasks.length"
               type="button"
-              class="btn btn-secondary h-[32px] text-xs"
-              @click="clearTasks"
+              class="btn btn-primary w-full"
+              :disabled="!canGenerate || submitting"
+              @click="submitTask"
             >
-              <Icon name="trash" size="xs" />
-              {{ t('tools.video.clear') }}
+              <Icon v-if="submitting" name="sync" size="sm" class="animate-spin" />
+              {{ submitting ? t('tools.video.submitting') : t('tools.video.generate') }}
             </button>
+
+            <p class="text-xs leading-5 text-gray-400 dark:text-dark-500">
+              {{ t('tools.video.asyncHint') }}
+            </p>
           </div>
 
-          <div v-if="tasks.length === 0" class="flex h-72 flex-col items-center justify-center gap-2 text-gray-400 dark:text-dark-500">
-            <Icon name="play" size="xl" />
-            <p class="text-sm">{{ t('tools.video.empty') }}</p>
+          <!-- 错误提示 -->
+          <div
+            v-if="error"
+            class="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400"
+          >
+            {{ error }}
           </div>
+        </div>
 
-          <div v-else class="space-y-4">
-            <div
-              v-for="task in tasks"
-              :key="task.id"
-              class="rounded-xl border border-gray-200 p-3 dark:border-dark-700"
-            >
-              <div class="mb-2 flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-dark-400">
-                <span class="truncate">{{ task.prompt }}</span>
-                <div class="flex shrink-0 items-center gap-2">
-                  <span class="font-medium">{{ task.model }}</span>
-                  <span
-                    class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
-                    :class="statusBadgeClass(task.status)"
-                  >
-                    <span v-if="task.status === 'pending'" class="h-1.5 w-1.5 animate-pulse rounded-full bg-current"></span>
-                    {{ statusText(task.status) }}
-                  </span>
+        <!-- 任务列表 -->
+        <div class="lg:col-span-2">
+          <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
+            <div class="mb-3 flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ t('tools.video.tasks') }}
+              </span>
+              <button
+                v-if="tasks.length"
+                type="button"
+                class="btn btn-secondary h-[32px] text-xs"
+                @click="clearTasks"
+              >
+                <Icon name="trash" size="xs" />
+                {{ t('tools.video.clear') }}
+              </button>
+            </div>
+
+            <div v-if="tasks.length === 0" class="flex h-72 flex-col items-center justify-center gap-2 text-gray-400 dark:text-dark-500">
+              <Icon name="play" size="xl" />
+              <p class="text-sm">{{ t('tools.video.empty') }}</p>
+            </div>
+
+            <div v-else class="space-y-4">
+              <div
+                v-for="task in tasks"
+                :key="task.id"
+                class="rounded-xl border border-gray-200 p-3 dark:border-dark-700"
+              >
+                <div class="mb-2 flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-dark-400">
+                  <span class="truncate">{{ task.prompt }}</span>
+                  <div class="flex shrink-0 items-center gap-2">
+                    <span class="font-medium">{{ task.model }}</span>
+                    <span
+                      class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+                      :class="statusBadgeClass(task.status)"
+                    >
+                      <span v-if="task.status === 'pending'" class="h-1.5 w-1.5 animate-pulse rounded-full bg-current"></span>
+                      {{ statusText(task.status) }}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <!-- 视频：成功后播放 -->
-              <video
-                v-if="task.status === 'done' && task.videoUrl"
-                :src="task.videoUrl"
-                controls
-                playsinline
-                class="w-full rounded-lg bg-black"
-              ></video>
+                <!-- 视频：成功后播放 -->
+                <video
+                  v-if="task.status === 'done' && task.videoUrl"
+                  :src="task.videoUrl"
+                  controls
+                  playsinline
+                  class="w-full rounded-lg bg-black"
+                ></video>
 
-              <!-- 进行中提示 -->
-              <div v-else-if="task.status === 'pending'" class="flex h-40 flex-col items-center justify-center gap-2 rounded-lg bg-gray-50 text-sm text-gray-400 dark:bg-dark-700/50 dark:text-dark-400">
-                <Icon name="sync" size="lg" class="animate-spin" />
-                <span>{{ t('tools.video.polling', { elapsed: elapsedSeconds(task) }) }}</span>
-              </div>
+                <!-- 进行中提示 -->
+                <div v-else-if="task.status === 'pending'" class="flex h-40 flex-col items-center justify-center gap-2 rounded-lg bg-gray-50 text-sm text-gray-400 dark:bg-dark-700/50 dark:text-dark-400">
+                  <Icon name="sync" size="lg" class="animate-spin" />
+                  <span>{{ t('tools.video.polling', { elapsed: elapsedSeconds(task) }) }}</span>
+                </div>
 
-              <!-- 失败提示 -->
-              <div v-else-if="task.error" class="flex h-40 flex-col items-center justify-center gap-1 rounded-lg bg-red-50 px-4 text-center text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
-                <Icon name="xCircle" size="lg" />
-                <span class="break-all">{{ task.error }}</span>
-              </div>
+                <!-- 失败提示 -->
+                <div v-else-if="task.error" class="flex h-40 flex-col items-center justify-center gap-1 rounded-lg bg-red-50 px-4 text-center text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                  <Icon name="xCircle" size="lg" />
+                  <span class="break-all">{{ task.error }}</span>
+                </div>
 
-              <!-- 下载按钮 -->
-              <div v-if="task.status === 'done' && task.videoUrl" class="mt-2 flex justify-end">
-                <button
-                  type="button"
-                  class="btn btn-secondary h-[32px] text-xs"
-                  @click="downloadVideo(task)"
-                >
-                  <Icon name="download" size="xs" />
-                  {{ t('tools.video.download') }}
-                </button>
+                <!-- 下载按钮 -->
+                <div v-if="task.status === 'done' && task.videoUrl" class="mt-2 flex justify-end">
+                  <button
+                    type="button"
+                    class="btn btn-secondary h-[32px] text-xs"
+                    @click="downloadVideo(task)"
+                  >
+                    <Icon name="download" size="xs" />
+                    {{ t('tools.video.download') }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
+import AppLayout from '@/components/layout/AppLayout.vue'
 import ToolsApiKeyPanel from '@/components/tools/ToolsApiKeyPanel.vue'
 import { GatewayError, useToolsSettings } from '@/composables/useToolsSettings'
 

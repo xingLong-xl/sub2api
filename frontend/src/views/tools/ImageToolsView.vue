@@ -1,147 +1,149 @@
 <template>
-  <div class="space-y-4">
-    <!-- 页头 -->
-    <div>
-      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-        {{ t('tools.image.title') }}
-      </h1>
-      <p class="mt-1 text-sm text-gray-500 dark:text-dark-400">
-        {{ t('tools.image.description') }}
-      </p>
-    </div>
-
-    <!-- 密钥面板 -->
-    <ToolsApiKeyPanel />
-
-    <div class="grid gap-4 lg:grid-cols-3">
-      <!-- 参数表单 -->
-      <div class="space-y-4 lg:col-span-1">
-        <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
-          <!-- 模型 -->
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-model">
-              {{ t('tools.image.model') }}
-            </label>
-            <input
-              id="tools-image-model"
-              v-model="imageModel"
-              list="tools-image-models"
-              type="text"
-              :placeholder="t('tools.image.modelPlaceholder')"
-              class="input h-[38px]"
-              autocomplete="off"
-              spellcheck="false"
-            />
-            <datalist id="tools-image-models">
-              <option v-for="m in availableModels" :key="m" :value="m" />
-            </datalist>
-          </div>
-
-          <!-- 提示词 -->
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-prompt">
-              {{ t('tools.image.prompt') }}
-            </label>
-            <textarea
-              id="tools-image-prompt"
-              v-model="prompt"
-              rows="5"
-              :placeholder="t('tools.image.promptPlaceholder')"
-              class="input resize-none"
-            ></textarea>
-          </div>
-
-          <!-- 尺寸 -->
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-size">
-              {{ t('tools.image.size') }}
-            </label>
-            <select id="tools-image-size" v-model="size" class="input h-[38px]">
-              <option value="auto">{{ t('tools.image.sizeAuto') }}</option>
-              <option value="1024x1024">1024 × 1024</option>
-              <option value="1024x1536">1024 × 1536</option>
-              <option value="1536x1024">1536 × 1024</option>
-              <option value="1024x1792">1024 × 1792</option>
-              <option value="1792x1024">1792 × 1024</option>
-            </select>
-          </div>
-
-          <!-- 数量 -->
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-count">
-              {{ t('tools.image.count') }}
-            </label>
-            <select id="tools-image-count" v-model.number="count" class="input h-[38px]">
-              <option :value="1">1</option>
-              <option :value="2">2</option>
-              <option :value="3">3</option>
-              <option :value="4">4</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            class="btn btn-primary w-full"
-            :disabled="!canGenerate || generating"
-            @click="generate"
-          >
-            <Icon v-if="generating" name="sync" size="sm" class="animate-spin" />
-            {{ generating ? t('tools.image.generating') : t('tools.image.generate') }}
-          </button>
-        </div>
-
-        <!-- 错误提示 -->
-        <div
-          v-if="error"
-          class="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400"
-        >
-          {{ error }}
-        </div>
+  <AppLayout>
+    <div class="space-y-4">
+      <!-- 页头 -->
+      <div>
+        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+          {{ t('tools.image.title') }}
+        </h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-dark-400">
+          {{ t('tools.image.description') }}
+        </p>
       </div>
 
-      <!-- 结果区 -->
-      <div class="lg:col-span-2">
-        <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
-          <div class="mb-3 flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-900 dark:text-white">
-              {{ t('tools.image.results') }}
-            </span>
+      <!-- 密钥面板 -->
+      <ToolsApiKeyPanel />
+
+      <div class="grid gap-4 lg:grid-cols-3">
+        <!-- 参数表单 -->
+        <div class="space-y-4 lg:col-span-1">
+          <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
+            <!-- 模型 -->
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-model">
+                {{ t('tools.image.model') }}
+              </label>
+              <input
+                id="tools-image-model"
+                v-model="imageModel"
+                list="tools-image-models"
+                type="text"
+                :placeholder="t('tools.image.modelPlaceholder')"
+                class="input h-[38px]"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <datalist id="tools-image-models">
+                <option v-for="m in availableModels" :key="m" :value="m" />
+              </datalist>
+            </div>
+
+            <!-- 提示词 -->
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-prompt">
+                {{ t('tools.image.prompt') }}
+              </label>
+              <textarea
+                id="tools-image-prompt"
+                v-model="prompt"
+                rows="5"
+                :placeholder="t('tools.image.promptPlaceholder')"
+                class="input resize-none"
+              ></textarea>
+            </div>
+
+            <!-- 尺寸 -->
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-size">
+                {{ t('tools.image.size') }}
+              </label>
+              <select id="tools-image-size" v-model="size" class="input h-[38px]">
+                <option value="auto">{{ t('tools.image.sizeAuto') }}</option>
+                <option value="1024x1024">1024 × 1024</option>
+                <option value="1024x1536">1024 × 1536</option>
+                <option value="1536x1024">1536 × 1024</option>
+                <option value="1024x1792">1024 × 1792</option>
+                <option value="1792x1024">1792 × 1024</option>
+              </select>
+            </div>
+
+            <!-- 数量 -->
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-dark-200" for="tools-image-count">
+                {{ t('tools.image.count') }}
+              </label>
+              <select id="tools-image-count" v-model.number="count" class="input h-[38px]">
+                <option :value="1">1</option>
+                <option :value="2">2</option>
+                <option :value="3">3</option>
+                <option :value="4">4</option>
+              </select>
+            </div>
+
             <button
-              v-if="history.length"
               type="button"
-              class="btn btn-secondary h-[32px] text-xs"
-              @click="history = []"
+              class="btn btn-primary w-full"
+              :disabled="!canGenerate || generating"
+              @click="generate"
             >
-              <Icon name="trash" size="xs" />
-              {{ t('tools.image.clear') }}
+              <Icon v-if="generating" name="sync" size="sm" class="animate-spin" />
+              {{ generating ? t('tools.image.generating') : t('tools.image.generate') }}
             </button>
           </div>
 
-          <div v-if="history.length === 0" class="flex h-72 flex-col items-center justify-center gap-2 text-gray-400 dark:text-dark-500">
-            <Icon name="sparkles" size="xl" />
-            <p class="text-sm">{{ t('tools.image.empty') }}</p>
+          <!-- 错误提示 -->
+          <div
+            v-if="error"
+            class="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400"
+          >
+            {{ error }}
           </div>
+        </div>
 
-          <div v-else class="space-y-6">
-            <div v-for="(item, index) in history" :key="index" class="space-y-2">
-              <div class="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-dark-400">
-                <span class="truncate">{{ item.prompt }}</span>
-                <span class="shrink-0">{{ item.model }} · {{ formatTime(item.createdAt) }}</span>
-              </div>
-              <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <div
-                  v-for="(image, imgIndex) in item.images"
-                  :key="imgIndex"
-                  class="group relative overflow-hidden rounded-lg border border-gray-200 dark:border-dark-700"
-                >
-                  <img :src="image.src" :alt="`generated-${index}-${imgIndex}`" class="aspect-square w-full object-cover" />
-                  <button
-                    type="button"
-                    class="absolute bottom-2 right-2 hidden rounded-md bg-black/60 px-2 py-1 text-white backdrop-blur group-hover:block"
-                    @click="downloadImage(image, item.model, imgIndex)"
+        <!-- 结果区 -->
+        <div class="lg:col-span-2">
+          <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-800">
+            <div class="mb-3 flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ t('tools.image.results') }}
+              </span>
+              <button
+                v-if="history.length"
+                type="button"
+                class="btn btn-secondary h-[32px] text-xs"
+                @click="history = []"
+              >
+                <Icon name="trash" size="xs" />
+                {{ t('tools.image.clear') }}
+              </button>
+            </div>
+
+            <div v-if="history.length === 0" class="flex h-72 flex-col items-center justify-center gap-2 text-gray-400 dark:text-dark-500">
+              <Icon name="sparkles" size="xl" />
+              <p class="text-sm">{{ t('tools.image.empty') }}</p>
+            </div>
+
+            <div v-else class="space-y-6">
+              <div v-for="(item, index) in history" :key="index" class="space-y-2">
+                <div class="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-dark-400">
+                  <span class="truncate">{{ item.prompt }}</span>
+                  <span class="shrink-0">{{ item.model }} · {{ formatTime(item.createdAt) }}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div
+                    v-for="(image, imgIndex) in item.images"
+                    :key="imgIndex"
+                    class="group relative overflow-hidden rounded-lg border border-gray-200 dark:border-dark-700"
                   >
-                    <Icon name="download" size="xs" />
-                  </button>
+                    <img :src="image.src" :alt="`generated-${index}-${imgIndex}`" class="aspect-square w-full object-cover" />
+                    <button
+                      type="button"
+                      class="absolute bottom-2 right-2 hidden rounded-md bg-black/60 px-2 py-1 text-white backdrop-blur group-hover:block"
+                      @click="downloadImage(image, item.model, imgIndex)"
+                    >
+                      <Icon name="download" size="xs" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -149,13 +151,14 @@
         </div>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
+import AppLayout from '@/components/layout/AppLayout.vue'
 import ToolsApiKeyPanel from '@/components/tools/ToolsApiKeyPanel.vue'
 import { GatewayError, useToolsSettings } from '@/composables/useToolsSettings'
 
