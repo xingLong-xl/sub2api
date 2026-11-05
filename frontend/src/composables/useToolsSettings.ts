@@ -1,17 +1,25 @@
 import { computed, ref, watch } from 'vue'
 import { buildGatewayUrl } from '@/api/url'
+import { keysAPI } from '@/api/keys'
+import { userChannelsAPI } from '@/api/channels'
+import type { BillingMode } from '@/constants/channel'
+import type { ApiKey } from '@/types'
 
 /**
- * 工具（聊天 / 图像 / 视频）页共享设置：
- * - API 密钥：调用本站网关 /v1/* 端点必须携带用户自己的 sk- 密钥，
- *   网关不认登录会话 Cookie，因此需要用户在工具页填一次密钥（存 localStorage）。
- * - 各工具记住的模型名：分别持久化，跨页面刷新保留。
+ * 工具页（聊天 / 图像 / 视频）共享的连接设置。
  *
- * 模块级单例：三个工具页共享同一份密钥与模型偏好。
+ * - 网关 /v1/* 只认 `Authorization: Bearer sk-xxx`，不认登录会话 Cookie，
+ *   所以工具页必须携带一把用户自己的密钥。
+ * - 优先让用户从「我的密钥」里直接选择（免去手工粘贴）；选不到时也可手动输入。
+ * - 密钥绑定分组，分组带平台属性（openai / grok / anthropic / gemini…），
+ *   平台决定该密钥能用哪些能力（图像仅 openai/grok，视频仅 grok）。
+ *
+ * 模块级单例：三个工具页共享同一份密钥与各自的模型偏好。
  */
 
 const STORAGE_KEYS = {
   apiKey: 'tools_api_key',
+  apiKeyId: 'tools_api_key_id',
   chatModel: 'tools_chat_model',
   imageModel: 'tools_image_model',
   videoModel: 'tools_video_model',
@@ -37,53 +45,212 @@ function writeStorage(key: string, value: string): void {
   }
 }
 
+function readNumberStorage(key: string): number | null {
+  const raw = readStorage(key)
+  if (!raw) return null
+  const value = Number(raw)
+  return Number.isFinite(value) && value > 0 ? value : null
+}
+
 const apiKey = ref(readStorage(STORAGE_KEYS.apiKey))
+const selectedKeyId = ref<number | null>(readNumberStorage(STORAGE_KEYS.apiKeyId))
 const chatModel = ref(readStorage(STORAGE_KEYS.chatModel))
 const imageModel = ref(readStorage(STORAGE_KEYS.imageModel))
 const videoModel = ref(readStorage(STORAGE_KEYS.videoModel))
 
 watch(apiKey, (v) => writeStorage(STORAGE_KEYS.apiKey, v.trim()))
+watch(selectedKeyId, (v) => writeStorage(STORAGE_KEYS.apiKeyId, v === null ? '' : String(v)))
 watch(chatModel, (v) => writeStorage(STORAGE_KEYS.chatModel, v.trim()))
 watch(imageModel, (v) => writeStorage(STORAGE_KEYS.imageModel, v.trim()))
 watch(videoModel, (v) => writeStorage(STORAGE_KEYS.videoModel, v.trim()))
 
-/** 网关错误：带 HTTP 状态码，视图层据此做本地化提示 */
+const userKeys = ref<ApiKey[]>([])
+const keysLoading = ref(false)
+const keysLoaded = ref(false)
+const keysError = ref('')
+
+const gatewayModels = ref<string[]>([])
+const modelsLoading = ref(false)
+const modelsLoaded = ref(false)
+/** /v1/models 失败原因（常见：账户余额为 0 → 网关返回 403） */
+const modelsError = ref('')
+
+/** 每个分组支持的模型（来自用户侧渠道接口，不受余额限制） */
+export interface CatalogModel {
+  name: string
+  capability: ToolCapability
+}
+
+export interface GroupCatalog {
+  name: string
+  platform: string
+  models: CatalogModel[]
+}
+
+const groupCatalog = ref<Record<string, GroupCatalog>>({})
+const catalogLoading = ref(false)
+const catalogLoaded = ref(false)
+
+/** 工具能力：与网关的三条业务链路一一对应 */
+export type ToolCapability = 'chat' | 'image' | 'video'
+
+/**
+ * 模型能力推断。网关 /v1/models 只返回模型 id，没有能力字段，
+ * 只能按命名约定归类；调用方始终提供「显示全部模型」的兜底开关。
+ */
+const VIDEO_MODEL_HINTS = ['video', 'seedance', 'sora', 'veo', 'kling', 'runway', 'hailuo', 'pika']
+const IMAGE_MODEL_HINTS = ['image', 'dall-e', 'imagen', 'flux', 'midjourney', 'seedream', 'seededit']
+
+export function inferModelCapability(modelID: string): ToolCapability {
+  const name = modelID.trim().toLowerCase()
+  if (!name) return 'chat'
+  if (VIDEO_MODEL_HINTS.some((hint) => name.includes(hint))) return 'video'
+  if (IMAGE_MODEL_HINTS.some((hint) => name.includes(hint))) return 'image'
+  return 'chat'
+}
+
+/**
+ * 用计费模式判定模型能力（比模型名猜测准确）。
+ * token/per_request 仍可能是图像模型（按张计费），因此再退回名称判断。
+ */
+function capabilityFromBillingMode(mode: BillingMode | undefined, modelID: string): ToolCapability {
+  if (mode === 'image') return 'image'
+  if (mode === 'video') return 'video'
+  return inferModelCapability(modelID)
+}
+
+/** 平台能力：图像仅 openai/grok，视频仅 grok（合成分组可路由到 grok） */
+const IMAGE_PLATFORMS = ['openai', 'grok']
+const VIDEO_PLATFORMS = ['grok', 'composite']
+
+/** 网关错误：带 HTTP 状态码与业务码（code），视图层据此做本地化提示 */
 export class GatewayError extends Error {
   readonly status: number
+  /** 后端返回的业务错误码，例如 INSUFFICIENT_BALANCE、API_KEY_EXPIRED */
+  readonly code: string
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, code = '') {
     super(message)
     this.name = 'GatewayError'
     this.status = status
+    this.code = code
   }
 }
 
 /** 从网关/上游错误响应体中尽力提取可读信息 */
 async function toGatewayError(res: Response): Promise<GatewayError> {
   let message = `HTTP ${res.status}`
+  let code = ''
   try {
     const body: unknown = await res.json()
     if (body && typeof body === 'object') {
+      const rawCode = (body as Record<string, unknown>).code
+      if (typeof rawCode === 'string') code = rawCode
       const err = (body as Record<string, unknown>).error
       if (typeof err === 'string' && err) {
         message = err
       } else if (err && typeof err === 'object') {
-        const msg = (err as Record<string, unknown>).message
+        const msg = (err as { message?: unknown }).message
         if (typeof msg === 'string' && msg) message = msg
       } else {
-        const msg = (body as Record<string, unknown>).message
+        const msg = (body as { message?: unknown }).message
         if (typeof msg === 'string' && msg) message = msg
       }
     }
   } catch {
     // 非 JSON 响应，保留 HTTP 状态码
   }
-  return new GatewayError(message, res.status)
+  return new GatewayError(message, res.status, code)
+}
+
+const selectedKey = computed<ApiKey | null>(() => {
+  if (selectedKeyId.value === null) return null
+  return userKeys.value.find((k) => k.id === selectedKeyId.value) ?? null
+})
+
+const selectedKeyPlatform = computed(() => selectedKey.value?.group?.platform ?? '')
+
+const selectedGroupID = computed<number | null>(() => selectedKey.value?.group_id ?? null)
+
+/** 当前分组在渠道目录里的模型清单；目录未覆盖该分组时返回空数组 */
+function catalogModelsForGroup(groupID: number | null, tool: ToolCapability): string[] {
+  if (groupID === null) return []
+  const entry = groupCatalog.value[String(groupID)]
+  if (!entry) return []
+  return entry.models.filter((model) => model.capability === tool).map((model) => model.name)
+}
+
+/** 判断给定平台是否支持某个能力；未知（空平台）时返回 null 表示「不确定」 */
+export function platformSupportsTool(platform: string, tool: ToolCapability): boolean | null {
+  if (!platform) return null
+  if (tool === 'image') return IMAGE_PLATFORMS.includes(platform)
+  if (tool === 'video') return VIDEO_PLATFORMS.includes(platform)
+  return true
+}
+
+/** 当前密钥是否支持某个能力；未知（手动输入/无分组）时返回 null 表示「不确定」 */
+function platformSupports(tool: ToolCapability): boolean | null {
+  return platformSupportsTool(selectedKeyPlatform.value, tool)
+}
+
+/** 按能力过滤模型列表（未知能力的模型归为 chat，避免图像/视频页混入聊天模型） */
+function modelsForCapability(tool: ToolCapability, models: string[]): string[] {
+  return models.filter((model) => inferModelCapability(model) === tool)
 }
 
 export function useToolsSettings() {
+  /** 手动输入密钥（同时清掉「从列表选择」的状态） */
   function setApiKey(key: string): void {
     apiKey.value = key.trim()
+    selectedKeyId.value = null
+  }
+
+  /** 从「我的密钥」中选一把；密钥明文从列表接口取回，避免用户重复粘贴 */
+  function selectKey(keyID: number | null): void {
+    selectedKeyId.value = keyID
+    if (keyID === null) return
+    const matched = userKeys.value.find((k) => k.id === keyID)
+    if (matched) apiKey.value = matched.key
+  }
+
+  /** 清空当前选择：不选分组时不携带任何密钥，也不展示任何模型 */
+  function clearSelection(): void {
+    selectedKeyId.value = null
+    apiKey.value = ''
+    gatewayModels.value = []
+    modelsLoaded.value = false
+    modelsError.value = ''
+  }
+
+  async function loadUserKeys(force = false): Promise<ApiKey[]> {
+    if (keysLoading.value) return userKeys.value
+    if (keysLoaded.value && !force) return userKeys.value
+    keysLoading.value = true
+    keysError.value = ''
+    try {
+      const page = await keysAPI.list(1, 100, { sort_by: 'created_at', sort_order: 'desc' })
+      const items = Array.isArray(page.items) ? page.items : []
+      userKeys.value = items.filter((k) => k.status === 'active')
+      keysLoaded.value = true
+      // 恢复上次选择：密钥可能被轮换，以服务端最新值为准
+      if (selectedKeyId.value !== null) {
+        const matched = userKeys.value.find((k) => k.id === selectedKeyId.value)
+        if (matched) {
+          apiKey.value = matched.key
+        } else {
+          selectedKeyId.value = null
+        }
+      } else if (apiKey.value.trim()) {
+        // 旧版本只存了密钥明文，没有 id：按密钥值反查，让分组下拉能正确回显
+        const matched = userKeys.value.find((k) => k.key === apiKey.value.trim())
+        if (matched) selectedKeyId.value = matched.id
+      }
+    } catch (err) {
+      keysError.value = err instanceof Error ? err.message : String(err)
+    } finally {
+      keysLoading.value = false
+    }
+    return userKeys.value
   }
 
   function authHeaders(): Record<string, string> {
@@ -108,32 +275,100 @@ export function useToolsSettings() {
     return res
   }
 
+  /**
+   * 拉取「分组 → 模型」目录（用户侧渠道接口）。
+   * 该接口走登录态、不受网关余额校验影响，且带 billing_mode，
+   * 能准确区分聊天 / 图像 / 视频模型，比解析 /v1/models 更可靠。
+   */
+  async function loadModelCatalog(force = false): Promise<void> {
+    if (catalogLoading.value) return
+    if (catalogLoaded.value && !force) return
+    catalogLoading.value = true
+    try {
+      const channels = await userChannelsAPI.getAvailable()
+      const map: Record<string, GroupCatalog> = {}
+      for (const channel of channels ?? []) {
+        for (const section of channel.platforms ?? []) {
+          const models: CatalogModel[] = (section.supported_models ?? []).map((model) => ({
+            name: model.name,
+            capability: capabilityFromBillingMode(model.pricing?.billing_mode, model.name),
+          }))
+          for (const group of section.groups ?? []) {
+            const key = String(group.id)
+            const existing = map[key]
+            if (!existing || existing.models.length === 0) {
+              map[key] = {
+                name: group.name,
+                platform: group.platform || section.platform,
+                models,
+              }
+            }
+          }
+        }
+      }
+      groupCatalog.value = map
+      catalogLoaded.value = true
+    } catch {
+      // 渠道接口失败时保持空目录，由调用方退回 /v1/models 或手动输入
+    } finally {
+      catalogLoading.value = false
+    }
+  }
+
   /** 拉取网关可用模型列表（OpenAI /v1/models 格式），密钥缺失时返回空数组 */
-  async function fetchGatewayModels(): Promise<string[]> {
+  async function fetchGatewayModels(force = false): Promise<string[]> {
     if (!hasApiKey.value) return []
+    if (modelsLoaded.value && !force) return gatewayModels.value
+    modelsLoading.value = true
     try {
       const res = await gatewayFetch('/v1/models')
       const body: unknown = await res.json()
       const data = (body as { data?: unknown })?.data
-      if (!Array.isArray(data)) return []
-      return data
+      if (!Array.isArray(data)) return gatewayModels.value
+      modelsError.value = ''
+      gatewayModels.value = data
         .map((m) => {
           const id = (m as { id?: unknown })?.id
           return typeof id === 'string' ? id : ''
         })
         .filter(Boolean)
-    } catch {
-      return []
+      modelsLoaded.value = true
+    } catch (err) {
+      // 模型列表拉取失败不影响手工填写，但要记录原因供界面提示
+      modelsError.value = err instanceof Error ? err.message : ''
+    } finally {
+      modelsLoading.value = false
     }
+    return gatewayModels.value
   }
 
   return {
     apiKey,
     hasApiKey,
     setApiKey,
+    selectKey,
+    clearSelection,
+    selectedKeyId,
+    selectedKey,
+    selectedKeyPlatform,
+    selectedGroupID,
+    groupCatalog,
+    catalogLoading,
+    loadModelCatalog,
+    catalogModelsForGroup,
+    userKeys,
+    keysLoading,
+    keysError,
+    loadUserKeys,
     authHeaders,
     gatewayFetch,
     fetchGatewayModels,
+    gatewayModels,
+    modelsError,
+    modelsLoading,
+    platformSupports,
+    platformSupportsTool,
+    modelsForCapability,
     chatModel,
     imageModel,
     videoModel,
