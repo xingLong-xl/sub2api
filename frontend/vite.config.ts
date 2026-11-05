@@ -166,7 +166,10 @@ export default defineConfig(({ mode }) => {
           target: backendUrl,
           changeOrigin: true
         },
-        '/setup': {
+        // 只代理 setup 的 API 子路径（/setup/status、/setup/install…），
+        // 不能写成 '/setup'：那样会把前端页面路由 /setup 也转发给后端，
+        // 而后端只注册了 /setup/status 等接口，页面因此返回 404。
+        '/setup/': {
           target: backendUrl,
           changeOrigin: true
         }
