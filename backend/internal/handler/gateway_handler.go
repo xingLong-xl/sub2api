@@ -1217,7 +1217,9 @@ func (h *GatewayHandler) Models(c *gin.Context) {
 		return
 	}
 
-	writeModelsListResponse(c, claude.DefaultModels)
+	// 兜底：按平台给默认目录。Anthropic 返回 Claude 全量列表，其它平台为空，
+	// 不再把 Claude 模型硬塞给 deepseek 这类没有内置目录的平台。
+	writeModelsList(c, platform, defaultModelIDsForPlatform(platform))
 }
 
 // CodexModels returns the effective group model list using the manifest shape
@@ -1525,11 +1527,17 @@ func defaultModelIDsForPlatform(platform string) []string {
 		}
 		return ids
 	default:
-		ids := make([]string, 0, len(claude.DefaultModels))
-		for _, model := range claude.DefaultModels {
-			ids = append(ids, model.ID)
+		// 只有 Anthropic 平台有"Claude 全量目录"这个合理默认值。
+		// deepseek / kimi / zhipu / minimax / cline / command_code 等平台没有内置目录，
+		// 返回空列表，避免把 Claude 模型误报给这些分组（用户未配置却看到一堆 claude-*）。
+		if platform == service.PlatformAnthropic {
+			ids := make([]string, 0, len(claude.DefaultModels))
+			for _, model := range claude.DefaultModels {
+				ids = append(ids, model.ID)
+			}
+			return ids
 		}
-		return ids
+		return nil
 	}
 }
 
