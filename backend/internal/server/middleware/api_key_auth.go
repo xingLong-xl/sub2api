@@ -170,6 +170,9 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 		// authenticated key and must remain available after the completed
 		// generation consumes the key's remaining balance.
 		skipBilling := c.Request.URL.Path == "/v1/usage" || billingInfoRequest || isAsyncImageTaskRead(c.Request.Method, c.Request.URL.Path)
+		// 只读的模型目录（/v1/models）不产生费用：即使余额为 0 也应允许访问，
+		// 好让前端能展示分组与可选模型；真正产生费用的推理请求仍会被下面的余额检查拦截。
+		skipBalanceCheck := isModelCatalogRequest(c.Request.Method, c.Request.URL.Path)
 
 		// ── 4. SimpleMode → early return ─────────────────────────────
 
@@ -260,7 +263,7 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 				}
 			} else {
 				// 非订阅模式 或 订阅模式但 subscriptionService 未注入：回退到余额检查
-				if apiKeyBalanceBelowAuthThreshold(apiKey.User.Balance, cfg) {
+				if !skipBalanceCheck && apiKeyBalanceBelowAuthThreshold(apiKey.User.Balance, cfg) {
 					AbortWithError(c, 403, "INSUFFICIENT_BALANCE", "Insufficient account balance")
 					return
 				}
@@ -338,6 +341,16 @@ func isAsyncImageTaskRead(method, path string) bool {
 		return false
 	}
 	return strings.HasPrefix(path, "/v1/images/tasks/") || strings.HasPrefix(path, "/images/tasks/")
+}
+
+// isModelCatalogRequest 判断是否为只读的模型目录请求（/v1/models、/models 及其子路径）。
+// 这类请求不产生费用，余额为 0 时也应放行，否则用户连"有哪些模型可用"都看不到。
+func isModelCatalogRequest(method, path string) bool {
+	if method != http.MethodGet {
+		return false
+	}
+	trimmed := strings.TrimPrefix(path, "/v1")
+	return trimmed == "/models" || strings.HasPrefix(trimmed, "/models/")
 }
 
 // GetAPIKeyFromContext 从上下文中获取API key
