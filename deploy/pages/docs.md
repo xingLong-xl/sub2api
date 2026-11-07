@@ -1,161 +1,339 @@
-# tokenpolit 配置文档
+## 一分钟接入
 
-tokenpolit 是一个统一的 AI 模型 API 网关：你只需要一个 API Key，就可以调用 Claude、GPT、Gemini 等主流模型，无需单独购买或维护多家订阅账号。
+| 你需要准备 | 在哪里获取 |
+| --- | --- |
+| 一个 TokenPilot 账号 | [tokenpilot.site](https://tokenpilot.site) |
+| 一个 API Key | 控制台 →「API 密钥」→「创建密钥」 |
+| 一个模型名 | [模型广场](https://tokenpilot.site/model-plaza) |
+| 一个 Base URL | `https://tokenpilot.site/v1` |
 
-本文档将带你完成从注册到接入的全过程。
+> 第一次使用，建议按下面的「快速开始」完整走一遍，大约 3 分钟。
 
 ## 快速开始
 
-### 第一步：注册并登录
+### 1. 注册并登录
 
-1. 打开 tokenpolit 首页，点击右上角「登录」。
-2. 首次使用请先注册账号，完成邮箱验证后登录控制台。
+打开 [tokenpilot.site](https://tokenpilot.site)，点击右上角「登录」。没有账号请先注册，按页面提示完成验证后进入控制台。
 
-### 第二步：创建 API Key
+### 2. 创建 API Key
 
-1. 登录后进入控制台。
-2. 在左侧菜单打开「API 密钥」（`/keys`）。
-3. 点击「创建密钥」，填写名称后确认。
-4. 复制生成的密钥（形如 `sk-xxxxxxxx`）并妥善保存。密钥只在创建时完整展示一次。
+1. 在左侧菜单进入「API 密钥」（`/keys`）。
+2. 点击「创建密钥」，填写一个容易辨认的名称，例如 `my-app`。
+3. 复制生成的密钥（以 `sk-` 开头）。**密钥只在创建时完整展示一次**，请立即保存。
 
-> 请勿把 API Key 提交到 Git 仓库、公开论坛或截图里。如果发现泄露，请立即在控制台删除并重新创建。
+> 不要把 API Key 提交到 Git 仓库、公开论坛或截图里。如果怀疑泄露，请立即删除旧密钥并重新创建。
 
-### 第三步：充值或兑换额度
+### 3. 充值或兑换额度
 
-- 「兑换中心」（`/redeem`）：输入兑换码即可增加余额。
-- 「购买订阅」（`/purchase`）：站点开启在线支付时，可直接购买套餐。
+- 「兑换中心」（`/redeem`）：输入兑换码增加余额。
+- 「购买订阅」（`/purchase`）：站点开启在线支付时，可以直接购买套餐。
+- 余额、订阅进度和消费明细可以在控制台首页和「用量记录」（`/usage`）中查看。
 
-余额与用量可以在控制台首页和「用量记录」（`/usage`）中查看。
+### 4. 选择模型
 
-### 第四步：选择模型
+打开「模型广场」（`/model-plaza`），确认三件事：
 
-打开「模型广场」（`/model-plaza`），可以查看当前可用模型、所属分组以及计费倍率。每个分组对应一组可调用的模型，请留意分组说明。
+- **模型名**：请求里的 `model` 必须和广场中展示的完全一致；
+- **分组**：你的 API Key 属于哪个分组，决定能用哪些模型；
+- **价格**：实付价格 = 渠道价 × 分组倍率，或你的专属倍率。
+
+### 5. 发出第一个请求
+
+```bash
+export TOKENPILOT_API_KEY="sk-你的密钥"
+
+curl https://tokenpilot.site/v1/chat/completions \
+  -H "Authorization: Bearer $TOKENPILOT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o-mini",
+    "messages": [{"role": "user", "content": "用三句话介绍你自己"}]
+  }'
+```
+
+如果响应里的 `choices[0].message.content` 有内容，说明接入成功。把 `model` 换成模型广场里的其他模型，就可以调用对应模型。
 
 ## 接口地址
 
-所有接口都遵循 OpenAI / Anthropic / Gemini 的兼容协议，基础地址为：
+TokenPilot 同时兼容三种主流协议，按你使用的 SDK 选择 Base URL：
 
-```
-https://你的站点域名/v1
-```
-
-请在控制台或站点公告中确认实际域名，将下面的示例域名替换为你自己的站点地址。
-
-支持的接口路径：
-
-| 接口路径 | 协议 | 典型用途 |
+| 协议 | Base URL | 适用客户端 |
 | --- | --- | --- |
-| `/v1/chat/completions` | OpenAI Chat Completions | GPT 系列、通用对话 |
-| `/v1/responses` | OpenAI Responses | 新版 OpenAI 调用方式 |
-| `/v1/messages` | Anthropic Messages | Claude 系列 |
-| `/v1/messages/count_tokens` | Anthropic | 预估 token 数 |
-| `/v1beta` | Gemini | Gemini 系列 |
+| OpenAI Chat Completions / Responses | `https://tokenpilot.site/v1` | OpenAI SDK、Codex CLI、NextChat、Cherry Studio |
+| Anthropic Messages | `https://tokenpilot.site` | Anthropic SDK、Claude Code |
+| Gemini | `https://tokenpilot.site` | Gemini SDK、Gemini CLI（SDK 会自动追加 `v1beta`） |
 
-## 接入示例
+### 常用端点
 
-### OpenAI SDK（Python）
+| 端点 | 用途 |
+| --- | --- |
+| `POST /v1/chat/completions` | OpenAI 兼容对话 |
+| `POST /v1/responses` | OpenAI Responses |
+| `POST /v1/messages` | Anthropic 消息 |
+| `POST /v1/messages/count_tokens` | 预估 token 数 |
+| `POST /v1beta/models/{model}:generateContent` | Gemini 生成内容 |
+| `GET /v1/models` | 查询当前 Key 可用的模型 |
+| `GET /v1/usage` | 查询当前 Key 的用量 |
+| `POST /v1/images/generations` | 图片生成（需分组支持） |
+| `POST /v1/videos` | 视频生成（需分组支持） |
+
+### 鉴权方式
+
+三种请求头任选其一，推荐第一种：
+
+| 请求头 | 示例 | 说明 |
+| --- | --- | --- |
+| `Authorization` | `Bearer sk-...` | 所有协议通用，推荐 |
+| `x-api-key` | `sk-...` | Anthropic 客户端常用 |
+| `x-goog-api-key` | `sk-...` | Gemini 客户端常用 |
+
+Gemini 的 `?key=sk-...` 查询参数仍然可用，但只建议在无法设置请求头的客户端中使用；旧的 `?api_key=` 写法已废弃。
+
+> 每个响应都会带上 `X-Client-Request-ID`。联系管理员排查问题时，请提供这个 ID，可以快速定位到具体请求。
+
+## 调用示例
+
+> 下面的示例统一用 `gpt-4o-mini`、`claude-sonnet-4-5`、`gemini-2.0-flash` 演示。实际调用时，请替换成[模型广场](https://tokenpilot.site/model-plaza)中可用的模型名。
+
+### OpenAI 兼容（Python）
 
 ```python
 from openai import OpenAI
 
 client = OpenAI(
     api_key="sk-你的密钥",
-    base_url="https://你的站点域名/v1",
+    base_url="https://tokenpilot.site/v1",
 )
 
 resp = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role": "user", "content": "你好，介绍一下你自己"}],
+    model="gpt-4o-mini",  # 换成模型广场里的模型名
+    messages=[{"role": "user", "content": "你好"}],
 )
 print(resp.choices[0].message.content)
 ```
 
-### curl 调用
+### OpenAI 兼容（Node.js）
+
+```js
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.TOKENPILOT_API_KEY,
+  baseURL: "https://tokenpilot.site/v1",
+});
+
+const resp = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [{ role: "user", content: "你好" }],
+});
+console.log(resp.choices[0].message.content);
+```
+
+### 流式输出
+
+把 `stream` 设为 `true`，服务端会以 SSE 返回 `data:` 事件，最后以 `data: [DONE]` 结束：
 
 ```bash
-curl https://你的站点域名/v1/chat/completions \
-  -H "Authorization: Bearer sk-你的密钥" \
+curl -N https://tokenpilot.site/v1/chat/completions \
+  -H "Authorization: Bearer $TOKENPILOT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-4o-mini",
-    "messages": [{"role": "user", "content": "你好"}]
+    "messages": [{"role": "user", "content": "写一首短诗"}],
+    "stream": true
   }'
+```
+
+> 使用 `curl` 时加 `-N` 关闭缓冲，否则可能看起来“没有输出”。
+
+### Anthropic / Claude（Python）
+
+```python
+from anthropic import Anthropic
+
+client = Anthropic(
+    api_key="sk-你的密钥",
+    base_url="https://tokenpilot.site",
+)
+
+msg = client.messages.create(
+    model="claude-sonnet-4-5",  # 以模型广场为准
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "你好"}],
+)
+print(msg.content[0].text)
 ```
 
 ### Claude Code
 
-在终端中配置环境变量后启动 Claude Code：
-
 ```bash
-export ANTHROPIC_BASE_URL="https://你的站点域名"
+export ANTHROPIC_BASE_URL="https://tokenpilot.site"
 export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 claude
 ```
+
+也可以写入 `~/.claude/settings.json`：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://tokenpilot.site",
+    "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  }
+}
+```
+
+> `ANTHROPIC_BASE_URL` 不要带 `/v1`，Claude Code 会自己追加 `/v1/messages`。如果模型名和默认值不一致，再设置 `ANTHROPIC_MODEL`、`ANTHROPIC_DEFAULT_SONNET_MODEL` 等变量。
 
 ### Codex CLI
 
 ```bash
-export OPENAI_BASE_URL="https://你的站点域名/v1"
+export OPENAI_BASE_URL="https://tokenpilot.site/v1"
 export OPENAI_API_KEY="sk-你的密钥"
 codex
 ```
 
-### Cherry Studio / NextChat 等客户端
+> 在控制台「API 密钥」页面点击「使用密钥」，可以直接复制对应客户端的完整配置，包括 `config.toml` 和认证方式，比手动拼写更不容易出错。
 
-在客户端中选择「OpenAI 兼容」或「自定义 API」：
+### Gemini
 
-- API 地址（Base URL）：`https://你的站点域名/v1`
-- API Key：`sk-你的密钥`
-- 模型名称：请填写模型广场中显示的完整模型名
+```bash
+curl "https://tokenpilot.site/v1beta/models/gemini-2.0-flash:generateContent" \
+  -H "x-goog-api-key: $TOKENPILOT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"contents":[{"parts":[{"text":"你好"}]}]}'
+```
+
+Gemini CLI：
+
+```bash
+export GOOGLE_GEMINI_BASE_URL="https://tokenpilot.site"
+export GEMINI_API_KEY="sk-你的密钥"
+export GEMINI_MODEL="gemini-2.0-flash"
+gemini
+```
+
+### 图形界面客户端
+
+Cherry Studio、NextChat、Chatbox、Open WebUI 等客户端，选择「OpenAI 兼容」或「自定义 API」：
+
+| 配置项 | 填写内容 |
+| --- | --- |
+| API 地址 / Base URL | `https://tokenpilot.site/v1` |
+| API Key | `sk-...` |
+| 模型 | 模型广场中展示的完整模型名 |
+
+> 部分客户端会在 Base URL 后自动追加 `/v1`，此时填 `https://tokenpilot.site` 即可。以客户端实际请求路径为准。
 
 ## 模型与计费
 
-- 模型名称必须与模型广场中展示的名称完全一致，大小写敏感。
-- 计费按实际用量统计，输入与输出 token 分开计算，具体单价以模型广场为准。
-- 不同分组可能有不同的倍率与可用模型，请按需选择。
-- 每次请求的消耗可在「用量记录」中查看，按时间与模型筛选即可。
+### 查询可用模型
 
-## 密钥使用情况查询
-
-未登录时也可以打开「密钥用量」（`/key-usage`）页面，输入 API Key 即可查询该密钥的余额、配额与近期用量。该页面不会保存你的密钥。
-
-## 常见问题
-
-### 401 Unauthorized
-
-密钥无效或已被删除。请确认请求头格式为：
-
-```
-Authorization: Bearer sk-你的密钥
+```bash
+curl https://tokenpilot.site/v1/models \
+  -H "Authorization: Bearer $TOKENPILOT_API_KEY"
 ```
 
-然后回到「API 密钥」页面核对密钥是否仍然存在。
+返回的是当前 Key 所在分组可用的模型列表（OpenAI 格式）。如果列表为空，通常是 Key 还没有绑定分组，或分组下暂时没有可用渠道。
 
-### 403 Forbidden
+### 计费规则
 
-当前密钥没有该模型或分组的访问权限。请在模型广场确认模型所属分组，或联系管理员开通对应权限。
+- **按 Token**：输入、输出、缓存写入、缓存读取分别计价，单位为「元 / 1M token」。
+- **按次 / 按图片 / 按视频**：部分模型按请求次数或媒体张数计费，以模型广场为准。
+- **分组倍率**：实付 = 渠道单价 × 分组倍率；如果管理员给你配置了专属倍率，会覆盖分组倍率。
+- **长上下文阶梯**：超过阈值后按更高档位计价，具体看模型广场的档位说明。
+- **分时 / 高峰倍率**：部分分组在指定时段或高峰时段有额外倍率，模型广场会标注。
 
-### 429 Too Many Requests
+### 查询用量
 
-触发了并发或频率限制。请降低请求频率后重试；如果你有较高的并发需求，请联系管理员。
+```bash
+curl "https://tokenpilot.site/v1/usage?days=7" \
+  -H "Authorization: Bearer $TOKENPILOT_API_KEY"
+```
 
-### 余额不足
+返回当前 Key 的今日/累计用量、费用、RPM/TPM，以及按模型统计的用量。`days` 可选 1–90。
 
-请求会返回余额不足相关错误。请前往「兑换中心」兑换额度，或在「购买订阅」页面充值。
+### 不登录查询密钥用量
+
+打开「密钥用量」（`/key-usage`），输入 API Key 即可查看余额、配额和近期用量。该页面不会保存你的密钥。
+
+### 余额与订阅
+
+- 余额不足时请求会返回 `403 billing_error`，请先充值或兑换。
+- 订阅型分组会优先消耗订阅额度；超出后按站点规则处理。
+- 具体余额、订阅进度和账单以控制台为准。
+
+## 错误与排查
+
+### 常见状态码
+
+| 状态码 | 错误类型 | 常见原因 | 处理方式 |
+| --- | --- | --- | --- |
+| 400 | `invalid_request_error` | JSON 格式错误、缺少 `model`、参数不合法 | 检查请求体，确认 `model` 已填写 |
+| 401 | `authentication_error` | 没有带 Key、Key 错误或已删除 | 检查 `Authorization: Bearer sk-...` |
+| 403 | `permission_error` | Key 没有该分组/模型的权限 | 在模型广场确认分组，或联系管理员开通 |
+| 403 | `billing_error` | 余额不足、订阅额度用完 | 充值/兑换，或购买订阅 |
+| 404 | `not_found_error` | 模型名或路径不存在 | 对照模型广场的完整模型名 |
+| 429 | `rate_limit_exceeded` | 并发、RPM/TPM 或窗口额度超限 | 按 `Retry-After` 退避后重试 |
+| 5xx | `api_error` | 上游模型服务异常 | 稍后重试；持续出现请联系管理员 |
+
+> 不同协议的响应结构略有差异：OpenAI 是 `{"error": {...}}`，Anthropic 是 `{"type": "error", "error": {...}}`，Gemini 是 `{"error": {"code", "message", "status"}}`。排查时优先看 `message` 和 `X-Client-Request-ID`。
+
+### 429 怎么处理
+
+1. 看响应头 `Retry-After`，按它建议的秒数退避，不要立刻重试。
+2. 降低并发或请求频率；批量任务加一点随机抖动。
+3. 确认不是 Key 的 5 小时 / 1 天 / 7 天窗口额度用完（控制台「API 密钥」可以看到额度）。
+4. 如果业务确实需要更高并发，联系管理员调整分组或账号容量。
+
+### 401 / 403
+
+- 401：优先检查请求头。可以直接用下面的命令验证：
+
+```bash
+curl https://tokenpilot.site/v1/models \
+  -H "Authorization: Bearer sk-你的密钥"
+```
+
+- 403：Key 有效，但当前分组没有这个模型，或者余额/订阅额度不足。先看错误 `code` 是 `permission_error` 还是 `billing_error`。
 
 ### 模型不存在
 
-请检查模型名称是否与模型广场完全一致，包括大小写和分隔符。部分模型只对特定分组开放。
+模型名必须和模型广场完全一致，包括大小写、日期后缀和分隔符。例如 `gpt-4o-mini` 和 `gpt-4o` 是两个不同的模型。可以先用 `GET /v1/models` 看当前 Key 能调用哪些模型。
 
-### 响应很慢或超时
+### 流式响应很慢或中断
 
-上游模型服务可能出现波动，可以稍后重试。若长时间不可用，请在「渠道状态」页面查看当前渠道状态。
+- 首 Token 慢通常是上游排队或网络问题；可以换一个模型或分组再试。
+- 流式过程中断时，客户端通常会收到不完整的 SSE。建议加超时和重试，并记录 `X-Client-Request-ID`。
+- 可以在「渠道状态」页面查看当前渠道是否可用。
 
-## 联系客服
+### Claude Code 连不上
 
-遇到文档未覆盖的问题时：
+按顺序检查：
 
-1. 登录控制台，点击右上角头像打开用户菜单。
-2. 在菜单中查看「联系客服」一栏，使用站点管理员配置的联系方式。
+1. `ANTHROPIC_BASE_URL` 是否写成 `https://tokenpilot.site`（不要带 `/v1`，也不要带 `/v1/messages`）。
+2. `ANTHROPIC_AUTH_TOKEN` 是否是完整的 `sk-...`，有没有多余空格或引号。
+3. 当前 Key 的分组是否包含 Claude 模型；可以在模型广场确认。
+4. 如果公司网络需要代理，先确认终端能访问 `https://tokenpilot.site`。
+5. 仍然失败时，用 `curl` 直接请求 `/v1/messages`，把 `X-Client-Request-ID` 和错误信息发给管理员。
 
-反馈问题时请附上：请求时间、使用的模型名、完整的错误信息（请先隐去 API Key）。
+## 安全建议
+
+- 一个应用一个 Key，不要把同一个 Key 用在多个项目里。
+- 不要把 Key 写进前端代码、Git 仓库或公开截图；用环境变量或密钥管理服务。
+- 定期在控制台轮换 Key；怀疑泄露时立即删除旧 Key。
+- 如果 Key 支持额度或过期时间，按最小权限设置。
+
+## 联系我们
+
+遇到文档没有覆盖的问题：
+
+1. 先看上面的「错误与排查」和「常见问题」。
+2. 登录控制台，在「个人资料」（`/profile`）页面查看管理员配置的联系方式。
+3. 反馈时请附上：请求时间、模型名、完整错误信息、`X-Client-Request-ID`（记得隐去 API Key）。
+
+---
+
+本文档适用于 [tokenpilot.site](https://tokenpilot.site)。模型、价格和可用性以控制台与模型广场的实时展示为准。
