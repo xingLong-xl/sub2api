@@ -442,11 +442,11 @@ onMounted(() => {
 }
 
 .docs-markdown .os-tablist {
-  @apply inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-100/80 p-1 dark:border-dark-700 dark:bg-dark-800/60;
+  @apply inline-flex items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-100/80 p-0.5 dark:border-dark-700 dark:bg-dark-800/60;
 }
 
 .docs-markdown .os-tablist--master {
-  @apply mb-4;
+  @apply mb-3;
 }
 
 .docs-markdown .os-tablist--master + h3 {
@@ -462,7 +462,7 @@ onMounted(() => {
 }
 
 .docs-markdown .os-tab {
-  @apply rounded-lg px-4 py-1.5 text-[13px] font-medium text-gray-600 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-dark-300 dark:hover:text-white;
+  @apply min-w-[82px] justify-center rounded-md px-5 py-1 text-center text-[12.5px] font-medium leading-5 text-gray-600 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-dark-300 dark:hover:text-white;
 }
 
 .docs-markdown .os-tab[aria-selected='true'] {

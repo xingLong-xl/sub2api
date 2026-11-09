@@ -319,3 +319,75 @@ codex
 - 修改环境变量或配置文件后，需要重新打开终端或重启对应 CLI。
 - 如果提示模型不存在，检查 Key 分组和模型名是否与模型广场一致。
 - 如果 Codex 仍然要求 ChatGPT 登录，检查 `~/.codex/config.toml` 路径和 `requires_openai_auth = false`。
+
+## 模型与计费
+
+### 查询模型和用量
+
+```bash
+# 当前 Key 可用的模型
+curl https://tokenpilot.site/v1/models \
+  -H "Authorization: Bearer $TOKENPILOT_API_KEY"
+
+# 最近 7 天用量
+curl "https://tokenpilot.site/v1/usage?days=7" \
+  -H "Authorization: Bearer $TOKENPILOT_API_KEY"
+```
+
+- `/v1/models` 返回当前 Key 分组可用的模型；列表为空通常是 Key 未绑定分组。
+- `/v1/usage` 返回用量、费用和 RPM/TPM，`days` 可选 1–90。
+- 也可以打开「密钥用量」（`/key-usage`）查询余额和配额，页面不会保存 Key。
+
+### 计费规则
+
+- 按 Token 计费，输入、输出、缓存分别计价。
+- 图片、视频等按次或按张计费，以模型广场为准。
+- 实付 = 渠道单价 × 分组倍率；专属倍率优先。
+- 长上下文、分时/高峰可能加价；余额不足返回 `403 billing_error`。
+- 订阅分组优先消耗订阅额度。
+
+## 错误与排查
+
+### 常见错误
+
+| 状态码 | 原因 | 处理 |
+| --- | --- | --- |
+| 401 | Key 缺失、错误或已删除 | 检查 `Authorization: Bearer sk-...` |
+| 403 | 没有模型权限，或余额/订阅不足 | 检查 Key 分组，或充值 |
+| 404 | 模型名或路径不存在 | 对照模型广场的完整模型名 |
+| 429 | 并发、RPM/TPM 或额度超限 | 按 `Retry-After` 退避，降低并发 |
+| 5xx | 上游模型服务异常 | 稍后重试，持续出现联系管理员 |
+
+> 排查时优先看错误 `message` 和响应头 `X-Client-Request-ID`。
+
+### Claude Code 连不上
+
+1. `ANTHROPIC_BASE_URL` 应为 `https://tokenpilot.site`，不要带 `/v1` 或 `/v1/messages`。
+2. `ANTHROPIC_AUTH_TOKEN` 应是完整的 `sk-...`，没有多余空格或引号。
+3. 当前 Key 分组要包含 Claude 模型。
+4. 修改配置后重启终端和 Claude Code。
+5. 仍然失败时，用 `curl` 请求 `/v1/messages`，把 `X-Client-Request-ID` 发给管理员。
+
+### Codex 仍然要求登录
+
+1. 确认配置在 `~/.codex/config.toml`（Windows 为 `%USERPROFILE%\.codex\config.toml`）。
+2. 确认 `requires_openai_auth = false`。
+3. 设置 `OPENAI_API_KEY` 后重新打开终端或重启 Codex；不要继续执行 `codex login`。
+
+## 安全建议
+
+- 一个应用一个 Key，不要多个项目共用。
+- 不要把 Key 写进前端代码、Git 仓库或公开截图，优先用环境变量。
+- 定期轮换 Key；怀疑泄露时立即删除旧 Key。
+
+## 联系我们
+
+遇到文档没有覆盖的问题：
+
+1. 先看上面的「错误与排查」。
+2. 登录控制台，在「个人资料」（`/profile`）查看管理员配置的联系方式。
+3. 反馈时附上请求时间、模型名、错误信息和 `X-Client-Request-ID`，不要发送完整 API Key。
+
+---
+
+本文档适用于 [tokenpilot.site](https://tokenpilot.site)。模型、价格和可用性以控制台与模型广场的实时展示为准。
