@@ -189,13 +189,81 @@ claude
 
 ### Codex CLI
 
+Codex CLI 使用 OpenAI Responses 协议。推荐通过 `~/.codex/config.toml` 指定 TokenPilot；只设置 `OPENAI_BASE_URL` 时，新版本 Codex 仍可能走 ChatGPT 登录。
+
+#### 1. 安装
+
 ```bash
-export OPENAI_BASE_URL="https://tokenpilot.site/v1"
-export OPENAI_API_KEY="sk-你的密钥"
+npm install -g @openai/codex
+codex --version
+```
+
+#### 2. 创建 `~/.codex/config.toml`
+
+macOS / Linux 路径为 `~/.codex/config.toml`，Windows 为 `%USERPROFILE%\.codex\config.toml`：
+
+```toml
+model_provider = "tokenpilot"
+model = "gpt-5.1-codex"          # 换成模型广场里你分组可用的 Codex 模型
+review_model = "gpt-5.1-codex"
+disable_response_storage = true
+
+[model_providers.tokenpilot]
+name = "TokenPilot"
+base_url = "https://tokenpilot.site/v1"
+env_key = "TOKENPILOT_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+supports_websockets = false
+```
+
+说明：
+
+- `base_url` 必须带 `/v1`，Codex 会自己追加 `/responses`；
+- `env_key` 填环境变量名，不要把 `sk-...` 直接写进 `config.toml`；
+- `requires_openai_auth = false` 表示使用 API Key，不要求 ChatGPT OAuth 登录；
+- `supports_websockets = false` 使用 HTTP/SSE，避免部分网关不支持 WebSocket；
+- `model` 必须是当前 API Key 所属分组可用的模型，可在[模型广场](https://tokenpilot.site/model-plaza)确认。
+
+#### 3. 设置环境变量并启动
+
+macOS / Linux：
+
+```bash
+export TOKENPILOT_API_KEY="sk-你的密钥"
 codex
 ```
 
-> 在控制台「API 密钥」页面点击「使用密钥」，可以直接复制对应客户端的完整配置，包括 `config.toml` 和认证方式，比手动拼写更不容易出错。
+PowerShell：
+
+```powershell
+$env:TOKENPILOT_API_KEY="sk-你的密钥"
+codex
+```
+
+Windows CMD：
+
+```bat
+set TOKENPILOT_API_KEY=sk-你的密钥
+codex
+```
+
+#### 4. 验证
+
+```bash
+codex exec "用一句话介绍当前目录"
+```
+
+常见问题：
+
+| 现象 | 检查项 |
+| --- | --- |
+| 提示 401 / Unauthorized | `TOKENPILOT_API_KEY` 是否已设置，Key 是否被删除或停用 |
+| 提示 model not found | `model` 是否在当前 Key 的分组中，名称是否与模型广场完全一致 |
+| 仍然弹出 ChatGPT 登录 | `config.toml` 路径是否正确，`requires_openai_auth` 是否为 `false` |
+| WebSocket / 连接失败 | 保留 `supports_websockets = false`，并确认 Base URL 带 `/v1` |
+
+> 也可以直接使用控制台「API 密钥」页面的「使用密钥」功能，选择 Codex CLI 后复制生成的 `config.toml` 和环境变量，避免手动拼写。
 
 ### Gemini
 
