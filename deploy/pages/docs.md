@@ -28,6 +28,19 @@ Claude Code 和 Codex 使用不同的协议和 Base URL：
 - Codex 的 Base URL **要带 `/v1`**，客户端会自己追加 `/responses`。
 - 同一把 Key 能否同时用于 Claude Code 和 Codex，取决于 Key 所属分组。Anthropic 分组用于 Claude 模型，OpenAI 分组用于 GPT/Codex 模型；不确定时请在模型广场确认，或分别创建对应分组的 Key。
 
+### 系统差异速查
+
+| 项目 | macOS | Linux | Windows |
+| --- | --- | --- | --- |
+| 默认终端 | zsh | bash / zsh | PowerShell |
+| 安装 Node.js | Homebrew 或官网安装包 | NodeSource / nvm / 发行版包管理器 | winget |
+| 环境变量长期保存 | `~/.zshrc` | `~/.bashrc` 或 `~/.zshrc` | `setx` |
+| Claude Code 配置 | `~/.claude/settings.json` | `~/.claude/settings.json` | `%USERPROFILE%\.claude\settings.json` |
+| Codex 配置 | `~/.codex/config.toml` | `~/.codex/config.toml` | `%USERPROFILE%\.codex\config.toml` |
+| 重新打开终端 | 需要 | 需要 | 需要 |
+
+> 三个系统的 Base URL 和模型名完全一致，区别只在 Node.js 安装方式、shell 和环境变量保存位置。
+
 ## 开始之前
 
 1. 登录 TokenPilot 控制台。
@@ -50,23 +63,32 @@ Claude Code 使用 Anthropic Messages 协议，因此：
 
 ### 安装
 
-#### macOS / Linux
+#### macOS
 
 ```bash
-# 需要 Node.js 18+，已安装可跳过
+# 已安装 Node.js 18+ 可跳过
+brew install node
 node -v
 
 npm install -g @anthropic-ai/claude-code
 claude --version
 ```
 
-如果 npm 全局安装报 `EACCES`，可以临时使用：
+macOS 默认使用 zsh。没有 Homebrew 时，也可以从 [nodejs.org](https://nodejs.org/) 下载 LTS 安装包。
+
+#### Linux
 
 ```bash
-sudo npm install -g @anthropic-ai/claude-code
+# Ubuntu / Debian 示例：Node.js 20/22，发行版自带的版本可能过旧
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+
+npm install -g @anthropic-ai/claude-code
+claude --version
 ```
 
-长期建议把 npm 的全局目录改到用户目录，避免每次使用 `sudo`。
+其他发行版请先安装 Node.js 20+，再执行 `npm install -g @anthropic-ai/claude-code`。如果全局安装报 `EACCES`，参考文末「Linux 全局 npm 安装报 EACCES」。
 
 #### Windows
 
@@ -85,11 +107,13 @@ claude --version
 
 安装 Node.js 后请重新打开 PowerShell，确保 `node` 和 `npm` 已进入 PATH。
 
+> 使用 CMD 时，当前窗口用 `set ANTHROPIC_BASE_URL=https://tokenpilot.site` 和 `set ANTHROPIC_AUTH_TOKEN=sk-...`；持久化仍然使用 `setx`，修改后重新打开 CMD。
+
 ### 配置方式 A：环境变量
 
 适合先在当前终端快速验证。
 
-#### macOS / Linux
+#### macOS（zsh）
 
 ```bash
 export ANTHROPIC_BASE_URL="https://tokenpilot.site"
@@ -99,7 +123,39 @@ export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 claude
 ```
 
-#### Windows PowerShell
+如果需要长期生效，可以写入 `~/.zshrc`：
+
+```bash
+cat >> ~/.zshrc <<'EOF'
+export ANTHROPIC_BASE_URL="https://tokenpilot.site"
+export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+EOF
+source ~/.zshrc
+```
+
+#### Linux（bash / zsh）
+
+```bash
+export ANTHROPIC_BASE_URL="https://tokenpilot.site"
+export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+
+claude
+```
+
+长期生效写入当前 shell 的启动文件：bash 用 `~/.bashrc`，zsh 用 `~/.zshrc`。
+
+```bash
+cat >> ~/.bashrc <<'EOF'
+export ANTHROPIC_BASE_URL="https://tokenpilot.site"
+export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+EOF
+source ~/.bashrc
+```
+
+#### Windows PowerShell（当前窗口）
 
 ```powershell
 $env:ANTHROPIC_BASE_URL="https://tokenpilot.site"
@@ -109,7 +165,7 @@ $env:CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1"
 claude
 ```
 
-#### Windows 持久环境变量
+#### Windows（持久环境变量）
 
 ```powershell
 setx ANTHROPIC_BASE_URL "https://tokenpilot.site"
@@ -121,9 +177,26 @@ setx CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC "1"
 
 ### 配置方式 B：settings.json
 
-适合长期使用。修改后同样需要重启 Claude Code。
+适合长期使用，macOS、Linux、Windows 都支持。修改后同样需要重启 Claude Code。
 
-#### macOS / Linux
+#### macOS
+
+```bash
+mkdir -p ~/.claude
+cat > ~/.claude/settings.json <<'JSON'
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://tokenpilot.site",
+    "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  }
+}
+JSON
+
+chmod 600 ~/.claude/settings.json
+```
+
+#### Linux
 
 ```bash
 mkdir -p ~/.claude
@@ -159,12 +232,22 @@ New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
 
 ### 可选：固定模型
 
-如果 Claude Code 默认选择的模型不在你的分组中，可以设置：
+如果 Claude Code 默认选择的模型不在你的分组中，可以设置。
+
+macOS / Linux（`export` 语法相同，只是 shell 启动文件不同）：
 
 ```bash
 export ANTHROPIC_MODEL="claude-sonnet-4-5"
 export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-5"
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5"
+```
+
+Windows PowerShell：
+
+```powershell
+$env:ANTHROPIC_MODEL="claude-sonnet-4-5"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-5"
+$env:ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5"
 ```
 
 模型名必须和[模型广场](https://tokenpilot.site/model-plaza)中展示的完全一致。不同 Claude Code 版本支持的变量名可能不同，以客户端文档为准。
@@ -197,15 +280,30 @@ claude -p "用一句话介绍当前目录"
 
 ### 安装
 
-#### macOS / Linux
+#### macOS
 
 ```bash
-# 需要 Node.js 18+，已安装可跳过
+# 已安装 Node.js 18+ 可跳过
+brew install node
 node -v
 
 npm install -g @openai/codex
 codex --version
 ```
+
+#### Linux
+
+```bash
+# Ubuntu / Debian 示例：Node.js 20/22
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+
+npm install -g @openai/codex
+codex --version
+```
+
+其他发行版请先安装 Node.js 20+，再执行 `npm install -g @openai/codex`。
 
 #### Windows
 
@@ -222,9 +320,34 @@ codex --version
 
 安装 Node.js 后请重新打开 PowerShell。
 
+> 使用 CMD 时，当前窗口用 `set OPENAI_API_KEY=sk-...`；持久化仍然使用 `setx OPENAI_API_KEY "sk-..."`，修改后重新打开 CMD。
+
 ### 配置 config.toml
 
-#### macOS / Linux
+#### macOS
+
+配置文件路径：`~/.codex/config.toml`
+
+```bash
+mkdir -p ~/.codex
+cat > ~/.codex/config.toml <<'TOML'
+model_provider = "tokenpilot"
+model = "gpt-5.5"                 # 换成模型广场里你分组可用的模型
+review_model = "gpt-5.5"
+model_reasoning_effort = "high"   # 可选：minimal / low / medium / high
+disable_response_storage = true
+
+[model_providers.tokenpilot]
+name = "TokenPilot"
+base_url = "https://tokenpilot.site/v1"
+env_key = "OPENAI_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+supports_websockets = false
+TOML
+```
+
+#### Linux
 
 配置文件路径：`~/.codex/config.toml`
 
@@ -296,21 +419,46 @@ api_key_model_discovery = true
 
 ### 设置 API Key
 
-#### macOS / Linux
+#### macOS（zsh）
 
 ```bash
 export OPENAI_API_KEY="sk-你的密钥"
 codex
 ```
 
-#### Windows PowerShell
+长期生效：
+
+```bash
+cat >> ~/.zshrc <<'EOF'
+export OPENAI_API_KEY="sk-你的密钥"
+EOF
+source ~/.zshrc
+```
+
+#### Linux（bash / zsh）
+
+```bash
+export OPENAI_API_KEY="sk-你的密钥"
+codex
+```
+
+长期生效：bash 写入 `~/.bashrc`，zsh 写入 `~/.zshrc`。
+
+```bash
+cat >> ~/.bashrc <<'EOF'
+export OPENAI_API_KEY="sk-你的密钥"
+EOF
+source ~/.bashrc
+```
+
+#### Windows PowerShell（当前窗口）
 
 ```powershell
 $env:OPENAI_API_KEY="sk-你的密钥"
 codex
 ```
 
-#### Windows 持久环境变量
+#### Windows（持久环境变量）
 
 ```powershell
 setx OPENAI_API_KEY "sk-你的密钥"
@@ -535,11 +683,18 @@ curl "https://tokenpilot.site/v1/usage?days=7" \
 
 ### 配置生效检查
 
+不同系统的配置文件位置：
+
+| 系统 | Claude Code | Codex |
+| --- | --- | --- |
+| macOS | `~/.claude/settings.json` | `~/.codex/config.toml` |
+| Linux | `~/.claude/settings.json` | `~/.codex/config.toml` |
+| Windows | `%USERPROFILE%\.claude\settings.json` | `%USERPROFILE%\.codex\config.toml` |
+
 | 检查项 | Claude Code | Codex |
 | --- | --- | --- |
 | Base URL 是否带 `/v1` | 不带 | 带 |
 | Key 环境变量 | `ANTHROPIC_AUTH_TOKEN` | `OPENAI_API_KEY` |
-| 配置文件 | `~/.claude/settings.json` | `~/.codex/config.toml` |
 | 修改后是否重启 | 是 | 是 |
 | Key 分组 | 需要 Claude 模型 | 需要 GPT/Codex 模型 |
 
