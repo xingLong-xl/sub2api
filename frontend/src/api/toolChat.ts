@@ -25,6 +25,29 @@ export interface ToolChatSessionsResult {
   retentionDays: number
 }
 
+export interface ToolChatPreferences {
+  api_key_id: number | null
+  chat_model: string
+  image_model: string
+  video_model: string
+}
+
+interface ToolChatPreferencesResponse {
+  preferences: ToolChatPreferences | null
+}
+
+/** 账号级工具连接偏好，用于跨浏览器同步分组/模型选择；不包含密钥明文。 */
+export const toolChatPreferencesAPI = {
+  async get(): Promise<ToolChatPreferences | null> {
+    const { data } = await apiClient.get<ToolChatPreferencesResponse>('/tools/chat/preferences')
+    return data.preferences ?? null
+  },
+
+  async save(preferences: ToolChatPreferences): Promise<void> {
+    await apiClient.put('/tools/chat/preferences', preferences)
+  },
+}
+
 /** 服务端聊天历史。历史按登录用户隔离，保存在 Redis。 */
 export const toolChatAPI = {
   async list(): Promise<ToolChatSessionsResult> {

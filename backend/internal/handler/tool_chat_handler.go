@@ -29,6 +29,10 @@ type toolChatSessionsRequest struct {
 	Sessions []service.ToolChatSession `json:"sessions"`
 }
 
+type toolChatPreferencesResponse struct {
+	Preferences *service.ToolChatPreferences `json:"preferences"`
+}
+
 // ListSessions 返回当前用户的服务端聊天历史。
 // GET /api/v1/tools/chat/sessions
 func (h *ToolChatHandler) ListSessions(c *gin.Context) {
@@ -83,4 +87,45 @@ func (h *ToolChatHandler) SaveSessions(c *gin.Context) {
 		return
 	}
 	response.Success(c, gin.H{"saved": true})
+}
+
+// GetPreferences 返回当前账号的工具页连接偏好。
+// GET /api/v1/tools/chat/preferences
+func (h *ToolChatHandler) GetPreferences(c *gin.Context) {
+	subject, ok := middleware2.GetAuthSubjectFromContext(c)
+	if !ok {
+		response.Unauthorized(c, "User not found in context")
+		return
+	}
+	preferences, err := h.store.GetPreferences(c.Request.Context(), subject.UserID)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, toolChatPreferencesResponse{Preferences: preferences})
+}
+
+// SavePreferences 保存当前账号的工具页连接偏好，供其他浏览器恢复。
+// PUT /api/v1/tools/chat/preferences
+func (h *ToolChatHandler) SavePreferences(c *gin.Context) {
+	subject, ok := middleware2.GetAuthSubjectFromContext(c)
+	if !ok {
+		response.Unauthorized(c, "User not found in context")
+		return
+	}
+	var body service.ToolChatPreferences
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response.BadRequest(c, "Invalid tool preferences payload")
+		return
+	}
+	preferences, err := service.NormalizeToolChatPreferences(body)
+	if err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+	if err := h.store.SavePreferences(c.Request.Context(), subject.UserID, preferences); err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, toolChatPreferencesResponse{Preferences: &preferences})
 }

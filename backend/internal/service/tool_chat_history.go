@@ -39,10 +39,46 @@ type ToolChatSession struct {
 	Messages  []ToolChatMessage `json:"messages"`
 }
 
-// ToolChatHistoryStore 持久化工具页聊天历史。实现使用 Redis，按用户隔离。
+// ToolChatPreferences 是账号级的工具页连接偏好。
+// 只保存 API Key 的 ID，不保存密钥明文；模型名用于跨浏览器恢复选择。
+type ToolChatPreferences struct {
+	APIKeyID   *int64 `json:"api_key_id"`
+	ChatModel  string `json:"chat_model"`
+	ImageModel string `json:"image_model"`
+	VideoModel string `json:"video_model"`
+}
+
+const toolChatMaxModelNameBytes = 200
+
+// NormalizeToolChatPreferences 清理并校验连接偏好，避免超长模型名进入 Redis。
+func NormalizeToolChatPreferences(input ToolChatPreferences) (ToolChatPreferences, error) {
+	out := ToolChatPreferences{
+		ChatModel:  strings.TrimSpace(input.ChatModel),
+		ImageModel: strings.TrimSpace(input.ImageModel),
+		VideoModel: strings.TrimSpace(input.VideoModel),
+	}
+	if input.APIKeyID != nil && *input.APIKeyID > 0 {
+		id := *input.APIKeyID
+		out.APIKeyID = &id
+	}
+	for name, value := range map[string]string{
+		"chat_model":  out.ChatModel,
+		"image_model": out.ImageModel,
+		"video_model": out.VideoModel,
+	} {
+		if len(value) > toolChatMaxModelNameBytes {
+			return ToolChatPreferences{}, fmt.Errorf("%s is too long", name)
+		}
+	}
+	return out, nil
+}
+
+// ToolChatHistoryStore 持久化工具页聊天历史和账号级连接偏好。实现使用 Redis，按用户隔离。
 type ToolChatHistoryStore interface {
 	Get(ctx context.Context, userID int64) ([]ToolChatSession, error)
 	Save(ctx context.Context, userID int64, sessions []ToolChatSession) error
+	GetPreferences(ctx context.Context, userID int64) (*ToolChatPreferences, error)
+	SavePreferences(ctx context.Context, userID int64, preferences ToolChatPreferences) error
 }
 
 // MaintainToolChatSessions 清理超过保留期的消息、丢弃空会话，并返回是否有改动。

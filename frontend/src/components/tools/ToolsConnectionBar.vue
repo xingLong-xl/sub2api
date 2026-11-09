@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
 import { useToolsSettings } from '@/composables/useToolsSettings'
@@ -251,7 +251,19 @@ watch(selectedKeyId, async () => {
 })
 
 onMounted(async () => {
-  await Promise.all([loadUserKeys(), loadModelCatalog()])
+  // 强制刷新：另一个浏览器/标签页新建密钥后，当前页也能在进入工具页时看到。
+  await Promise.all([loadUserKeys(true), loadModelCatalog(true)])
   if (hasApiKey.value) await fetchGatewayModels()
+  window.addEventListener('focus', refreshKeysOnVisible)
+  document.addEventListener('visibilitychange', refreshKeysOnVisible)
 })
+
+onBeforeUnmount(() => {
+  window.removeEventListener('focus', refreshKeysOnVisible)
+  document.removeEventListener('visibilitychange', refreshKeysOnVisible)
+})
+
+function refreshKeysOnVisible(): void {
+  if (document.visibilityState === 'visible') void loadUserKeys(true)
+}
 </script>

@@ -12,6 +12,7 @@ import (
 )
 
 const toolChatHistoryKeyPrefix = "tool_chat:sessions:"
+const toolChatPreferencesKeyPrefix = "tool_chat:preferences:"
 
 // 比保留期多留一天，让长时间不活跃的用户键也能自动过期。
 const toolChatHistoryTTL = (service.ToolChatRetentionDays + 1) * 24 * time.Hour
@@ -28,6 +29,10 @@ func NewToolChatHistoryStore(rdb *redis.Client) service.ToolChatHistoryStore {
 
 func toolChatHistoryKey(userID int64) string {
 	return fmt.Sprintf("%s%d", toolChatHistoryKeyPrefix, userID)
+}
+
+func toolChatPreferencesKey(userID int64) string {
+	return fmt.Sprintf("%s%d", toolChatPreferencesKeyPrefix, userID)
 }
 
 func (s *toolChatHistoryStore) Get(ctx context.Context, userID int64) ([]service.ToolChatSession, error) {
@@ -61,6 +66,37 @@ func (s *toolChatHistoryStore) Save(ctx context.Context, userID int64, sessions 
 	}
 	if err := s.rdb.Set(ctx, toolChatHistoryKey(userID), data, toolChatHistoryTTL).Err(); err != nil {
 		return fmt.Errorf("save tool chat history: %w", err)
+	}
+	return nil
+}
+
+// GetPreferences 返回账号级连接偏好；没有保存过时返回 nil。
+func (s *toolChatHistoryStore) GetPreferences(ctx context.Context, userID int64) (*service.ToolChatPreferences, error) {
+	data, err := s.rdb.Get(ctx, toolChatPreferencesKey(userID)).Bytes()
+	if errors.Is(err, redis.Nil) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("get tool chat preferences: %w", err)
+	}
+	if len(data) == 0 {
+		return nil, nil
+	}
+	var preferences service.ToolChatPreferences
+	if err := json.Unmarshal(data, &preferences); err != nil {
+		return nil, fmt.Errorf("decode tool chat preferences: %w", err)
+	}
+	return &preferences, nil
+}
+
+// SavePreferences 保存账号级连接偏好，不设置 TTL，跨浏览器长期生效。
+func (s *toolChatHistoryStore) SavePreferences(ctx context.Context, userID int64, preferences service.ToolChatPreferences) error {
+	data, err := json.Marshal(preferences)
+	if err != nil {
+		return fmt.Errorf("encode tool chat preferences: %w", err)
+	}
+	if err := s.rdb.Set(ctx, toolChatPreferencesKey(userID), data, 0).Err(); err != nil {
+		return fmt.Errorf("save tool chat preferences: %w", err)
 	}
 	return nil
 }

@@ -17,9 +17,11 @@ import (
 )
 
 type toolChatHistoryStoreStub struct {
-	sessions []service.ToolChatSession
-	saved    []service.ToolChatSession
-	err      error
+	sessions         []service.ToolChatSession
+	saved            []service.ToolChatSession
+	preferences      *service.ToolChatPreferences
+	savedPreferences *service.ToolChatPreferences
+	err              error
 }
 
 func (s *toolChatHistoryStoreStub) Get(_ context.Context, _ int64) ([]service.ToolChatSession, error) {
@@ -28,6 +30,15 @@ func (s *toolChatHistoryStoreStub) Get(_ context.Context, _ int64) ([]service.To
 
 func (s *toolChatHistoryStoreStub) Save(_ context.Context, _ int64, sessions []service.ToolChatSession) error {
 	s.saved = sessions
+	return s.err
+}
+
+func (s *toolChatHistoryStoreStub) GetPreferences(_ context.Context, _ int64) (*service.ToolChatPreferences, error) {
+	return s.preferences, s.err
+}
+
+func (s *toolChatHistoryStoreStub) SavePreferences(_ context.Context, _ int64, preferences service.ToolChatPreferences) error {
+	s.savedPreferences = &preferences
 	return s.err
 }
 
@@ -91,4 +102,51 @@ func TestToolChatHandlerRejectsInvalidRole(t *testing.T) {
 
 	require.Equal(t, http.StatusBadRequest, rec.Code)
 	require.Empty(t, store.saved)
+}
+
+func TestToolChatHandlerPreferencesRoundTrip(t *testing.T) {
+	keyID := int64(12)
+	store := &toolChatHistoryStoreStub{preferences: &service.ToolChatPreferences{
+		APIKeyID:   &keyID,
+		ChatModel:  "gpt-5",
+		ImageModel: "gpt-image-1",
+		VideoModel: "",
+	}}
+	h := NewToolChatHandler(store)
+
+	ctx, rec := newToolChatTestContext(http.MethodGet, "/api/v1/tools/chat/preferences", "")
+	h.GetPreferences(ctx)
+	require.Equal(t, http.StatusOK, rec.Code)
+	var body struct {
+		Code int `json:"code"`
+		Data struct {
+			Preferences *service.ToolChatPreferences `json:"preferences"`
+		} `json:"data"`
+	}
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &body))
+	require.NotNil(t, body.Data.Preferences)
+	require.Equal(t, keyID, *body.Data.Preferences.APIKeyID)
+	require.Equal(t, "gpt-5", body.Data.Preferences.ChatModel)
+
+	saveCtx, saveRec := newToolChatTestContext(
+		http.MethodPut,
+		"/api/v1/tools/chat/preferences",
+		`{"api_key_id":12,"chat_model":"  gpt-5  ","image_model":"gpt-image-1"}`,
+	)
+	h.SavePreferences(saveCtx)
+	require.Equal(t, http.StatusOK, saveRec.Code)
+	require.NotNil(t, store.savedPreferences)
+	require.Equal(t, "gpt-5", store.savedPreferences.ChatModel)
+}
+
+func TestToolChatHandlerPreferencesRejectsLongModel(t *testing.T) {
+	store := &toolChatHistoryStoreStub{}
+	h := NewToolChatHandler(store)
+	payload := fmt.Sprintf(`{"api_key_id":12,"chat_model":%q}`, strings.Repeat("m", 201))
+	ctx, rec := newToolChatTestContext(http.MethodPut, "/api/v1/tools/chat/preferences", payload)
+
+	h.SavePreferences(ctx)
+
+	require.Equal(t, http.StatusBadRequest, rec.Code)
+	require.Nil(t, store.savedPreferences)
 }

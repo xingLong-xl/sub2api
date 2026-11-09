@@ -3,6 +3,8 @@ import { buildGatewayUrl } from '@/api/url'
 import { keysAPI } from '@/api/keys'
 import { userChannelsAPI } from '@/api/channels'
 import { useAuthStore } from '@/stores/auth'
+import { toolChatPreferencesAPI } from '@/api/toolChat'
+import type { ToolChatPreferences } from '@/api/toolChat'
 import type { BillingMode } from '@/constants/channel'
 import type { ApiKey } from '@/types'
 
@@ -60,11 +62,18 @@ const chatModel = ref(readStorage(STORAGE_KEYS.chatModel))
 const imageModel = ref(readStorage(STORAGE_KEYS.imageModel))
 const videoModel = ref(readStorage(STORAGE_KEYS.videoModel))
 
+let preferencesLoaded = false
+let preferencesLoading = false
+let preferencesRequestSeq = 0
+let preferencesSaveTimer: ReturnType<typeof setTimeout> | null = null
+let applyingRemotePreferences = false
+
 watch(apiKey, (v) => writeStorage(STORAGE_KEYS.apiKey, v.trim()))
 watch(selectedKeyId, (v) => writeStorage(STORAGE_KEYS.apiKeyId, v === null ? '' : String(v)))
 watch(chatModel, (v) => writeStorage(STORAGE_KEYS.chatModel, v.trim()))
 watch(imageModel, (v) => writeStorage(STORAGE_KEYS.imageModel, v.trim()))
 watch(videoModel, (v) => writeStorage(STORAGE_KEYS.videoModel, v.trim()))
+watch([selectedKeyId, chatModel, imageModel, videoModel], () => schedulePreferencesSave())
 
 const userKeys = ref<ApiKey[]>([])
 const keysLoading = ref(false)
@@ -109,6 +118,14 @@ function currentToolsOwnerId(): string {
 function resetToolsConnectionState(): void {
   keysRequestSeq++
   catalogRequestSeq++
+  preferencesRequestSeq++
+  preferencesLoaded = false
+  preferencesLoading = false
+  if (preferencesSaveTimer) {
+    clearTimeout(preferencesSaveTimer)
+    preferencesSaveTimer = null
+  }
+  applyingRemotePreferences = false
   apiKey.value = ''
   selectedKeyId.value = null
   chatModel.value = ''
@@ -146,6 +163,77 @@ function ensureToolsOwner(): void {
     localStorage.setItem(STORAGE_KEYS.owner, owner)
   } catch {
     // 忽略存储失败
+  }
+}
+
+/** 应用服务端偏好。只恢复 Key ID，明文密钥仍从当前账号的密钥列表解析。 */
+function applyRemotePreferences(preferences: ToolChatPreferences): void {
+  applyingRemotePreferences = true
+  try {
+    selectedKeyId.value = preferences.api_key_id
+    const matched =
+      preferences.api_key_id === null
+        ? undefined
+        : userKeys.value.find((key) => key.id === preferences.api_key_id)
+    apiKey.value = matched?.key ?? ''
+    chatModel.value = preferences.chat_model ?? ''
+    imageModel.value = preferences.image_model ?? ''
+    videoModel.value = preferences.video_model ?? ''
+  } finally {
+    applyingRemotePreferences = false
+  }
+}
+
+function schedulePreferencesSave(): void {
+  if (!preferencesLoaded || applyingRemotePreferences || !currentToolsOwnerId()) return
+  if (preferencesSaveTimer) clearTimeout(preferencesSaveTimer)
+  preferencesSaveTimer = setTimeout(() => {
+    preferencesSaveTimer = null
+    void savePreferences()
+  }, 400)
+}
+
+async function savePreferences(): Promise<void> {
+  const owner = currentToolsOwnerId()
+  if (!owner || !preferencesLoaded) return
+  const payload: ToolChatPreferences = {
+    api_key_id: selectedKeyId.value,
+    chat_model: chatModel.value.trim(),
+    image_model: imageModel.value.trim(),
+    video_model: videoModel.value.trim(),
+  }
+  try {
+    await toolChatPreferencesAPI.save(payload)
+  } catch {
+    // 同步失败不阻塞本地使用；下次修改或刷新会重试。
+  }
+}
+
+/**
+ * 从服务端读取账号级偏好。服务端没有记录时，把当前浏览器里的旧选择作为初始值上传。
+ * 读取失败时保留本地值，且不标记已加载，避免用本地值覆盖服务端。
+ */
+async function loadPreferences(force = false): Promise<void> {
+  const owner = currentToolsOwnerId()
+  if (!owner) return
+  if (preferencesLoaded && !force) return
+  if (preferencesLoading && !force) return
+  const requestSeq = ++preferencesRequestSeq
+  preferencesLoading = true
+  try {
+    const preferences = await toolChatPreferencesAPI.get()
+    if (requestSeq !== preferencesRequestSeq || owner !== currentToolsOwnerId()) return
+    preferencesLoaded = true
+    if (preferences) {
+      applyRemotePreferences(preferences)
+    } else {
+      // 新账号/首次升级：当前本地选择作为种子，随后同步到服务端。
+      schedulePreferencesSave()
+    }
+  } catch {
+    // 读取失败保持本地状态；不标记 loaded，后续页面加载会重试。
+  } finally {
+    if (requestSeq === preferencesRequestSeq) preferencesLoading = false
   }
 }
 
@@ -259,6 +347,7 @@ function modelsForCapability(tool: ToolCapability, models: string[]): string[] {
 export function useToolsSettings() {
   const authStore = useAuthStore()
   ensureToolsOwner()
+  void loadPreferences()
   watch(
     () => authStore.user?.id,
     () => {
@@ -267,6 +356,7 @@ export function useToolsSettings() {
         return
       }
       ensureToolsOwner()
+      void loadPreferences(true)
       void loadUserKeys(true)
       void loadModelCatalog(true)
     },
@@ -297,6 +387,7 @@ export function useToolsSettings() {
 
   async function loadUserKeys(force = false): Promise<ApiKey[]> {
     ensureToolsOwner()
+    void loadPreferences()
     if (keysLoading.value) return userKeys.value
     if (keysLoaded.value && !force) return userKeys.value
     const requestSeq = ++keysRequestSeq

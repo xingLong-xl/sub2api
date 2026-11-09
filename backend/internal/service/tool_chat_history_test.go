@@ -148,3 +148,26 @@ func TestNormalizeToolChatSessionsRejectsInvalidInput(t *testing.T) {
 		})
 	}
 }
+
+func TestNormalizeToolChatPreferences(t *testing.T) {
+	keyID := int64(12)
+	got, err := NormalizeToolChatPreferences(ToolChatPreferences{
+		APIKeyID:   &keyID,
+		ChatModel:  "  gpt-5  ",
+		ImageModel: " gpt-image-1 ",
+		VideoModel: "  ",
+	})
+	require.NoError(t, err)
+	require.Equal(t, keyID, *got.APIKeyID)
+	require.Equal(t, "gpt-5", got.ChatModel)
+	require.Equal(t, "gpt-image-1", got.ImageModel)
+	require.Empty(t, got.VideoModel)
+
+	zero := int64(0)
+	got, err = NormalizeToolChatPreferences(ToolChatPreferences{APIKeyID: &zero})
+	require.NoError(t, err)
+	require.Nil(t, got.APIKeyID)
+
+	_, err = NormalizeToolChatPreferences(ToolChatPreferences{ChatModel: strings.Repeat("m", 201)})
+	require.Error(t, err)
+}

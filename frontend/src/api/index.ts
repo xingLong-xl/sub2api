@@ -22,7 +22,7 @@ export { totpAPI } from './totp'
 export { passkeyAPI, type PasskeyCredentialSummary } from './passkey'
 export { default as announcementsAPI } from './announcements'
 export { channelMonitorUserAPI } from './channelMonitor'
-export { toolChatAPI, type ToolChatSession, type ToolChatMessage } from './toolChat'
+export { toolChatAPI, toolChatPreferencesAPI, type ToolChatSession, type ToolChatMessage, type ToolChatPreferences } from './toolChat'
 
 // Admin APIs
 export { adminAPI } from './admin'
