@@ -5,39 +5,378 @@
 | 一个 TokenPilot 账号 | [tokenpilot.site](https://tokenpilot.site) |
 | 一个 API Key | 控制台 →「API 密钥」→「创建密钥」 |
 | 一个模型名 | [模型广场](https://tokenpilot.site/model-plaza) |
-| 一个 Base URL | `https://tokenpilot.site/v1` |
+| Claude Code Base URL | `https://tokenpilot.site` |
+| Codex / OpenAI Base URL | `https://tokenpilot.site/v1` |
 
-> 第一次使用，建议按下面的「快速开始」完整走一遍，大约 3 分钟。
+> 第一次使用，建议按下面的「开始之前」和对应客户端章节完整走一遍，大约 3–5 分钟。
 
-## 快速开始
+## 基础信息
 
-### 1. 注册并登录
+Claude Code 和 Codex 使用不同的协议和 Base URL：
 
-打开 [tokenpilot.site](https://tokenpilot.site)，点击右上角「登录」。没有账号请先注册，按页面提示完成验证后进入控制台。
+| 客户端 | Base URL | 协议 |
+| --- | --- | --- |
+| Claude Code | `https://tokenpilot.site` | Anthropic Messages |
+| Codex CLI | `https://tokenpilot.site/v1` | OpenAI Responses |
+| OpenAI SDK / 兼容客户端 | `https://tokenpilot.site/v1` | OpenAI Chat Completions / Responses |
+| Anthropic SDK | `https://tokenpilot.site` | Anthropic Messages |
+| Gemini SDK / Gemini CLI | `https://tokenpilot.site` | Gemini |
 
-### 2. 创建 API Key
+注意：
 
-1. 在左侧菜单进入「API 密钥」（`/keys`）。
-2. 点击「创建密钥」，填写一个容易辨认的名称，例如 `my-app`。
-3. 复制生成的密钥（以 `sk-` 开头）。**密钥只在创建时完整展示一次**，请立即保存。
+- Claude Code 的 Base URL **不要带 `/v1`**，客户端会自己追加 `/v1/messages`。
+- Codex 的 Base URL **要带 `/v1`**，客户端会自己追加 `/responses`。
+- 同一把 Key 能否同时用于 Claude Code 和 Codex，取决于 Key 所属分组。Anthropic 分组用于 Claude 模型，OpenAI 分组用于 GPT/Codex 模型；不确定时请在模型广场确认，或分别创建对应分组的 Key。
 
-> 不要把 API Key 提交到 Git 仓库、公开论坛或截图里。如果怀疑泄露，请立即删除旧密钥并重新创建。
+## 开始之前
 
-### 3. 充值或兑换额度
+1. 登录 TokenPilot 控制台。
+2. 进入「API 密钥」（`/keys`），点击「创建密钥」。
+3. 复制生成的 Key（以 `sk-` 开头），并妥善保存。
+4. 在下面的环境变量或配置文件中，把 `sk-你的密钥` 替换成真实 Key。
+5. 修改环境变量或配置文件后，重新打开终端，或完全退出并重启 Claude Code / Codex。
 
-- 「兑换中心」（`/redeem`）：输入兑换码增加余额。
-- 「购买订阅」（`/purchase`）：站点开启在线支付时，可以直接购买套餐。
-- 余额、订阅进度和消费明细可以在控制台首页和「用量记录」（`/usage`）中查看。
+> 不要把 API Key 提交到 Git 仓库、公开论坛或截图里。如果怀疑泄露，请立即删除旧 Key 并重新创建。
 
-### 4. 选择模型
+## Claude Code
 
-打开「模型广场」（`/model-plaza`），确认三件事：
+适合使用 Claude 系列模型进行项目开发。配置完成后，在项目目录执行 `claude` 即可进入交互式编码环境。
 
-- **模型名**：请求里的 `model` 必须和广场中展示的完全一致；
-- **分组**：你的 API Key 属于哪个分组，决定能用哪些模型；
-- **价格**：实付价格 = 渠道价 × 分组倍率，或你的专属倍率。
+Claude Code 使用 Anthropic Messages 协议，因此：
 
-### 5. 发出第一个请求
+- `ANTHROPIC_BASE_URL` 填 `https://tokenpilot.site`，不要带 `/v1`；
+- `ANTHROPIC_AUTH_TOKEN` 填 TokenPilot 的 `sk-...` Key；
+- 当前 Key 的分组必须包含你要使用的 Claude 模型。
+
+### 安装
+
+#### macOS / Linux
+
+```bash
+# 需要 Node.js 18+，已安装可跳过
+node -v
+
+npm install -g @anthropic-ai/claude-code
+claude --version
+```
+
+如果 npm 全局安装报 `EACCES`，可以临时使用：
+
+```bash
+sudo npm install -g @anthropic-ai/claude-code
+```
+
+长期建议把 npm 的全局目录改到用户目录，避免每次使用 `sudo`。
+
+#### Windows
+
+打开 PowerShell：
+
+```powershell
+winget install OpenJS.NodeJS.LTS
+```
+
+安装完成后重新打开 PowerShell，再执行：
+
+```powershell
+npm install -g @anthropic-ai/claude-code
+claude --version
+```
+
+安装 Node.js 后请重新打开 PowerShell，确保 `node` 和 `npm` 已进入 PATH。
+
+### 配置方式 A：环境变量
+
+适合先在当前终端快速验证。
+
+#### macOS / Linux
+
+```bash
+export ANTHROPIC_BASE_URL="https://tokenpilot.site"
+export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+
+claude
+```
+
+#### Windows PowerShell
+
+```powershell
+$env:ANTHROPIC_BASE_URL="https://tokenpilot.site"
+$env:ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
+$env:CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1"
+
+claude
+```
+
+#### Windows 持久环境变量
+
+```powershell
+setx ANTHROPIC_BASE_URL "https://tokenpilot.site"
+setx ANTHROPIC_AUTH_TOKEN "sk-你的密钥"
+setx CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC "1"
+```
+
+`setx` 不会影响已经打开的窗口，执行后请重新打开 PowerShell。
+
+### 配置方式 B：settings.json
+
+适合长期使用。修改后同样需要重启 Claude Code。
+
+#### macOS / Linux
+
+```bash
+mkdir -p ~/.claude
+cat > ~/.claude/settings.json <<'JSON'
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://tokenpilot.site",
+    "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  }
+}
+JSON
+
+chmod 600 ~/.claude/settings.json
+```
+
+#### Windows PowerShell
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
+@'
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://tokenpilot.site",
+    "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  }
+}
+'@ | Set-Content "$env:USERPROFILE\.claude\settings.json"
+```
+
+> `settings.json` 会保存明文 Key，请勿提交到 Git 或共享目录。更推荐使用环境变量或系统密钥管理工具。
+
+### 可选：固定模型
+
+如果 Claude Code 默认选择的模型不在你的分组中，可以设置：
+
+```bash
+export ANTHROPIC_MODEL="claude-sonnet-4-5"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-5"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5"
+```
+
+模型名必须和[模型广场](https://tokenpilot.site/model-plaza)中展示的完全一致。不同 Claude Code 版本支持的变量名可能不同，以客户端文档为准。
+
+### 验证
+
+在项目目录执行：
+
+```bash
+claude
+```
+
+或直接发一条非交互请求：
+
+```bash
+claude -p "用一句话介绍当前目录"
+```
+
+如果提示 401，优先检查 `ANTHROPIC_AUTH_TOKEN` 是否有空格、引号或换行；如果提示模型不存在，检查 Key 分组和模型名。
+
+## Codex
+
+适合使用 GPT 系列模型进行代码生成、修改和审查。Codex 使用 OpenAI Responses 协议，因此：
+
+- `base_url` 填 `https://tokenpilot.site/v1`；
+- 推荐通过 `OPENAI_API_KEY` 环境变量提供 Key；
+- 在 `~/.codex/config.toml` 中定义 `model_provider`。
+
+只设置 `OPENAI_BASE_URL` 时，新版本 Codex 仍可能走 ChatGPT 登录；推荐直接使用下面的 `config.toml`。
+
+### 安装
+
+#### macOS / Linux
+
+```bash
+# 需要 Node.js 18+，已安装可跳过
+node -v
+
+npm install -g @openai/codex
+codex --version
+```
+
+#### Windows
+
+```powershell
+winget install OpenJS.NodeJS.LTS
+```
+
+安装完成后重新打开 PowerShell，再执行：
+
+```powershell
+npm install -g @openai/codex
+codex --version
+```
+
+安装 Node.js 后请重新打开 PowerShell。
+
+### 配置 config.toml
+
+#### macOS / Linux
+
+配置文件路径：`~/.codex/config.toml`
+
+```bash
+mkdir -p ~/.codex
+cat > ~/.codex/config.toml <<'TOML'
+model_provider = "tokenpilot"
+model = "gpt-5.5"                 # 换成模型广场里你分组可用的模型
+review_model = "gpt-5.5"
+model_reasoning_effort = "high"   # 可选：minimal / low / medium / high
+disable_response_storage = true
+
+[model_providers.tokenpilot]
+name = "TokenPilot"
+base_url = "https://tokenpilot.site/v1"
+env_key = "OPENAI_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+supports_websockets = false
+TOML
+```
+
+#### Windows PowerShell
+
+配置文件路径：`%USERPROFILE%\.codex\config.toml`
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex" | Out-Null
+@'
+model_provider = "tokenpilot"
+model = "gpt-5.5"                 # 换成模型广场里你分组可用的模型
+review_model = "gpt-5.5"
+model_reasoning_effort = "high"   # 可选：minimal / low / medium / high
+disable_response_storage = true
+
+[model_providers.tokenpilot]
+name = "TokenPilot"
+base_url = "https://tokenpilot.site/v1"
+env_key = "OPENAI_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+supports_websockets = false
+'@ | Set-Content "$env:USERPROFILE\.codex\config.toml"
+```
+
+配置说明：
+
+- `base_url` 必须带 `/v1`，Codex 会自己追加 `/responses`；
+- `env_key` 填环境变量名，不是 Key 本身，不要把 `sk-...` 直接写进 `config.toml`；
+- `requires_openai_auth = false` 表示使用 API Key，不要求 ChatGPT OAuth 登录；
+- `supports_websockets = false` 使用 HTTP/SSE，避免部分网关不支持 WebSocket；
+- `model` 必须是当前 Key 所属分组可用的模型，可在[模型广场](https://tokenpilot.site/model-plaza)确认；
+- 如果模型不支持 `model_reasoning_effort`，删除这一行即可。
+
+可选：让 Codex 从网关读取模型目录，在 `[model_providers.tokenpilot]` 中增加：
+
+```toml
+model_catalog_url = "https://tokenpilot.site/v1/models"
+```
+
+部分 Codex 版本还需要在文件末尾启用：
+
+```toml
+[features]
+api_key_model_discovery = true
+```
+
+如果不需要模型选择器，保持默认即可。
+
+### 设置 API Key
+
+#### macOS / Linux
+
+```bash
+export OPENAI_API_KEY="sk-你的密钥"
+codex
+```
+
+#### Windows PowerShell
+
+```powershell
+$env:OPENAI_API_KEY="sk-你的密钥"
+codex
+```
+
+#### Windows 持久环境变量
+
+```powershell
+setx OPENAI_API_KEY "sk-你的密钥"
+```
+
+`setx` 不会影响当前窗口，执行后请重新打开 PowerShell。
+
+> 不建议把 Key 直接写进 `config.toml`。如果确实需要在配置中提供，可使用 `experimental_bearer_token`，但这会把明文密钥留在磁盘上，优先使用环境变量。
+
+### 验证
+
+```bash
+codex exec "用一句话介绍当前目录"
+```
+
+如果命令能正常返回内容，说明 Codex 已通过 TokenPilot 接入成功。
+
+### Codex 常见问题
+
+| 现象 | 检查项 |
+| --- | --- |
+| 提示 401 / Unauthorized | `OPENAI_API_KEY` 是否已设置；Key 是否被删除、停用或额度耗尽 |
+| 提示 model not found | `model` 是否在当前 Key 的分组中，名称是否与模型广场完全一致 |
+| 仍然弹出 ChatGPT 登录 | `config.toml` 路径是否正确；`requires_openai_auth` 是否为 `false`；是否重启了 Codex |
+| WebSocket / 连接失败 | 保留 `supports_websockets = false`，并确认 Base URL 带 `/v1` |
+| `codex` 命令不存在 | 重新打开终端，检查 `node -v`、`npm -v`、`where.exe codex`（Windows） |
+
+> 也可以直接使用控制台「API 密钥」页面的「使用密钥」功能，选择 Codex CLI 后复制生成的 `config.toml` 和环境变量，避免手动拼写。
+
+## 其他接入方式
+
+### OpenAI SDK（Python）
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-你的密钥",
+    base_url="https://tokenpilot.site/v1",
+)
+
+resp = client.chat.completions.create(
+    model="gpt-4o-mini",  # 换成模型广场里的模型名
+    messages=[{"role": "user", "content": "你好"}],
+)
+print(resp.choices[0].message.content)
+```
+
+### OpenAI SDK（Node.js）
+
+```js
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.TOKENPILOT_API_KEY,
+  baseURL: "https://tokenpilot.site/v1",
+});
+
+const resp = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [{ role: "user", content: "你好" }],
+});
+console.log(resp.choices[0].message.content);
+```
+
+### curl
 
 ```bash
 export TOKENPILOT_API_KEY="sk-你的密钥"
@@ -51,7 +390,70 @@ curl https://tokenpilot.site/v1/chat/completions \
   }'
 ```
 
-如果响应里的 `choices[0].message.content` 有内容，说明接入成功。把 `model` 换成模型广场里的其他模型，就可以调用对应模型。
+### 流式输出
+
+把 `stream` 设为 `true`，服务端会以 SSE 返回 `data:` 事件，最后以 `data: [DONE]` 结束：
+
+```bash
+curl -N https://tokenpilot.site/v1/chat/completions \
+  -H "Authorization: Bearer $TOKENPILOT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o-mini",
+    "messages": [{"role": "user", "content": "写一首短诗"}],
+    "stream": true
+  }'
+```
+
+> 使用 `curl` 时加 `-N` 关闭缓冲，否则可能看起来“没有输出”。
+
+### Anthropic SDK（Python）
+
+```python
+from anthropic import Anthropic
+
+client = Anthropic(
+    api_key="sk-你的密钥",
+    base_url="https://tokenpilot.site",
+)
+
+msg = client.messages.create(
+    model="claude-sonnet-4-5",  # 以模型广场为准
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "你好"}],
+)
+print(msg.content[0].text)
+```
+
+### Gemini
+
+```bash
+curl "https://tokenpilot.site/v1beta/models/gemini-2.0-flash:generateContent" \
+  -H "x-goog-api-key: $TOKENPILOT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"contents":[{"parts":[{"text":"你好"}]}]}'
+```
+
+Gemini CLI：
+
+```bash
+export GOOGLE_GEMINI_BASE_URL="https://tokenpilot.site"
+export GEMINI_API_KEY="sk-你的密钥"
+export GEMINI_MODEL="gemini-2.0-flash"
+gemini
+```
+
+### 图形界面客户端
+
+Cherry Studio、NextChat、Chatbox、Open WebUI 等客户端，选择「OpenAI 兼容」或「自定义 API」：
+
+| 配置项 | 填写内容 |
+| --- | --- |
+| API 地址 / Base URL | `https://tokenpilot.site/v1` |
+| API Key | `sk-...` |
+| 模型 | 模型广场中展示的完整模型名 |
+
+> 部分客户端会在 Base URL 后自动追加 `/v1`，此时填 `https://tokenpilot.site` 即可。以客户端实际请求路径为准。
 
 ## 接口地址
 
@@ -90,210 +492,6 @@ TokenPilot 同时兼容三种主流协议，按你使用的 SDK 选择 Base URL�
 Gemini 的 `?key=sk-...` 查询参数仍然可用，但只建议在无法设置请求头的客户端中使用；旧的 `?api_key=` 写法已废弃。
 
 > 每个响应都会带上 `X-Client-Request-ID`。联系管理员排查问题时，请提供这个 ID，可以快速定位到具体请求。
-
-## 调用示例
-
-> 下面的示例统一用 `gpt-4o-mini`、`claude-sonnet-4-5`、`gemini-2.0-flash` 演示。实际调用时，请替换成[模型广场](https://tokenpilot.site/model-plaza)中可用的模型名。
-
-### OpenAI 兼容（Python）
-
-```python
-from openai import OpenAI
-
-client = OpenAI(
-    api_key="sk-你的密钥",
-    base_url="https://tokenpilot.site/v1",
-)
-
-resp = client.chat.completions.create(
-    model="gpt-4o-mini",  # 换成模型广场里的模型名
-    messages=[{"role": "user", "content": "你好"}],
-)
-print(resp.choices[0].message.content)
-```
-
-### OpenAI 兼容（Node.js）
-
-```js
-import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: process.env.TOKENPILOT_API_KEY,
-  baseURL: "https://tokenpilot.site/v1",
-});
-
-const resp = await client.chat.completions.create({
-  model: "gpt-4o-mini",
-  messages: [{ role: "user", content: "你好" }],
-});
-console.log(resp.choices[0].message.content);
-```
-
-### 流式输出
-
-把 `stream` 设为 `true`，服务端会以 SSE 返回 `data:` 事件，最后以 `data: [DONE]` 结束：
-
-```bash
-curl -N https://tokenpilot.site/v1/chat/completions \
-  -H "Authorization: Bearer $TOKENPILOT_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-4o-mini",
-    "messages": [{"role": "user", "content": "写一首短诗"}],
-    "stream": true
-  }'
-```
-
-> 使用 `curl` 时加 `-N` 关闭缓冲，否则可能看起来“没有输出”。
-
-### Anthropic / Claude（Python）
-
-```python
-from anthropic import Anthropic
-
-client = Anthropic(
-    api_key="sk-你的密钥",
-    base_url="https://tokenpilot.site",
-)
-
-msg = client.messages.create(
-    model="claude-sonnet-4-5",  # 以模型广场为准
-    max_tokens=1024,
-    messages=[{"role": "user", "content": "你好"}],
-)
-print(msg.content[0].text)
-```
-
-### Claude Code
-
-```bash
-export ANTHROPIC_BASE_URL="https://tokenpilot.site"
-export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
-export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-claude
-```
-
-也可以写入 `~/.claude/settings.json`：
-
-```json
-{
-  "env": {
-    "ANTHROPIC_BASE_URL": "https://tokenpilot.site",
-    "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
-  }
-}
-```
-
-> `ANTHROPIC_BASE_URL` 不要带 `/v1`，Claude Code 会自己追加 `/v1/messages`。如果模型名和默认值不一致，再设置 `ANTHROPIC_MODEL`、`ANTHROPIC_DEFAULT_SONNET_MODEL` 等变量。
-
-### Codex CLI
-
-Codex CLI 使用 OpenAI Responses 协议。推荐通过 `~/.codex/config.toml` 指定 TokenPilot；只设置 `OPENAI_BASE_URL` 时，新版本 Codex 仍可能走 ChatGPT 登录。
-
-#### 1. 安装
-
-```bash
-npm install -g @openai/codex
-codex --version
-```
-
-#### 2. 创建 `~/.codex/config.toml`
-
-macOS / Linux 路径为 `~/.codex/config.toml`，Windows 为 `%USERPROFILE%\.codex\config.toml`：
-
-```toml
-model_provider = "tokenpilot"
-model = "gpt-5.1-codex"          # 换成模型广场里你分组可用的 Codex 模型
-review_model = "gpt-5.1-codex"
-disable_response_storage = true
-
-[model_providers.tokenpilot]
-name = "TokenPilot"
-base_url = "https://tokenpilot.site/v1"
-env_key = "TOKENPILOT_API_KEY"
-wire_api = "responses"
-requires_openai_auth = false
-supports_websockets = false
-```
-
-说明：
-
-- `base_url` 必须带 `/v1`，Codex 会自己追加 `/responses`；
-- `env_key` 填环境变量名，不要把 `sk-...` 直接写进 `config.toml`；
-- `requires_openai_auth = false` 表示使用 API Key，不要求 ChatGPT OAuth 登录；
-- `supports_websockets = false` 使用 HTTP/SSE，避免部分网关不支持 WebSocket；
-- `model` 必须是当前 API Key 所属分组可用的模型，可在[模型广场](https://tokenpilot.site/model-plaza)确认。
-
-#### 3. 设置环境变量并启动
-
-macOS / Linux：
-
-```bash
-export TOKENPILOT_API_KEY="sk-你的密钥"
-codex
-```
-
-PowerShell：
-
-```powershell
-$env:TOKENPILOT_API_KEY="sk-你的密钥"
-codex
-```
-
-Windows CMD：
-
-```bat
-set TOKENPILOT_API_KEY=sk-你的密钥
-codex
-```
-
-#### 4. 验证
-
-```bash
-codex exec "用一句话介绍当前目录"
-```
-
-常见问题：
-
-| 现象 | 检查项 |
-| --- | --- |
-| 提示 401 / Unauthorized | `TOKENPILOT_API_KEY` 是否已设置，Key 是否被删除或停用 |
-| 提示 model not found | `model` 是否在当前 Key 的分组中，名称是否与模型广场完全一致 |
-| 仍然弹出 ChatGPT 登录 | `config.toml` 路径是否正确，`requires_openai_auth` 是否为 `false` |
-| WebSocket / 连接失败 | 保留 `supports_websockets = false`，并确认 Base URL 带 `/v1` |
-
-> 也可以直接使用控制台「API 密钥」页面的「使用密钥」功能，选择 Codex CLI 后复制生成的 `config.toml` 和环境变量，避免手动拼写。
-
-### Gemini
-
-```bash
-curl "https://tokenpilot.site/v1beta/models/gemini-2.0-flash:generateContent" \
-  -H "x-goog-api-key: $TOKENPILOT_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"contents":[{"parts":[{"text":"你好"}]}]}'
-```
-
-Gemini CLI：
-
-```bash
-export GOOGLE_GEMINI_BASE_URL="https://tokenpilot.site"
-export GEMINI_API_KEY="sk-你的密钥"
-export GEMINI_MODEL="gemini-2.0-flash"
-gemini
-```
-
-### 图形界面客户端
-
-Cherry Studio、NextChat、Chatbox、Open WebUI 等客户端，选择「OpenAI 兼容」或「自定义 API」：
-
-| 配置项 | 填写内容 |
-| --- | --- |
-| API 地址 / Base URL | `https://tokenpilot.site/v1` |
-| API Key | `sk-...` |
-| 模型 | 模型广场中展示的完整模型名 |
-
-> 部分客户端会在 Base URL 后自动追加 `/v1`，此时填 `https://tokenpilot.site` 即可。以客户端实际请求路径为准。
 
 ## 模型与计费
 
@@ -335,6 +533,16 @@ curl "https://tokenpilot.site/v1/usage?days=7" \
 
 ## 错误与排查
 
+### 配置生效检查
+
+| 检查项 | Claude Code | Codex |
+| --- | --- | --- |
+| Base URL 是否带 `/v1` | 不带 | 带 |
+| Key 环境变量 | `ANTHROPIC_AUTH_TOKEN` | `OPENAI_API_KEY` |
+| 配置文件 | `~/.claude/settings.json` | `~/.codex/config.toml` |
+| 修改后是否重启 | 是 | 是 |
+| Key 分组 | 需要 Claude 模型 | 需要 GPT/Codex 模型 |
+
 ### 常见状态码
 
 | 状态码 | 错误类型 | 常见原因 | 处理方式 |
@@ -371,12 +579,6 @@ curl https://tokenpilot.site/v1/models \
 
 模型名必须和模型广场完全一致，包括大小写、日期后缀和分隔符。例如 `gpt-4o-mini` 和 `gpt-4o` 是两个不同的模型。可以先用 `GET /v1/models` 看当前 Key 能调用哪些模型。
 
-### 流式响应很慢或中断
-
-- 首 Token 慢通常是上游排队或网络问题；可以换一个模型或分组再试。
-- 流式过程中断时，客户端通常会收到不完整的 SSE。建议加超时和重试，并记录 `X-Client-Request-ID`。
-- 可以在「渠道状态」页面查看当前渠道是否可用。
-
 ### Claude Code 连不上
 
 按顺序检查：
@@ -384,8 +586,49 @@ curl https://tokenpilot.site/v1/models \
 1. `ANTHROPIC_BASE_URL` 是否写成 `https://tokenpilot.site`（不要带 `/v1`，也不要带 `/v1/messages`）。
 2. `ANTHROPIC_AUTH_TOKEN` 是否是完整的 `sk-...`，有没有多余空格或引号。
 3. 当前 Key 的分组是否包含 Claude 模型；可以在模型广场确认。
-4. 如果公司网络需要代理，先确认终端能访问 `https://tokenpilot.site`。
-5. 仍然失败时，用 `curl` 直接请求 `/v1/messages`，把 `X-Client-Request-ID` 和错误信息发给管理员。
+4. 是否重启了终端和 Claude Code，旧进程不会自动读取新配置。
+5. 如果公司网络需要代理，先确认终端能访问 `https://tokenpilot.site`。
+6. 仍然失败时，用 `curl` 直接请求 `/v1/messages`，把 `X-Client-Request-ID` 和错误信息发给管理员。
+
+### Codex 仍然要求登录
+
+按顺序检查：
+
+1. `config.toml` 是否在 `~/.codex/config.toml`（Windows 为 `%USERPROFILE%\.codex\config.toml`）。
+2. `requires_openai_auth` 是否为 `false`。
+3. `env_key` 是否为 `"OPENAI_API_KEY"`，并且当前终端确实设置了这个变量。
+4. 是否重新打开了终端或重启了 Codex。
+5. 如果之前登录过 ChatGPT，先完全退出 Codex 再重新打开；不要继续执行 `codex login`。
+
+### 流式响应很慢或中断
+
+- 首 Token 慢通常是上游排队或网络问题；可以换一个模型或分组再试。
+- 流式过程中断时，客户端通常会收到不完整的 SSE。建议加超时和重试，并记录 `X-Client-Request-ID`。
+- 可以在「渠道状态」页面查看当前渠道是否可用。
+
+### Windows 提示 npm 无法识别
+
+1. 重新打开 PowerShell。
+2. 检查 `node -v`、`npm -v`。
+3. 执行 `where.exe npm`，确认 `C:\Program Files\nodejs` 在 PATH 中。
+4. 如果安装了多个 Node 版本，确认当前终端使用的是你刚安装的那个。
+
+### Linux 全局 npm 安装报 EACCES
+
+临时方案：
+
+```bash
+sudo npm install -g @anthropic-ai/claude-code
+```
+
+长期方案是把 npm 全局目录改到用户目录，例如：
+
+```bash
+npm config set prefix ~/.npm-global
+export PATH="$HOME/.npm-global/bin:$PATH"
+```
+
+然后把上面的 `export PATH` 写入 `~/.bashrc` 或 `~/.zshrc`。
 
 ## 安全建议
 
@@ -393,6 +636,7 @@ curl https://tokenpilot.site/v1/models \
 - 不要把 Key 写进前端代码、Git 仓库或公开截图；用环境变量或密钥管理服务。
 - 定期在控制台轮换 Key；怀疑泄露时立即删除旧 Key。
 - 如果 Key 支持额度或过期时间，按最小权限设置。
+- `settings.json` 和 `config.toml` 如果包含密钥，请限制文件权限，不要共享。
 
 ## 联系我们
 
