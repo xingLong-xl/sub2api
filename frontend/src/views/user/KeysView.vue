@@ -1556,6 +1556,13 @@ watch([showCreateModal, createProviderOptions], ([isOpen, providers], [wasOpen])
   }
 })
 
+// 打开创建弹窗时刷新分组，避免管理员刚调整分组后必须整页刷新。
+watch(showCreateModal, (isOpen) => {
+  if (!isOpen) return
+  void loadGroups()
+  void loadUserGroupRates()
+})
+
 // Group dropdown search
 const groupSearchQuery = ref('')
 const filteredGroupOptions = computed(() => {
@@ -1763,6 +1770,9 @@ const openGroupSelector = (key: ApiKey) => {
     }
     groupSelectorKeyId.value = key.id
     groupSearchQuery.value = ''
+    // 分组列表可能是页面首次加载时的旧缓存，展开时补一次。
+    void loadGroups()
+    void loadUserGroupRates()
   }
 }
 

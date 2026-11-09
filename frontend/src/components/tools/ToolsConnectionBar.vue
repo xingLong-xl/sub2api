@@ -6,6 +6,7 @@
         v-model="keyChoice"
         :class="groupSelectClass"
         :aria-label="t('tools.connection.selectGroup')"
+        @focus="refreshConnectionData"
       >
         <option value="">{{ t('tools.connection.selectGroup') }}</option>
         <option v-for="option in keyOptions" :key="option.id" :value="option.id">
@@ -258,16 +259,22 @@ onMounted(async () => {
   // 强制刷新：另一个浏览器/标签页新建密钥后，当前页也能在进入工具页时看到。
   await Promise.all([loadUserKeys(true), loadModelCatalog(true)])
   if (hasApiKey.value) await fetchGatewayModels()
-  window.addEventListener('focus', refreshKeysOnVisible)
-  document.addEventListener('visibilitychange', refreshKeysOnVisible)
+  window.addEventListener('focus', refreshConnectionData)
+  window.addEventListener('pageshow', refreshConnectionData)
+  document.addEventListener('visibilitychange', refreshConnectionData)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('focus', refreshKeysOnVisible)
-  document.removeEventListener('visibilitychange', refreshKeysOnVisible)
+  window.removeEventListener('focus', refreshConnectionData)
+  window.removeEventListener('pageshow', refreshConnectionData)
+  document.removeEventListener('visibilitychange', refreshConnectionData)
 })
 
-function refreshKeysOnVisible(): void {
-  if (document.visibilityState === 'visible') void loadUserKeys(true)
+function refreshConnectionData(): void {
+  if (document.visibilityState !== 'visible') return
+  // 密钥列表是工具页共享缓存；切回页面或展开分组下拉时重新拉取，
+  // 这样在「密钥管理」新建密钥后不需要刷新整个浏览器。
+  void loadUserKeys(true)
+  void loadModelCatalog(true)
 }
 </script>

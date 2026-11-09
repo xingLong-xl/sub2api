@@ -103,6 +103,8 @@ const catalogLoading = ref(false)
 const catalogLoaded = ref(false)
 let keysRequestSeq = 0
 let catalogRequestSeq = 0
+let keysReloadQueued = false
+let catalogReloadQueued = false
 
 /** 当前登录用户 ID；未登录/尚未恢复用户信息时返回空串。 */
 function currentToolsOwnerId(): string {
@@ -119,6 +121,8 @@ function resetToolsConnectionState(): void {
   keysRequestSeq++
   catalogRequestSeq++
   preferencesRequestSeq++
+  keysReloadQueued = false
+  catalogReloadQueued = false
   preferencesLoaded = false
   preferencesLoading = false
   if (preferencesSaveTimer) {
@@ -388,7 +392,10 @@ export function useToolsSettings() {
   async function loadUserKeys(force = false): Promise<ApiKey[]> {
     ensureToolsOwner()
     void loadPreferences()
-    if (keysLoading.value) return userKeys.value
+    if (keysLoading.value) {
+      if (force) keysReloadQueued = true
+      return userKeys.value
+    }
     if (keysLoaded.value && !force) return userKeys.value
     const requestSeq = ++keysRequestSeq
     keysLoading.value = true
@@ -419,7 +426,13 @@ export function useToolsSettings() {
         keysError.value = err instanceof Error ? err.message : String(err)
       }
     } finally {
-      if (requestSeq === keysRequestSeq) keysLoading.value = false
+      if (requestSeq === keysRequestSeq) {
+        keysLoading.value = false
+        if (keysReloadQueued) {
+          keysReloadQueued = false
+          void loadUserKeys(true)
+        }
+      }
     }
     return userKeys.value
   }
@@ -452,7 +465,10 @@ export function useToolsSettings() {
    * 能准确区分聊天 / 图像 / 视频模型，比解析 /v1/models 更可靠。
    */
   async function loadModelCatalog(force = false): Promise<void> {
-    if (catalogLoading.value) return
+    if (catalogLoading.value) {
+      if (force) catalogReloadQueued = true
+      return
+    }
     if (catalogLoaded.value && !force) return
     const requestSeq = ++catalogRequestSeq
     catalogLoading.value = true
@@ -485,7 +501,13 @@ export function useToolsSettings() {
     } catch {
       // 渠道接口失败时保持空目录，由调用方退回 /v1/models 或手动输入
     } finally {
-      if (requestSeq === catalogRequestSeq) catalogLoading.value = false
+      if (requestSeq === catalogRequestSeq) {
+        catalogLoading.value = false
+        if (catalogReloadQueued) {
+          catalogReloadQueued = false
+          void loadModelCatalog(true)
+        }
+      }
     }
   }
 
