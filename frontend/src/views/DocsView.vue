@@ -164,6 +164,7 @@ import { useAppStore, useAuthStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
 import { buildApiUrl } from '@/api/client'
 import { sanitizeUrl } from '@/utils/url'
+import { enhanceDocsOsTabs } from '@/utils/docsOsTabs'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
@@ -312,6 +313,8 @@ function enhanceContent() {
     wrapper.insertBefore(bar, pre)
   })
 
+  enhanceDocsOsTabs(container)
+
   container.querySelectorAll('h2, h3, h4').forEach((heading) => {
     const id = heading.getAttribute('id')
     if (!id || heading.querySelector('.heading-anchor')) return
@@ -415,6 +418,30 @@ onMounted(() => {
 
 .docs-markdown h4 {
   @apply mb-2 mt-6 scroll-mt-24 text-[15px] font-semibold text-gray-900 dark:text-white;
+}
+
+.docs-markdown .os-tabs {
+  @apply my-5;
+}
+
+.docs-markdown .os-tablist {
+  @apply inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-100/80 p-1 dark:border-dark-700 dark:bg-dark-800/60;
+}
+
+.docs-markdown .os-tab {
+  @apply rounded-lg px-4 py-1.5 text-[13px] font-medium text-gray-600 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-dark-300 dark:hover:text-white;
+}
+
+.docs-markdown .os-tab[aria-selected='true'] {
+  @apply bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white;
+}
+
+.docs-markdown .os-panel {
+  @apply pt-3;
+}
+
+.docs-markdown .os-panel[hidden] {
+  display: none;
 }
 
 .docs-markdown .heading-anchor {

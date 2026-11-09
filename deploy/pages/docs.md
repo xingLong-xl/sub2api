@@ -155,7 +155,9 @@ EOF
 source ~/.bashrc
 ```
 
-#### Windows PowerShell（当前窗口）
+#### Windows
+
+当前 PowerShell 窗口：
 
 ```powershell
 $env:ANTHROPIC_BASE_URL="https://tokenpilot.site"
@@ -165,7 +167,7 @@ $env:CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1"
 claude
 ```
 
-#### Windows（持久环境变量）
+长期保存（`setx`）：
 
 ```powershell
 setx ANTHROPIC_BASE_URL "https://tokenpilot.site"
@@ -173,7 +175,7 @@ setx ANTHROPIC_AUTH_TOKEN "sk-你的密钥"
 setx CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC "1"
 ```
 
-`setx` 不会影响已经打开的窗口，执行后请重新打开 PowerShell。
+`setx` 不会影响已经打开的窗口，执行后请重新打开 PowerShell。使用 CMD 时，当前窗口用 `set`，长期保存仍用 `setx`。
 
 ### 配置方式 B：settings.json
 
@@ -234,7 +236,7 @@ New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
 
 如果 Claude Code 默认选择的模型不在你的分组中，可以设置。
 
-macOS / Linux（`export` 语法相同，只是 shell 启动文件不同）：
+#### macOS
 
 ```bash
 export ANTHROPIC_MODEL="claude-sonnet-4-5"
@@ -242,7 +244,15 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-5"
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5"
 ```
 
-Windows PowerShell：
+#### Linux
+
+```bash
+export ANTHROPIC_MODEL="claude-sonnet-4-5"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-5"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5"
+```
+
+#### Windows
 
 ```powershell
 $env:ANTHROPIC_MODEL="claude-sonnet-4-5"
@@ -451,20 +461,22 @@ EOF
 source ~/.bashrc
 ```
 
-#### Windows PowerShell（当前窗口）
+#### Windows
+
+当前 PowerShell 窗口：
 
 ```powershell
 $env:OPENAI_API_KEY="sk-你的密钥"
 codex
 ```
 
-#### Windows（持久环境变量）
+长期保存（`setx`）：
 
 ```powershell
 setx OPENAI_API_KEY "sk-你的密钥"
 ```
 
-`setx` 不会影响当前窗口，执行后请重新打开 PowerShell。
+`setx` 不会影响当前窗口，执行后请重新打开 PowerShell。使用 CMD 时，当前窗口用 `set`，长期保存仍用 `setx`。
 
 > 不建议把 Key 直接写进 `config.toml`。如果确实需要在配置中提供，可使用 `experimental_bearer_token`，但这会把明文密钥留在磁盘上，优先使用环境变量。
 
