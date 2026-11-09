@@ -34,7 +34,7 @@ function detectOsKey(heading: HTMLElement): DocsOsKey | null {
 }
 
 function isHeading(element: HTMLElement): boolean {
-  return /^H[1-6]$/.test(element.tagName)
+  return /^H[1-4]$/.test(element.tagName)
 }
 
 function getStoredOs(container: HTMLElement): DocsOsKey | null {

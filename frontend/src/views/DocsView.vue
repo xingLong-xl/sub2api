@@ -420,6 +420,23 @@ onMounted(() => {
   @apply mb-2 mt-6 scroll-mt-24 text-[15px] font-semibold text-gray-900 dark:text-white;
 }
 
+.docs-markdown h5 {
+  @apply mb-2 mt-6 flex items-center gap-2.5 text-[14px] font-semibold text-gray-900 dark:text-white;
+}
+
+.docs-markdown .os-panel {
+  counter-reset: docs-step;
+}
+
+.docs-markdown .os-panel h5 {
+  counter-increment: docs-step;
+}
+
+.docs-markdown .os-panel h5::before {
+  content: counter(docs-step);
+  @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-50 text-[11px] font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-300;
+}
+
 .docs-markdown .os-tabs {
   @apply my-5;
 }
