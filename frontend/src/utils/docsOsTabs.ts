@@ -37,18 +37,22 @@ function isHeading(element: HTMLElement): boolean {
   return /^H[1-4]$/.test(element.tagName)
 }
 
-function getStoredOs(container: HTMLElement): DocsOsKey | null {
+function readStoredOs(container: HTMLElement, storageKey: string): DocsOsKey | null {
   try {
-    const value = container.ownerDocument.defaultView?.localStorage.getItem(DOCS_OS_STORAGE_KEY)
+    const value = container.ownerDocument.defaultView?.localStorage.getItem(storageKey)
     return OS_ORDER.includes(value as DocsOsKey) ? (value as DocsOsKey) : null
   } catch {
     return null
   }
 }
 
-function storeOs(container: HTMLElement, key: DocsOsKey): void {
+function getStoredOs(container: HTMLElement, storageKey: string): DocsOsKey | null {
+  return readStoredOs(container, storageKey) ?? readStoredOs(container, DOCS_OS_STORAGE_KEY)
+}
+
+function storeOs(container: HTMLElement, storageKey: string, key: DocsOsKey): void {
   try {
-    container.ownerDocument.defaultView?.localStorage.setItem(DOCS_OS_STORAGE_KEY, key)
+    container.ownerDocument.defaultView?.localStorage.setItem(storageKey, key)
   } catch {
     // Ignore storage failures (private mode, quota, etc.).
   }
@@ -135,21 +139,30 @@ function findScopeHeading(group: OsTabGroup): HTMLElement | null {
   return null
 }
 
+function getScopeStorageKey(scope: HTMLElement, index: number): string {
+  const label = scope.tagName === 'H2' ? (scope.textContent || '').trim() : ''
+  return `${DOCS_OS_STORAGE_KEY}:${label || `section-${index}`}`
+}
+
+function groupByScopes(groups: OsTabGroup[]): Map<HTMLElement, OsTabGroup[]> {
+  const scopes = new Map<HTMLElement, OsTabGroup[]>()
+
+  for (const group of groups) {
+    const scope = findScopeHeading(group) ?? group.wrapper
+    const scoped = scopes.get(scope) ?? []
+    scoped.push(group)
+    scopes.set(scope, scoped)
+  }
+
+  return scopes
+}
+
 /**
  * One client section can contain several OS-dependent blocks (install, env,
  * settings...). Keep a single tab bar at the top of that section and let it
  * control every block, instead of repeating the switcher above each block.
  */
-function arrangeMasterTabLists(groups: OsTabGroup[]): void {
-  const scopes = new Map<HTMLElement, OsTabGroup[]>()
-
-  for (const group of groups) {
-    const scope = findScopeHeading(group)
-    if (!scope) continue
-    const scoped = scopes.get(scope) ?? []
-    scoped.push(group)
-    scopes.set(scope, scoped)
-  }
+function arrangeMasterTabLists(scopes: Map<HTMLElement, OsTabGroup[]>): void {
 
   for (const [scope, scoped] of scopes) {
     const first = scoped[0]
@@ -225,8 +238,8 @@ function bindKeyboard(tablist: HTMLElement, group: OsTabGroup, activate: (key: D
 
 /**
  * Turns adjacent `#### macOS` / `#### Linux` / `#### Windows` sections into
- * accessible tabs. Selecting an OS in one group switches every group on the
- * page, so users only choose their system once.
+ * accessible tabs. Each client section keeps its own OS selection, so changing
+ * Claude Code does not also switch Codex.
  */
 export function enhanceDocsOsTabs(container: HTMLElement): void {
   if (container.dataset.osTabsReady === 'true') return
@@ -278,30 +291,38 @@ export function enhanceDocsOsTabs(container: HTMLElement): void {
     return
   }
 
-  arrangeMasterTabLists(groups)
+  const scopes = groupByScopes(groups)
+  arrangeMasterTabLists(scopes)
 
-  const available = new Set<DocsOsKey>()
-  groups.forEach((group) => group.keys.forEach((key) => available.add(key)))
+  let scopeIndex = 0
+  for (const [scope, scoped] of scopes) {
+    const storageKey = getScopeStorageKey(scope, scopeIndex)
+    scopeIndex += 1
 
-  const stored = getStoredOs(container)
-  const preferred = stored ?? detectPreferredOs(container)
-  const initial = available.has(preferred) ? preferred : (groups[0] && OS_ORDER.find((key) => groups[0].keys.has(key))) || 'windows'
+    const available = new Set<DocsOsKey>()
+    scoped.forEach((group) => group.keys.forEach((key) => available.add(key)))
 
-  const activate = (key: DocsOsKey): void => {
-    storeOs(container, key)
-    groups.forEach((group) => {
-      if (group.keys.has(key)) applySelection(group, key)
-    })
+    const preferred = getStoredOs(container, storageKey) ?? detectPreferredOs(container)
+    const initial =
+      (available.has(preferred) ? preferred : OS_ORDER.find((key) => available.has(key))) || 'windows'
+
+    const activate = (key: DocsOsKey): void => {
+      storeOs(container, storageKey, key)
+      scoped.forEach((group) => {
+        if (group.keys.has(key)) applySelection(group, key)
+      })
+    }
+
+    for (const group of scoped) {
+      group.buttons.forEach((button, key) => {
+        button.addEventListener('click', () => activate(key))
+      })
+      const tablist = group.buttons.values().next().value?.parentElement
+      if (tablist) bindKeyboard(tablist, group, activate)
+    }
+
+    activate(initial)
   }
 
-  for (const group of groups) {
-    group.buttons.forEach((button, key) => {
-      button.addEventListener('click', () => activate(key))
-    })
-    const tablist = group.buttons.values().next().value?.parentElement
-    if (tablist) bindKeyboard(tablist, group, activate)
-  }
-
-  activate(initial)
   container.dataset.osTabsReady = 'true'
 }

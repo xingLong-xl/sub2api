@@ -76,17 +76,19 @@ describe('enhanceDocsOsTabs', () => {
     ])
   })
 
-  it('switches every group to the selected OS', () => {
+  it('keeps each client section on its own OS selection', () => {
+    localStorage.setItem(DOCS_OS_STORAGE_KEY, 'windows')
     const container = mountDocs()
     enhanceDocsOsTabs(container)
 
-    const linuxTab = container.querySelector<HTMLButtonElement>('[role="tab"][data-os="linux"]')
-    linuxTab?.click()
+    const claudeTablist = container.querySelectorAll<HTMLElement>('.os-tablist--master')[0]
+    claudeTablist?.querySelector<HTMLButtonElement>('[data-os="linux"]')?.click()
 
     const selectedTabs = Array.from(container.querySelectorAll<HTMLButtonElement>('[role="tab"][aria-selected="true"]'))
     expect(selectedTabs).toHaveLength(3)
-    expect(selectedTabs.every((tab) => tab.dataset.os === 'linux')).toBe(true)
-    expect(localStorage.getItem(DOCS_OS_STORAGE_KEY)).toBe('linux')
+    expect(selectedTabs.filter((tab) => tab.dataset.os === 'linux')).toHaveLength(2)
+    expect(selectedTabs.filter((tab) => tab.dataset.os === 'windows')).toHaveLength(1)
+    expect(localStorage.getItem(`${DOCS_OS_STORAGE_KEY}:Claude Code`)).toBe('linux')
 
     const visiblePanels = Array.from(container.querySelectorAll<HTMLElement>('.os-panel')).filter(
       (panel) => !panel.hidden,
@@ -94,21 +96,29 @@ describe('enhanceDocsOsTabs', () => {
     expect(visiblePanels.map((panel) => panel.textContent?.trim())).toEqual([
       'linux-install',
       'linux-config',
-      'linux-codex',
+      'windows-codex',
     ])
+
+    const codexTablist = container.querySelectorAll<HTMLElement>('.os-tablist--master')[1]
+    codexTablist?.querySelector<HTMLButtonElement>('[data-os="macos"]')?.click()
+
+    const afterCodex = Array.from(container.querySelectorAll<HTMLButtonElement>('[role="tab"][aria-selected="true"]'))
+    expect(afterCodex.filter((tab) => tab.dataset.os === 'linux')).toHaveLength(2)
+    expect(afterCodex.filter((tab) => tab.dataset.os === 'macos')).toHaveLength(1)
   })
 
-  it('supports arrow-key navigation and remembers the selection', () => {
+  it('supports arrow-key navigation inside one client section', () => {
     localStorage.setItem(DOCS_OS_STORAGE_KEY, 'windows')
     const container = mountDocs()
     enhanceDocsOsTabs(container)
 
-    const tablist = container.querySelector<HTMLElement>('.os-tablist')
+    const tablist = container.querySelector<HTMLElement>('.os-tablist--master')
     tablist?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
 
     const selectedTabs = Array.from(container.querySelectorAll<HTMLButtonElement>('[role="tab"][aria-selected="true"]'))
-    expect(selectedTabs.every((tab) => tab.dataset.os === 'linux')).toBe(true)
-    expect(localStorage.getItem(DOCS_OS_STORAGE_KEY)).toBe('linux')
+    expect(selectedTabs.filter((tab) => tab.dataset.os === 'linux')).toHaveLength(2)
+    expect(selectedTabs.filter((tab) => tab.dataset.os === 'windows')).toHaveLength(1)
+    expect(localStorage.getItem(`${DOCS_OS_STORAGE_KEY}:Claude Code`)).toBe('linux')
   })
 
   it('does not create tabs for a single OS section', () => {
