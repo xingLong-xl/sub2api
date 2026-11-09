@@ -428,6 +428,14 @@ onMounted(() => {
   @apply inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-100/80 p-1 dark:border-dark-700 dark:bg-dark-800/60;
 }
 
+.docs-markdown .os-tablist--master {
+  @apply mb-4;
+}
+
+.docs-markdown .os-tablist--master + h3 {
+  @apply mt-2;
+}
+
 .docs-markdown .os-tab {
   @apply rounded-lg px-4 py-1.5 text-[13px] font-medium text-gray-600 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-dark-300 dark:hover:text-white;
 }

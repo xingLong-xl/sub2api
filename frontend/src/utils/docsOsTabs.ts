@@ -20,6 +20,8 @@ interface OsTabGroup {
   keys: Set<DocsOsKey>
   buttons: Map<DocsOsKey, HTMLButtonElement>
   panels: Map<DocsOsKey, HTMLElement>
+  wrapper: HTMLElement
+  tablist: HTMLElement
 }
 
 function detectOsKey(heading: HTMLElement): DocsOsKey | null {
@@ -119,7 +121,67 @@ function buildGroup(container: HTMLElement, sections: OsSection[], groupIndex: n
   firstHeading?.parentNode?.insertBefore(wrapper, firstHeading)
   for (const section of sections) section.heading.remove()
 
-  return { keys: new Set(buttons.keys()), buttons, panels }
+  return { keys: new Set(buttons.keys()), buttons, panels, wrapper, tablist }
+}
+
+function findScopeHeading(group: OsTabGroup): HTMLElement | null {
+  let node = group.wrapper.previousElementSibling
+  while (node) {
+    if (node.tagName === 'H2') return node as HTMLElement
+    if (node.tagName === 'H1') return null
+    node = node.previousElementSibling
+  }
+  return null
+}
+
+/**
+ * One client section can contain several OS-dependent blocks (install, env,
+ * settings...). Keep a single tab bar at the top of that section and let it
+ * control every block, instead of repeating the switcher above each block.
+ */
+function arrangeMasterTabLists(groups: OsTabGroup[]): void {
+  const scopes = new Map<HTMLElement, OsTabGroup[]>()
+
+  for (const group of groups) {
+    const scope = findScopeHeading(group)
+    if (!scope) continue
+    const scoped = scopes.get(scope) ?? []
+    scoped.push(group)
+    scopes.set(scope, scoped)
+  }
+
+  for (const [scope, scoped] of scopes) {
+    const first = scoped[0]
+    if (!first) continue
+
+    let insertBefore: Element | null = null
+    let node = scope.nextElementSibling
+    while (node && node.tagName !== 'H2') {
+      if (node.tagName === 'H3') {
+        insertBefore = node
+        break
+      }
+      node = node.nextElementSibling
+    }
+
+    const target = insertBefore ?? first.wrapper
+    target.parentNode?.insertBefore(first.tablist, target)
+    first.tablist.classList.add('os-tablist--master')
+
+    // The master tab now controls every OS panel in this client section.
+    for (const group of scoped) {
+      group.panels.forEach((panel, key) => {
+        const masterButton = first.buttons.get(key)
+        if (!masterButton) return
+        const controlled = new Set((masterButton.getAttribute('aria-controls') || '').split(/\s+/).filter(Boolean))
+        controlled.add(panel.id)
+        masterButton.setAttribute('aria-controls', Array.from(controlled).join(' '))
+        panel.setAttribute('aria-labelledby', masterButton.id)
+      })
+    }
+
+    for (const group of scoped.slice(1)) group.tablist.hidden = true
+  }
 }
 
 function applySelection(group: OsTabGroup, key: DocsOsKey): void {
@@ -214,6 +276,8 @@ export function enhanceDocsOsTabs(container: HTMLElement): void {
     container.dataset.osTabsReady = 'true'
     return
   }
+
+  arrangeMasterTabLists(groups)
 
   const available = new Set<DocsOsKey>()
   groups.forEach((group) => group.keys.forEach((key) => available.add(key)))
