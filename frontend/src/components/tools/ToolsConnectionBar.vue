@@ -87,7 +87,10 @@
       </template>
     </p>
 
-    <span v-if="!keysLoading && keyOptions.length === 0" class="text-xs text-amber-600 dark:text-amber-400">
+    <span v-if="keysError" class="text-xs text-red-500 dark:text-red-400">
+      {{ keysError }}
+    </span>
+    <span v-else-if="!keysLoading && keyOptions.length === 0" class="text-xs text-amber-600 dark:text-amber-400">
       {{ t('tools.connection.noKeys') }}
     </span>
   </div>
@@ -117,6 +120,7 @@ const {
   apiKey,
   userKeys,
   keysLoading,
+  keysError,
   selectedKey,
   selectedKeyId,
   selectedGroupID,
