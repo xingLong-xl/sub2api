@@ -320,32 +320,6 @@ codex
 - 如果提示模型不存在，检查 Key 分组和模型名是否与模型广场一致。
 - 如果 Codex 仍然要求 ChatGPT 登录，检查 `~/.codex/config.toml` 路径和 `requires_openai_auth = false`。
 
-## 模型与计费
-
-### 查询模型和用量
-
-```bash
-# 当前 Key 可用的模型
-curl https://tokenpilot.site/v1/models \
-  -H "Authorization: Bearer $TOKENPILOT_API_KEY"
-
-# 最近 7 天用量
-curl "https://tokenpilot.site/v1/usage?days=7" \
-  -H "Authorization: Bearer $TOKENPILOT_API_KEY"
-```
-
-- `/v1/models` 返回当前 Key 分组可用的模型；列表为空通常是 Key 未绑定分组。
-- `/v1/usage` 返回用量、费用和 RPM/TPM，`days` 可选 1–90。
-- 也可以打开「密钥用量」（`/key-usage`）查询余额和配额，页面不会保存 Key。
-
-### 计费规则
-
-- 按 Token 计费，输入、输出、缓存分别计价。
-- 图片、视频等按次或按张计费，以模型广场为准。
-- 实付 = 渠道单价 × 分组倍率；专属倍率优先。
-- 长上下文、分时/高峰可能加价；余额不足返回 `403 billing_error`。
-- 订阅分组优先消耗订阅额度。
-
 ## 错误与排查
 
 ### 常见错误
