@@ -432,6 +432,10 @@ func (s *SettingService) buildSystemSettingsUpdates(ctx context.Context, setting
 	// Available channels feature switch
 	updates[SettingKeyAvailableChannelsEnabled] = strconv.FormatBool(settings.AvailableChannelsEnabled)
 
+	// Tools feature switches
+	updates[SettingKeyToolsImageEnabled] = strconv.FormatBool(settings.ToolsImageEnabled)
+	updates[SettingKeyToolsVideoEnabled] = strconv.FormatBool(settings.ToolsVideoEnabled)
+
 	// Subscription feature switch
 	updates[SettingKeySubscriptionEnabled] = strconv.FormatBool(settings.SubscriptionEnabled)
 

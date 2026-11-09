@@ -257,6 +257,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
+      requiresTools: 'image',
       title: 'Image Generation',
       titleKey: 'tools.image.title',
       descriptionKey: 'tools.image.description'
@@ -269,6 +270,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
+      requiresTools: 'video',
       title: 'Video Generation',
       titleKey: 'tools.video.title',
       descriptionKey: 'tools.video.description'
@@ -954,7 +956,7 @@ router.beforeEach(async (to, _from, next) => {
   // 公共设置可能尚未加载（App.vue 的 onMounted 异步拉取晚于首次导航，且纯静态部署
   // 无 __APP_CONFIG__ 注入）。此时 cachedPublicSettings 为空会把 payment/risk_control
   // 误判为“未启用”而错误拦截，故这里先确保设置加载完成。
-  if ((to.meta.requiresPayment || to.meta.requiresRiskControl || to.meta.requiresSubscription) && !appStore.publicSettingsLoaded) {
+  if ((to.meta.requiresPayment || to.meta.requiresRiskControl || to.meta.requiresSubscription || to.meta.requiresTools) && !appStore.publicSettingsLoaded) {
     try {
       await appStore.fetchPublicSettings()
     } catch (error) {
@@ -990,6 +992,18 @@ router.beforeEach(async (to, _from, next) => {
   ) {
     next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
     return
+  }
+
+  // 图像/视频工具是 opt-in 开关：未显式开启时隐藏入口并拦截直达。
+  if (to.meta.requiresTools && appStore.publicSettingsLoaded) {
+    const enabled =
+      to.meta.requiresTools === 'image'
+        ? appStore.cachedPublicSettings?.tools_image_enabled === true
+        : appStore.cachedPublicSettings?.tools_video_enabled === true
+    if (!enabled) {
+      next('/tools/chat')
+      return
+    }
   }
 
   // 简易模式下限制访问某些页面

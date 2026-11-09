@@ -585,6 +585,12 @@ func diffSettings(before *service.SystemSettings, after *service.SystemSettings,
 	if before.AvailableChannelsEnabled != after.AvailableChannelsEnabled {
 		changed = append(changed, "available_channels_enabled")
 	}
+	if before.ToolsImageEnabled != after.ToolsImageEnabled {
+		changed = append(changed, "tools_image_enabled")
+	}
+	if before.ToolsVideoEnabled != after.ToolsVideoEnabled {
+		changed = append(changed, "tools_video_enabled")
+	}
 	if before.SubscriptionEnabled != after.SubscriptionEnabled {
 		changed = append(changed, "subscription_enabled")
 	}

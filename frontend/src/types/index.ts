@@ -277,6 +277,10 @@ export interface PublicSettings {
   /** When true, user monitor hides the user ranking tab and /users payload. */
   channel_monitor_hide_user_ranking?: boolean
   available_channels_enabled: boolean
+  /** When true, the image generation tool is visible. Default false (opt-in). */
+  tools_image_enabled: boolean
+  /** When true, the video generation tool is visible. Default false (opt-in). */
+  tools_video_enabled: boolean
   /** When false, the whole user-facing subscription surface is hidden. Default true. */
   subscription_enabled: boolean
   /** Mirrors payment config BALANCE_PAYMENT_DISABLED; true = balance top-up closed (subscription-only site). */

@@ -62,6 +62,12 @@ declare module 'vue-router' {
     requiresSubscription?: boolean
 
     /**
+     * 需要显式启用的工具页（tools_image_enabled / tools_video_enabled，opt-in）。
+     * 关闭时侧边栏入口隐藏，直接访问也会跳回 AI 聊天。
+     */
+    requiresTools?: 'image' | 'video'
+
+    /**
      * i18n key for the page title
      */
     titleKey?: string

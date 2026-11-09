@@ -325,6 +325,10 @@ type SystemSettings struct {
 	// Available Channels feature switch (user-facing aggregate view)
 	AvailableChannelsEnabled bool `json:"available_channels_enabled"`
 
+	// Tools feature switches (image/video generation)
+	ToolsImageEnabled bool `json:"tools_image_enabled"`
+	ToolsVideoEnabled bool `json:"tools_video_enabled"`
+
 	// Subscription feature switch: gates the whole user-facing subscription surface
 	// (sidebar entries, purchase-page subscription tab, header badge, /subscriptions route).
 	SubscriptionEnabled bool `json:"subscription_enabled"`
@@ -438,6 +442,9 @@ type PublicSettings struct {
 	ChannelMonitorHideUserRanking        bool   `json:"channel_monitor_hide_user_ranking"`
 
 	AvailableChannelsEnabled bool `json:"available_channels_enabled"`
+
+	ToolsImageEnabled bool `json:"tools_image_enabled"`
+	ToolsVideoEnabled bool `json:"tools_video_enabled"`
 
 	SubscriptionEnabled bool `json:"subscription_enabled"`
 

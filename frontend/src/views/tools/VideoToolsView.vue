@@ -1,14 +1,18 @@
 <template>
   <AppLayout>
     <div class="-m-[11px] flex h-[calc(100dvh-77px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-dark-700 dark:bg-dark-800 md:-m-[19px] lg:-m-[27px]">
-      <ToolsConnectionBar v-model="videoModel" tool="video" class="shrink-0" />
-
       <div
-        class="grid min-h-0 flex-1 grid-cols-1 divide-y divide-gray-200 overflow-y-auto dark:divide-dark-700 xl:grid-cols-[340px_minmax(0,1fr)_300px] xl:divide-x xl:divide-y-0 xl:overflow-hidden"
+        class="grid min-h-0 flex-1 grid-cols-1 divide-y divide-gray-200 overflow-y-auto dark:divide-dark-700 xl:grid-cols-[380px_minmax(0,1fr)_300px] xl:divide-x xl:divide-y-0 xl:overflow-hidden"
       >
         <!-- 第一栏：生成参数 -->
         <ToolsPanel :title="t('tools.video.params')" icon="cog">
           <div class="space-y-3">
+            <ToolsConnectionBar
+              v-model="videoModel"
+              tool="video"
+              inline
+              class="border-b border-gray-100 pb-3 dark:border-dark-700"
+            />
             <div>
               <label class="mb-1 block text-xs font-medium text-gray-600 dark:text-dark-300" for="tools-video-prompt">
                 {{ t('tools.video.prompt') }}

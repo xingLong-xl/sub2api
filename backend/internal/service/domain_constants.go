@@ -533,6 +533,16 @@ const (
 	// sidebar entry is hidden. Defaults to false (opt-in feature).
 	SettingKeyAvailableChannelsEnabled = "available_channels_enabled"
 
+	// SettingKeyToolsImageEnabled controls the user-facing image generation tool page.
+	// When false, the sidebar entry and direct route are hidden. Defaults to false
+	// (opt-in) so incomplete generation features stay offline after deployment.
+	SettingKeyToolsImageEnabled = "tools_image_enabled"
+
+	// SettingKeyToolsVideoEnabled controls the user-facing video generation tool page.
+	// When false, the sidebar entry and direct route are hidden. Defaults to false
+	// (opt-in) so incomplete generation features stay offline after deployment.
+	SettingKeyToolsVideoEnabled = "tools_video_enabled"
+
 	// SettingKeySubscriptionEnabled is a DB-backed soft switch for the user-facing
 	// subscription surface: sidebar entries, purchase-page subscription tab, header
 	// progress badge, usage billing-type filter and the /subscriptions route. When

@@ -791,6 +791,8 @@ const ChevronDownIcon = {
 const flagChannelMonitor = makeSidebarFlag(FeatureFlags.channelMonitor)
 const flagPayment = makeSidebarFlag(FeatureFlags.payment)
 const flagAvailableChannels = makeSidebarFlag(FeatureFlags.availableChannels)
+const flagToolsImage = makeSidebarFlag(FeatureFlags.toolsImage)
+const flagToolsVideo = makeSidebarFlag(FeatureFlags.toolsVideo)
 const flagSubscription = makeSidebarFlag(FeatureFlags.subscription)
 
 // 购买入口文案随站点计费模式切换：仅充值 → 「充值」，仅订阅 → 「订阅」，否则「充值/订阅」。
@@ -854,11 +856,11 @@ const userNavItems = computed((): NavItem[] => finalizeNav(buildSelfNavItems(tru
 
 // Tools navigation items (chat / image generation / video generation).
 // Shared by both the admin view and the regular user view.
-const toolNavItems = computed((): NavItem[] => [
+const toolNavItems = computed((): NavItem[] => applyFeatureFlags([
   { path: '/tools/chat', label: t('nav.toolsChat'), icon: ToolChatIcon },
-  { path: '/tools/image', label: t('nav.toolsImage'), icon: ToolImageIcon },
-  { path: '/tools/video', label: t('nav.toolsVideo'), icon: ToolVideoIcon },
-])
+  { path: '/tools/image', label: t('nav.toolsImage'), icon: ToolImageIcon, featureFlag: flagToolsImage },
+  { path: '/tools/video', label: t('nav.toolsVideo'), icon: ToolVideoIcon, featureFlag: flagToolsVideo },
+]))
 
 // Personal navigation items (for admin's "My Account" section, without Dashboard).
 // Admins access 可用渠道 from this section just like regular users — there is no

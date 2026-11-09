@@ -60,6 +60,14 @@ export default {
             subscriptionOnly: '用户端购买页只保留订阅套餐，侧边栏入口显示为「订阅」，余额充值下单会被拒绝；兑换码、返利等余额入账不受影响。',
           },
         },
+        tools: {
+          title: '工具页功能',
+          description: '控制用户端「图像生成」和「视频生成」入口是否显示。默认关闭，开启后立即显示。',
+          imageEnabled: '启用图像生成',
+          imageHint: '关闭后侧边栏入口隐藏，直接访问 /tools/image 会跳回 AI 聊天；不影响已保存的聊天记录。',
+          videoEnabled: '启用视频生成',
+          videoHint: '关闭后侧边栏入口隐藏，直接访问 /tools/video 会跳回 AI 聊天。',
+        },
         modelPlaza: {
           title: '模型广场',
           description: '以分组为单位向访客展示可用模型与价格的公开页面。默认关闭。',

@@ -95,6 +95,14 @@ func RegisterUserRoutes(
 			channels.GET("/available", h.AvailableChannel.List)
 		}
 
+		// 工具页服务端历史（AI 聊天）
+		tools := authenticated.Group("/tools")
+		{
+			chat := tools.Group("/chat")
+			chat.GET("/sessions", h.ToolChat.ListSessions)
+			chat.PUT("/sessions", h.ToolChat.SaveSessions)
+		}
+
 		// 使用记录（聚合统计属重查询，叠加更严格的按用户限流）
 		usage := authenticated.Group("/usage")
 		usage.Use(panelRateLimiter.Heavy())

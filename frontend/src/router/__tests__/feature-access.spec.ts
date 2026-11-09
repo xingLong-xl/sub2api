@@ -26,6 +26,8 @@ const appStore = vi.hoisted(() => ({
     payment_enabled?: boolean
     risk_control_enabled?: boolean
     subscription_enabled?: boolean
+    tools_image_enabled?: boolean
+    tools_video_enabled?: boolean
     custom_menu_items?: []
   },
   fetchPublicSettings: vi.fn(),
@@ -176,6 +178,42 @@ describe('feature route guard', () => {
     expect(appStore.fetchPublicSettings).not.toHaveBeenCalled()
     expect(next).toHaveBeenCalledOnce()
     expect(next).toHaveBeenCalledWith(target)
+  })
+})
+
+describe('tools route guard (opt-in flags)', () => {
+  beforeEach(() => {
+    authStore.isAdmin = false
+    authStore.isSimpleMode = false
+    appStore.publicSettingsLoaded = true
+    appStore.fetchPublicSettings.mockReset()
+  })
+
+  it.each([
+    ['image', { requiresTools: 'image' }, { tools_image_enabled: false }, '/tools/chat'],
+    ['video', { requiresTools: 'video' }, { tools_video_enabled: false }, '/tools/chat'],
+    ['image (missing)', { requiresTools: 'image' }, {}, '/tools/chat'],
+  ])('redirects %s to AI Chat when not explicitly enabled', async (_name, meta, settings, target) => {
+    appStore.cachedPublicSettings = settings
+
+    const { navigation, next } = runGuard(meta, '/tools')
+    await navigation
+
+    expect(next).toHaveBeenCalledOnce()
+    expect(next).toHaveBeenCalledWith(target)
+  })
+
+  it.each([
+    ['image', { requiresTools: 'image' }, { tools_image_enabled: true }],
+    ['video', { requiresTools: 'video' }, { tools_video_enabled: true }],
+  ])('lets %s through when enabled', async (_name, meta, settings) => {
+    appStore.cachedPublicSettings = settings
+
+    const { navigation, next } = runGuard(meta, '/tools')
+    await navigation
+
+    expect(next).toHaveBeenCalledOnce()
+    expect(next).toHaveBeenCalledWith()
   })
 })
 

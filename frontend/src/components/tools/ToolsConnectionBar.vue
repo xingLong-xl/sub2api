@@ -1,19 +1,66 @@
 <template>
-  <div
-    :class="inline
-      ? 'flex flex-wrap items-center gap-[8px]'
-      : 'flex shrink-0 flex-wrap items-center gap-2 border-b border-gray-200 px-3 py-1.5 dark:border-dark-700'"
-  >
-    <select
-      v-model="keyChoice"
-      :class="['input !w-auto !rounded-lg !px-2.5 !py-1.5 text-sm', inline ? 'min-w-[150px] max-w-[200px]' : 'min-w-[180px] max-w-[280px]']"
-      :aria-label="t('tools.connection.selectGroup')"
+  <div :class="rootClass">
+    <div>
+      <select
+        id="tools-connection-group"
+        v-model="keyChoice"
+        :class="groupSelectClass"
+        :aria-label="t('tools.connection.selectGroup')"
+      >
+        <option value="">{{ t('tools.connection.selectGroup') }}</option>
+        <option v-for="option in keyOptions" :key="option.id" :value="option.id">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <div :class="inline ? 'flex min-w-0 flex-1 flex-wrap items-center gap-[8px]' : 'ml-auto flex flex-wrap items-center gap-2'">
+      <span v-if="!inline" class="text-xs font-medium text-gray-500 dark:text-dark-400">
+        {{ t('tools.connection.model') }}
+      </span>
+      <div class="flex items-center gap-1.5" :class="inline ? 'min-w-0 flex-1' : ''">
+        <select
+          v-if="!hasGroup"
+          disabled
+          :class="[modelSelectClass, 'cursor-not-allowed text-gray-400 dark:text-dark-500']"
+          :aria-label="t('tools.connection.model')"
+        >
+          <option>{{ t('tools.connection.selectGroupFirst') }}</option>
+        </select>
+        <select
+          v-else-if="modelsLoading"
+          disabled
+          :class="[modelSelectClass, 'cursor-not-allowed text-gray-400 dark:text-dark-500']"
+          :aria-label="t('tools.connection.model')"
+        >
+          <option>{{ t('tools.common.loading') }}</option>
+        </select>
+        <select
+          v-else-if="modelOptions.length > 0"
+          v-model="model"
+          :class="modelSelectClass"
+          :aria-label="t('tools.connection.model')"
+        >
+          <option value="">{{ t('tools.connection.selectModel') }}</option>
+          <option v-for="item in modelOptions" :key="item" :value="item">{{ item }}</option>
+        </select>
+        <select
+          v-else
+          disabled
+          :class="[modelSelectClass, 'cursor-not-allowed text-gray-400 dark:text-dark-500']"
+          :aria-label="t('tools.connection.model')"
+        >
+          <option>{{ t('tools.connection.noModels') }}</option>
+        </select>
+      </div>
+    </div>
+
+    <p
+      v-if="hasGroup && !modelsLoading && modelOptions.length === 0 && !capabilityUnsupported"
+      class="w-full text-[11px] leading-4 text-amber-600 dark:text-amber-400"
     >
-      <option value="">{{ t('tools.connection.selectGroup') }}</option>
-      <option v-for="option in keyOptions" :key="option.id" :value="option.id">
-        {{ option.label }}
-      </option>
-    </select>
+      {{ modelsError ? t('tools.connection.modelListUnavailable') : t('tools.connection.noModelsHint') }}
+    </p>
 
     <p
       v-if="capabilityUnsupported"
@@ -43,47 +90,6 @@
     <span v-if="!keysLoading && keyOptions.length === 0" class="text-xs text-amber-600 dark:text-amber-400">
       {{ t('tools.connection.noKeys') }}
     </span>
-
-    <!-- 模型选择：右对齐，按工具能力过滤 -->
-    <div :class="inline ? 'flex flex-wrap items-center gap-[8px]' : 'ml-auto flex flex-wrap items-center gap-2'">
-      <span v-if="!inline" class="text-xs font-medium text-gray-500 dark:text-dark-400">{{ t('tools.connection.model') }}</span>
-      <select
-        v-if="!hasGroup"
-        disabled
-        :class="['input !w-auto cursor-not-allowed !rounded-lg !px-2.5 !py-1.5 text-sm text-gray-400 dark:text-dark-500', inline ? 'min-w-[160px] max-w-[240px]' : 'min-w-[220px] max-w-[360px]']"
-        :aria-label="t('tools.connection.model')"
-      >
-        <option>{{ t('tools.connection.selectGroupFirst') }}</option>
-      </select>
-      <select
-        v-else-if="modelOptions.length > 0"
-        v-model="model"
-        :class="['input !w-auto !rounded-lg !px-2.5 !py-1.5 text-sm', inline ? 'min-w-[160px] max-w-[240px]' : 'min-w-[220px] max-w-[360px]']"
-        :aria-label="t('tools.connection.model')"
-      >
-        <option value="">{{ t('tools.connection.selectModel') }}</option>
-        <option v-for="item in modelOptions" :key="item" :value="item">{{ item }}</option>
-      </select>
-      <input
-        v-else
-        v-model="model"
-        type="text"
-        :class="['input !w-auto flex-1 !rounded-lg !px-2.5 !py-1.5 text-sm placeholder:text-[11px]', inline ? 'min-w-[200px] max-w-[320px]' : 'min-w-[300px] max-w-[440px]']"
-        :placeholder="modelPlaceholder"
-        :title="modelsError || undefined"
-        autocomplete="off"
-        spellcheck="false"
-      />
-      <button
-        type="button"
-        class="btn btn-secondary !px-2 !py-1.5"
-        :disabled="modelsLoading || !hasGroup"
-        :title="t('tools.connection.refreshModels')"
-        @click="refreshModels"
-      >
-        <Icon name="refresh" size="sm" :class="{ 'animate-spin': modelsLoading }" />
-      </button>
-    </div>
   </div>
 </template>
 
@@ -130,6 +136,25 @@ const {
   platformSupportsTool,
 } = useToolsSettings()
 
+const rootClass = computed(() => {
+  if (props.inline) return 'flex flex-wrap items-center gap-[8px]'
+  return 'flex shrink-0 flex-wrap items-center gap-2 border-b border-gray-200 px-3 py-1.5 dark:border-dark-700'
+})
+
+const groupSelectClass = computed(() => [
+  'input !rounded-lg !px-2.5 !py-1.5 text-sm',
+  props.inline
+    ? '!w-auto min-w-[110px] max-w-[145px]'
+    : '!w-auto min-w-[180px] max-w-[280px]',
+])
+
+const modelSelectClass = computed(() => [
+  'input !rounded-lg !px-2.5 !py-1.5 text-sm',
+  props.inline
+    ? '!w-full min-w-0'
+    : '!w-auto min-w-[220px] max-w-[360px]',
+])
+
 
 interface KeyGroupOption {
   /** 选项值：分组优先（g:<id>），无分组时退化为单把密钥（k:<id>） */
@@ -171,7 +196,11 @@ const keyChoice = computed({
       return
     }
     const option = keyOptions.value.find((item) => item.id === value)
-    if (option) selectKey(option.key.id)
+    if (option) {
+      selectKey(option.key.id)
+      // 换分组后模型列表会整体变化，清空旧模型，等用户重新选择
+      emit('update:modelValue', '')
+    }
   },
 })
 
@@ -203,46 +232,23 @@ function switchGroup(id: string): void {
   keyChoice.value = id
 }
 
-/** 没有模型清单时，把原因直接放进输入框占位符，而不是在框外再挂一行提示 */
 /** 是否已经选中分组：未选中时模型框只提示、不接受输入 */
 const hasGroup = computed(() => selectedGroupID.value !== null)
 
-const modelPlaceholder = computed(() =>
-  modelsError.value
-    ? t('tools.connection.modelListUnavailable')
-    : t('tools.connection.manualModelPlaceholder'),
-)
-
 const modelOptions = computed<string[]>(() => {
   const entry = selectedGroupID.value !== null ? groupCatalog.value[String(selectedGroupID.value)] : undefined
-  let scoped: string[]
   if (entry && entry.models.length > 0) {
     // 渠道目录带 billing_mode，能力判定比模型名更准
-    scoped = catalogModelsForGroup(selectedGroupID.value, props.tool)
-  } else {
-    // 目录未覆盖该分组时退回网关 /v1/models（余额/权限不足时会为空）
-    scoped = modelsForCapability(props.tool, gatewayModels.value)
+    return catalogModelsForGroup(selectedGroupID.value, props.tool)
   }
-  const current = props.modelValue.trim()
-  if (current && !scoped.includes(current)) return [current, ...scoped]
-  return scoped
+  // 目录未覆盖该分组时退回网关 /v1/models（余额/权限不足时会为空）
+  return modelsForCapability(props.tool, gatewayModels.value)
 })
 
 // 换分组后模型清单会变，重新拉取
 watch(selectedKeyId, async () => {
   if (hasApiKey.value) await fetchGatewayModels(true)
 })
-
-// 模型清单到达且当前为空时，默认选中第一个
-watch(modelOptions, (options) => {
-  if (!props.modelValue.trim() && options.length > 0) {
-    emit('update:modelValue', options[0])
-  }
-})
-
-async function refreshModels(): Promise<void> {
-  await fetchGatewayModels(true)
-}
 
 onMounted(async () => {
   await Promise.all([loadUserKeys(), loadModelCatalog()])

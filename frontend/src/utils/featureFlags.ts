@@ -104,6 +104,16 @@ export const FeatureFlags = {
     mode: 'opt-in',
     label: 'Available Channels',
   }),
+  toolsImage: defineFlag({
+    key: 'tools_image_enabled',
+    mode: 'opt-in',
+    label: 'Image Generation Tool',
+  }),
+  toolsVideo: defineFlag({
+    key: 'tools_video_enabled',
+    mode: 'opt-in',
+    label: 'Video Generation Tool',
+  }),
   subscription: defineFlag({
     key: 'subscription_enabled',
     mode: 'opt-out',

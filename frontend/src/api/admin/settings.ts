@@ -742,6 +742,10 @@ export interface SystemSettings {
   // Available Channels feature switch
   available_channels_enabled: boolean;
 
+  // Tools feature switches (image/video generation)
+  tools_image_enabled: boolean;
+  tools_video_enabled: boolean;
+
   // Subscription feature switch (user sidebar "My Subscriptions" entry)
   subscription_enabled: boolean;
 
@@ -1053,6 +1057,10 @@ export interface UpdateSettingsRequest {
 
   // Available Channels feature switch
   available_channels_enabled?: boolean;
+
+  // Tools feature switches (image/video generation)
+  tools_image_enabled?: boolean;
+  tools_video_enabled?: boolean;
 
   // Subscription feature switch
   subscription_enabled?: boolean;

@@ -60,6 +60,14 @@ export default {
             subscriptionOnly: 'The purchase page only offers subscription plans and the sidebar entry reads "Subscription"; balance top-up orders are rejected. Redeem codes, affiliate payouts and other balance credits are unaffected.',
           },
         },
+        tools: {
+          title: 'Tool Pages',
+          description: 'Control whether the Image Generation and Video Generation entries are visible to users. Off by default; enabling takes effect immediately.',
+          imageEnabled: 'Enable Image Generation',
+          imageHint: 'When off, the sidebar entry is hidden and /tools/image redirects to AI Chat. Saved chats are unaffected.',
+          videoEnabled: 'Enable Video Generation',
+          videoHint: 'When off, the sidebar entry is hidden and /tools/video redirects to AI Chat.',
+        },
         modelPlaza: {
           title: 'Model Plaza',
           description: 'A public page showcasing available models and pricing by group. Disabled by default.',

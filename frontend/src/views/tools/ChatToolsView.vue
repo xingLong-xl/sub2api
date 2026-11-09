@@ -3,23 +3,49 @@
     <div class="-m-[11px] flex h-[calc(100dvh-77px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-dark-700 dark:bg-dark-800 md:-m-[19px] lg:-m-[27px]">
       <div
         class="grid min-h-0 flex-1 grid-cols-1 divide-y divide-gray-200 overflow-y-auto dark:divide-dark-700 xl:divide-x xl:divide-y-0 xl:overflow-hidden"
-        :class="paramsCollapsed ? 'xl:grid-cols-[260px_minmax(0,1fr)_48px]' : 'xl:grid-cols-[260px_minmax(0,1fr)_380px]'"
+        :class="sessionsCollapsed
+          ? (paramsCollapsed ? 'xl:grid-cols-[48px_minmax(0,1fr)_48px]' : 'xl:grid-cols-[48px_minmax(0,1fr)_380px]')
+          : (paramsCollapsed ? 'xl:grid-cols-[260px_minmax(0,1fr)_48px]' : 'xl:grid-cols-[260px_minmax(0,1fr)_380px]')"
       >
-        <!-- 第一栏：对话记录 -->
-        <ToolsPanel :title="t('tools.chat.sessions')" icon="chatBubble" :badge="sessions.length">
+        <!-- 第一栏：对话记录（可折叠，向左收起） -->
+        <section
+          v-if="sessionsCollapsed"
+          class="flex min-h-[56px] items-center justify-center gap-2 py-2 xl:min-h-0 xl:flex-col xl:justify-start xl:pt-3"
+        >
+          <button
+            type="button"
+            class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-dark-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
+            :title="t('tools.chat.expandSessions')"
+            @click="sessionsCollapsed = false"
+          >
+            <Icon name="chevronRight" size="sm" />
+          </button>
+          <span class="text-xs text-gray-500 dark:text-dark-400 xl:[writing-mode:vertical-rl]">
+            {{ t('tools.chat.sessions') }}
+          </span>
+        </section>
+
+        <ToolsPanel v-else :title="t('tools.chat.sessions')" icon="chatBubble" :badge="sessions.length">
           <template #actions>
             <button
               type="button"
               class="btn btn-secondary !px-2 !py-1 text-xs"
-              :disabled="activeSession !== null && messages.length === 0"
               @click="newSession"
             >
               <Icon name="plus" size="xs" />
               {{ t('tools.chat.newSession') }}
             </button>
+            <button
+              type="button"
+              class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-dark-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
+              :title="t('tools.chat.collapseSessions')"
+              @click="sessionsCollapsed = true"
+            >
+              <Icon name="chevronLeft" size="sm" />
+            </button>
           </template>
 
-          <p class="mb-2 text-xs text-gray-400 dark:text-dark-500">{{ t('tools.chat.sessionLocalHint') }}</p>
+          <p class="mb-2 text-xs text-gray-400 dark:text-dark-500">{{ t('tools.chat.sessionLocalHint', { days: retentionDays }) }}</p>
 
           <p v-if="sessions.length === 0" class="py-6 text-center text-xs text-gray-400 dark:text-dark-500">
             {{ t('tools.chat.emptySessions') }}
@@ -126,11 +152,12 @@
                 </div>
 
                 <textarea
+                  ref="inputEl"
                   v-model="input"
                   rows="6"
                   :placeholder="t('tools.chat.inputPlaceholder')"
                   class="max-h-72 w-full resize-none border-0 bg-transparent px-2.5 py-1.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-100"
-                  :disabled="streaming || !activeSession"
+                  :disabled="streaming || !historyReady"
                   @keydown.enter.exact.prevent="sendMessage"
                 ></textarea>
 
@@ -335,10 +362,13 @@ import ToolsConnectionBar from '@/components/tools/ToolsConnectionBar.vue'
 import ToolsPanel from '@/components/tools/ToolsPanel.vue'
 import { useClipboard } from '@/composables/useClipboard'
 import { GatewayError, useToolsSettings } from '@/composables/useToolsSettings'
+import { toolChatAPI } from '@/api/toolChat'
+import { useAuthStore } from '@/stores/auth'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
+  createdAt?: number
 }
 
 interface ChatSession {
@@ -349,7 +379,11 @@ interface ChatSession {
 }
 
 const SESSIONS_STORAGE_KEY = 'tools_chat_sessions_v1'
+const SESSIONS_OWNER_KEY = 'tools_chat_sessions_owner'
+const SERVER_MIGRATION_KEY = 'tools_chat_history_server_migrated'
 const MAX_SESSIONS = 20
+const DEFAULT_CONTEXT_LIMIT = 20
+const DEFAULT_RETENTION_DAYS = 7
 
 function newSessionId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -368,16 +402,22 @@ function loadSessions(): ChatSession[] {
     for (const item of parsed) {
       const candidate = item as Partial<ChatSession>
       if (typeof candidate?.id !== 'string' || !Array.isArray(candidate.messages)) continue
+      const createdAt = typeof candidate.createdAt === 'number' ? candidate.createdAt : Date.now()
       sessions.push({
         id: candidate.id,
         title: typeof candidate.title === 'string' && candidate.title ? candidate.title : '',
-        createdAt: typeof candidate.createdAt === 'number' ? candidate.createdAt : Date.now(),
+        createdAt,
         messages: candidate.messages
           .filter((m): m is ChatMessage => !!m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-          .slice(-200),
+          .slice(-200)
+          .map((m) => ({
+            role: m.role,
+            content: m.content,
+            createdAt: typeof m.createdAt === 'number' && m.createdAt > 0 ? m.createdAt : createdAt,
+          })),
       })
     }
-    return sessions.slice(0, MAX_SESSIONS)
+    return sessions.filter((session) => session.messages.length > 0).slice(0, MAX_SESSIONS)
   } catch {
     return []
   }
@@ -386,9 +426,31 @@ function loadSessions(): ChatSession[] {
 const { t } = useI18n()
 const { hasApiKey, chatModel, gatewayFetch } = useToolsSettings()
 const { copyToClipboard } = useClipboard()
+const authStore = useAuthStore()
 
-const sessions = ref<ChatSession[]>(loadSessions())
+function currentOwnerId(): string {
+  const id = authStore.user?.id
+  return id === undefined || id === null ? '' : String(id)
+}
+
+/** 本地缓存只作为服务端历史不可用时的回退，且不能跨账号读取。 */
+function loadSessionsForCurrentUser(): ChatSession[] {
+  const owner = currentOwnerId()
+  try {
+    const storedOwner = localStorage.getItem(SESSIONS_OWNER_KEY) ?? ''
+    if (storedOwner && owner && storedOwner !== owner) return []
+    if (!storedOwner && owner) localStorage.setItem(SESSIONS_OWNER_KEY, owner)
+  } catch {
+    // 忽略存储失败
+  }
+  return loadSessions()
+}
+
+const sessions = ref<ChatSession[]>(loadSessionsForCurrentUser())
 const activeId = ref<string>(sessions.value[0]?.id ?? '')
+const historyReady = ref(false)
+const contextLimit = ref(DEFAULT_CONTEXT_LIMIT)
+const retentionDays = ref(DEFAULT_RETENTION_DAYS)
 
 const input = ref('')
 const streaming = ref(false)
@@ -404,25 +466,30 @@ const presencePenalty = ref<number | ''>('')
 const systemPrompt = ref('')
 const streamEnabled = ref(true)
 
-// 参数栏折叠状态（记忆到本地，刷新后保持）
+// 左右两栏折叠状态（记忆到本地，刷新后保持）
+const SESSIONS_COLLAPSED_KEY = 'tools_chat_sessions_collapsed'
 const PARAMS_COLLAPSED_KEY = 'tools_chat_params_collapsed'
-function readCollapsedFlag(): boolean {
+function readCollapsedFlag(key: string): boolean {
   try {
-    return localStorage.getItem(PARAMS_COLLAPSED_KEY) === '1'
+    return localStorage.getItem(key) === '1'
   } catch {
     return false
   }
 }
-const paramsCollapsed = ref(readCollapsedFlag())
-watch(paramsCollapsed, (value) => {
+function saveCollapsedFlag(key: string, value: boolean): void {
   try {
-    localStorage.setItem(PARAMS_COLLAPSED_KEY, value ? '1' : '0')
+    localStorage.setItem(key, value ? '1' : '0')
   } catch {
     // 忽略存储失败
   }
-})
+}
+const sessionsCollapsed = ref(readCollapsedFlag(SESSIONS_COLLAPSED_KEY))
+watch(sessionsCollapsed, (value) => saveCollapsedFlag(SESSIONS_COLLAPSED_KEY, value))
+const paramsCollapsed = ref(readCollapsedFlag(PARAMS_COLLAPSED_KEY))
+watch(paramsCollapsed, (value) => saveCollapsedFlag(PARAMS_COLLAPSED_KEY, value))
 
 const messagesContainer = ref<HTMLElement | null>(null)
+const inputEl = ref<HTMLTextAreaElement | null>(null)
 
 
 /** 会话标题最大显示宽度：中文/全角按 2、英文按 1 计 */
@@ -472,18 +539,94 @@ const activeTitle = computed(() => summarizeTitle(firstUserMessage.value) || t('
 
 const canSend = computed(
   () =>
+    historyReady.value &&
     !streaming.value &&
     input.value.trim() !== '' &&
     chatModel.value.trim() !== '' &&
-    hasApiKey.value &&
-    activeSession.value !== null,
+    hasApiKey.value,
 )
 
-function persist(): void {
+function persistLocal(): void {
   try {
+    const owner = currentOwnerId()
+    if (owner) localStorage.setItem(SESSIONS_OWNER_KEY, owner)
     localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions.value.slice(0, MAX_SESSIONS)))
   } catch {
-    // 超出配额时放弃持久化，不影响当前会话
+    // 超出配额时放弃本地缓存，不影响当前会话
+  }
+}
+
+let serverSaveTimer: ReturnType<typeof setTimeout> | null = null
+let serverSaveQueue: Promise<void> = Promise.resolve()
+
+/** 合并短时间内的多次变更，并串行写入服务端，避免旧快照覆盖新快照。 */
+function scheduleServerSave(): void {
+  if (serverSaveTimer !== null) clearTimeout(serverSaveTimer)
+  serverSaveTimer = setTimeout(() => {
+    serverSaveTimer = null
+    const snapshot = sessions.value.slice(0, MAX_SESSIONS).map((session) => ({
+      id: session.id,
+      title: session.title,
+      createdAt: session.createdAt,
+      messages: session.messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+        createdAt: message.createdAt,
+      })),
+    }))
+    serverSaveQueue = serverSaveQueue
+      .catch(() => undefined)
+      .then(() => toolChatAPI.save(snapshot))
+      .catch((err) => {
+        console.warn('Failed to save chat history to server', err)
+      })
+  }, 300)
+}
+
+function persist(): void {
+  persistLocal()
+  scheduleServerSave()
+}
+
+function serverMigrationDone(): boolean {
+  try {
+    return localStorage.getItem(SERVER_MIGRATION_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function markServerMigrationDone(): void {
+  try {
+    localStorage.setItem(SERVER_MIGRATION_KEY, '1')
+  } catch {
+    // 忽略存储失败
+  }
+}
+
+/** 服务端历史是主数据源；首次上线时把浏览器里已有的旧记录迁移过去。 */
+async function loadServerSessions(): Promise<void> {
+  try {
+    const result = await toolChatAPI.list()
+    contextLimit.value = result.contextLimit > 0 ? result.contextLimit : DEFAULT_CONTEXT_LIMIT
+    retentionDays.value = result.retentionDays > 0 ? result.retentionDays : DEFAULT_RETENTION_DAYS
+    const remoteSessions = result.sessions.slice(0, MAX_SESSIONS)
+    if (remoteSessions.length > 0) {
+      sessions.value = remoteSessions
+      markServerMigrationDone()
+      persistLocal()
+      return
+    }
+    if (sessions.value.length > 0 && !serverMigrationDone()) {
+      await toolChatAPI.save(sessions.value.slice(0, MAX_SESSIONS))
+      markServerMigrationDone()
+      return
+    }
+    // 服务端明确为空时以服务端为准，避免已删除的记录被本地缓存复活。
+    sessions.value = []
+  } catch (err) {
+    // 服务端不可用时退回本地缓存，不阻塞聊天。
+    console.warn('Failed to load chat history from server', err)
   }
 }
 
@@ -496,17 +639,28 @@ function createSession(): ChatSession {
   }
   sessions.value.unshift(session)
   if (sessions.value.length > MAX_SESSIONS) sessions.value = sessions.value.slice(0, MAX_SESSIONS)
-  return session
+  // 返回响应式代理，确保首条消息推入后视图和流式输出能正常更新。
+  return sessions.value[0] ?? session
 }
 
 function newSession(): void {
-  // 当前对话还没有任何消息时，不重复新建，避免堆出一串空对话
   const current = activeSession.value
-  if (current && current.messages.length === 0) return
   if (streaming.value) stopStreaming()
-  const session = createSession()
-  activeId.value = session.id
-  persist()
+
+  // 真实会话才需要清空输入；已经处于空白草稿时重复点击只是保持当前界面。
+  if (current && current.messages.length > 0) {
+    input.value = ''
+  }
+  // 兼容旧数据中遗留的 0 条消息会话，顺手清掉。
+  if (current && current.messages.length === 0) {
+    sessions.value = sessions.value.filter((session) => session.id !== current.id)
+    persist()
+  }
+
+  // 只是切回空白草稿；真正发送第一条消息时才创建会话记录。
+  activeId.value = ''
+  streamError.value = ''
+  void nextTick(() => inputEl.value?.focus())
 }
 
 function switchSession(id: string): void {
@@ -558,8 +712,13 @@ function stopStreaming(): void {
 
 function clearConversation(): void {
   if (streaming.value) stopStreaming()
-  if (activeSession.value) activeSession.value.messages = []
+  const current = activeSession.value
+  if (!current) return
+  current.messages = []
   streamError.value = ''
+  // 清空后同样回到空白草稿，不保留 0 条消息的会话记录。
+  sessions.value = sessions.value.filter((session) => session.id !== current.id)
+  activeId.value = ''
   persist()
 }
 
@@ -607,7 +766,8 @@ function buildPayload(history: ChatMessage[]): Record<string, unknown> {
   if (systemPrompt.value.trim()) {
     payloadMessages.push({ role: 'system', content: systemPrompt.value.trim() })
   }
-  for (const message of history) {
+  // 服务端保存完整历史，但每次请求只携带最近 N 条（默认 20 条）上下文。
+  for (const message of history.slice(-contextLimit.value)) {
     payloadMessages.push({ role: message.role, content: message.content })
   }
 
@@ -627,8 +787,14 @@ function buildPayload(history: ChatMessage[]): Record<string, unknown> {
 
 async function sendMessage(): Promise<void> {
   const text = input.value.trim()
-  const session = activeSession.value
-  if (!canSend.value || !text || !session) return
+  if (!canSend.value || !text) return
+
+  // 空白草稿在发送第一条消息时才创建会话，避免出现 0 条消息的记录。
+  let session = activeSession.value
+  if (!session) {
+    session = createSession()
+    activeId.value = session.id
+  }
 
   streamError.value = ''
   input.value = ''
@@ -638,13 +804,13 @@ async function sendMessage(): Promise<void> {
   if (userMessageCount === 0) {
     session.title = summarizeTitle(text) || t('tools.chat.untitled')
   }
-  session.messages.push({ role: 'user', content: text })
+  session.messages.push({ role: 'user', content: text, createdAt: Date.now() })
   persist()
 
   // 注意：必须通过数组下标访问拿到 Vue 的响应式代理再修改。
   // 直接修改 push 进去的原始对象不会触发视图更新，表现为"流式输出变成最后一次性出现"。
-  const assistantIndex = session.messages.push({ role: 'assistant', content: '' }) - 1
-  const assistantMessage = (): ChatMessage => session.messages[assistantIndex]
+  const assistantIndex = session.messages.push({ role: 'assistant', content: '', createdAt: Date.now() }) - 1
+  const assistantMessage = (): ChatMessage | undefined => session.messages[assistantIndex]
 
   const controller = new AbortController()
   abortController.value = controller
@@ -661,7 +827,8 @@ async function sendMessage(): Promise<void> {
 
     if (!streamEnabled.value) {
       const body: unknown = await res.json()
-      assistantMessage().content = extractMessageContent(body)
+      const assistant = assistantMessage()
+      if (assistant) assistant.content = extractMessageContent(body)
       return
     }
 
@@ -686,7 +853,8 @@ async function sendMessage(): Promise<void> {
         if (payload === '[DONE]') continue
         const delta = extractDeltaText(payload)
         if (delta) {
-          assistantMessage().content += delta
+          const assistant = assistantMessage()
+          if (assistant) assistant.content += delta
           void scrollToBottom()
         }
       }
@@ -699,8 +867,9 @@ async function sendMessage(): Promise<void> {
   } finally {
     streaming.value = false
     abortController.value = null
-    if (!assistantMessage().content && streamError.value) {
-      // 完全没有产出则移除空的助手气泡（按下标删除，避免身份比较失效）
+    const assistant = assistantMessage()
+    if (assistant && !assistant.content) {
+      // 中断或空响应时不要留下空的助手气泡
       session.messages.splice(assistantIndex, 1)
     }
     persist()
@@ -708,13 +877,16 @@ async function sendMessage(): Promise<void> {
   }
 }
 
-onMounted(() => {
-  if (sessions.value.length === 0) {
-    const session = createSession()
-    activeId.value = session.id
-    persist()
-  } else if (!sessions.value.some((session) => session.id === activeId.value)) {
-    activeId.value = sessions.value[0].id
+onMounted(async () => {
+  try {
+    await loadServerSessions()
+  } finally {
+    // 没有会话时保持空白草稿；不预先创建 0 条消息的会话。
+    if (!sessions.value.some((session) => session.id === activeId.value)) {
+      activeId.value = sessions.value[0]?.id ?? ''
+    }
+    historyReady.value = true
+    persistLocal()
   }
 })
 </script>
