@@ -19,6 +19,15 @@ const AUTH_USER_KEY = 'auth_user'
 const REFRESH_TOKEN_KEY = 'refresh_token'
 const TOKEN_EXPIRES_AT_KEY = 'token_expires_at' // 存储过期时间戳而非有效期
 const PENDING_AUTH_SESSION_KEY = 'pending_auth_session'
+// 工具页连接设置包含用户 API Key，登出时必须一并清除，避免下一个账号继承。
+const TOOLS_CONNECTION_STORAGE_KEYS = [
+  'tools_api_key',
+  'tools_api_key_id',
+  'tools_chat_model',
+  'tools_image_model',
+  'tools_video_model',
+  'tools_settings_owner',
+] as const
 const AUTO_REFRESH_INTERVAL = 60 * 1000 // 60 seconds for user data refresh
 const TOKEN_REFRESH_BUFFER = 120 * 1000 // 120 seconds before expiry to refresh token
 
@@ -476,6 +485,9 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem(AUTH_USER_KEY)
     localStorage.removeItem(REFRESH_TOKEN_KEY)
     localStorage.removeItem(TOKEN_EXPIRES_AT_KEY)
+    for (const key of TOOLS_CONNECTION_STORAGE_KEYS) {
+      localStorage.removeItem(key)
+    }
 
     if (options?.preservePendingAuthSession) {
       pendingAuthSession.value = getPersistedPendingAuthSession()

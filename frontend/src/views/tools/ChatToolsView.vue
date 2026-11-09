@@ -706,6 +706,28 @@ async function scrollToBottom(): Promise<void> {
 watch(() => messages.value.length, () => void scrollToBottom())
 watch(activeId, () => void scrollToBottom())
 
+// 同一浏览器切换账号时，重新按新账号加载历史；不能把上一个账号的会话留在内存里。
+watch(
+  () => authStore.user?.id,
+  async (nextOwner, previousOwner) => {
+    if (nextOwner === previousOwner) return
+    if (streaming.value) stopStreaming()
+    activeId.value = ''
+    historyReady.value = false
+    if (nextOwner === undefined || nextOwner === null) {
+      sessions.value = []
+      return
+    }
+    sessions.value = loadSessionsForCurrentUser()
+    await loadServerSessions()
+    if (!sessions.value.some((session) => session.id === activeId.value)) {
+      activeId.value = sessions.value[0]?.id ?? ''
+    }
+    historyReady.value = true
+    persistLocal()
+  },
+)
+
 function stopStreaming(): void {
   abortController.value?.abort()
 }

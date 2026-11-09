@@ -144,6 +144,9 @@ describe('useAuthStore', () => {
       // 先登录
       await store.login({ email: 'test@example.com', password: '123456' })
       expect(store.isAuthenticated).toBe(true)
+      localStorage.setItem('tools_api_key', 'sk-previous-account')
+      localStorage.setItem('tools_api_key_id', '12')
+      localStorage.setItem('tools_settings_owner', '1')
 
       // 注销
       await store.logout()
@@ -155,6 +158,9 @@ describe('useAuthStore', () => {
       expect(localStorage.getItem('auth_user')).toBeNull()
       expect(localStorage.getItem('refresh_token')).toBeNull()
       expect(localStorage.getItem('token_expires_at')).toBeNull()
+      expect(localStorage.getItem('tools_api_key')).toBeNull()
+      expect(localStorage.getItem('tools_api_key_id')).toBeNull()
+      expect(localStorage.getItem('tools_settings_owner')).toBeNull()
     })
   })
 

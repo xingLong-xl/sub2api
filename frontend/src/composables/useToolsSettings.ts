@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue'
 import { buildGatewayUrl } from '@/api/url'
 import { keysAPI } from '@/api/keys'
 import { userChannelsAPI } from '@/api/channels'
+import { useAuthStore } from '@/stores/auth'
 import type { BillingMode } from '@/constants/channel'
 import type { ApiKey } from '@/types'
 
@@ -23,6 +24,7 @@ const STORAGE_KEYS = {
   chatModel: 'tools_chat_model',
   imageModel: 'tools_image_model',
   videoModel: 'tools_video_model',
+  owner: 'tools_settings_owner',
 } as const
 
 function readStorage(key: string): string {
@@ -90,6 +92,62 @@ export interface GroupCatalog {
 const groupCatalog = ref<Record<string, GroupCatalog>>({})
 const catalogLoading = ref(false)
 const catalogLoaded = ref(false)
+let keysRequestSeq = 0
+let catalogRequestSeq = 0
+
+/** 当前登录用户 ID；未登录/尚未恢复用户信息时返回空串。 */
+function currentToolsOwnerId(): string {
+  try {
+    const id = useAuthStore().user?.id
+    return id === undefined || id === null ? '' : String(id)
+  } catch {
+    return ''
+  }
+}
+
+/** 切换账号时清空所有连接选择，避免沿用上一个账号的密钥和分组。 */
+function resetToolsConnectionState(): void {
+  keysRequestSeq++
+  catalogRequestSeq++
+  apiKey.value = ''
+  selectedKeyId.value = null
+  chatModel.value = ''
+  imageModel.value = ''
+  videoModel.value = ''
+  gatewayModels.value = []
+  modelsLoading.value = false
+  modelsLoaded.value = false
+  modelsError.value = ''
+  userKeys.value = []
+  keysLoading.value = false
+  keysLoaded.value = false
+  keysError.value = ''
+  groupCatalog.value = {}
+  catalogLoading.value = false
+  catalogLoaded.value = false
+}
+
+/**
+ * 工具页的密钥/分组选择是浏览器级单例，必须绑定登录账号。
+ * 账号变化（含首次升级时没有 owner 的旧缓存）一律清空，绝不跨账号复用密钥。
+ */
+function ensureToolsOwner(): void {
+  const owner = currentToolsOwnerId()
+  if (!owner) return
+  let storedOwner = ''
+  try {
+    storedOwner = localStorage.getItem(STORAGE_KEYS.owner) ?? ''
+  } catch {
+    // 忽略存储失败；下面仍会清空内存中的旧选择
+  }
+  if (storedOwner === owner) return
+  resetToolsConnectionState()
+  try {
+    localStorage.setItem(STORAGE_KEYS.owner, owner)
+  } catch {
+    // 忽略存储失败
+  }
+}
 
 /** 工具能力：与网关的三条业务链路一一对应 */
 export type ToolCapability = 'chat' | 'image' | 'video'
@@ -199,6 +257,21 @@ function modelsForCapability(tool: ToolCapability, models: string[]): string[] {
 }
 
 export function useToolsSettings() {
+  const authStore = useAuthStore()
+  ensureToolsOwner()
+  watch(
+    () => authStore.user?.id,
+    () => {
+      if (!currentToolsOwnerId()) {
+        resetToolsConnectionState()
+        return
+      }
+      ensureToolsOwner()
+      void loadUserKeys(true)
+      void loadModelCatalog(true)
+    },
+  )
+
   /** 手动输入密钥（同时清掉「从列表选择」的状态） */
   function setApiKey(key: string): void {
     apiKey.value = key.trim()
@@ -223,12 +296,16 @@ export function useToolsSettings() {
   }
 
   async function loadUserKeys(force = false): Promise<ApiKey[]> {
+    ensureToolsOwner()
     if (keysLoading.value) return userKeys.value
     if (keysLoaded.value && !force) return userKeys.value
+    const requestSeq = ++keysRequestSeq
     keysLoading.value = true
     keysError.value = ''
     try {
       const page = await keysAPI.list(1, 100, { sort_by: 'created_at', sort_order: 'desc' })
+      // 账号在请求期间切换：丢弃旧账号的响应，避免把上一个账号的密钥写回来。
+      if (requestSeq !== keysRequestSeq) return userKeys.value
       const items = Array.isArray(page.items) ? page.items : []
       userKeys.value = items.filter((k) => k.status === 'active')
       keysLoaded.value = true
@@ -238,7 +315,8 @@ export function useToolsSettings() {
         if (matched) {
           apiKey.value = matched.key
         } else {
-          selectedKeyId.value = null
+          // 选中的密钥不属于当前账号（账号切换/密钥被删除）：连明文一起清掉。
+          clearSelection()
         }
       } else if (apiKey.value.trim()) {
         // 旧版本只存了密钥明文，没有 id：按密钥值反查，让分组下拉能正确回显
@@ -246,9 +324,11 @@ export function useToolsSettings() {
         if (matched) selectedKeyId.value = matched.id
       }
     } catch (err) {
-      keysError.value = err instanceof Error ? err.message : String(err)
+      if (requestSeq === keysRequestSeq) {
+        keysError.value = err instanceof Error ? err.message : String(err)
+      }
     } finally {
-      keysLoading.value = false
+      if (requestSeq === keysRequestSeq) keysLoading.value = false
     }
     return userKeys.value
   }
@@ -283,9 +363,12 @@ export function useToolsSettings() {
   async function loadModelCatalog(force = false): Promise<void> {
     if (catalogLoading.value) return
     if (catalogLoaded.value && !force) return
+    const requestSeq = ++catalogRequestSeq
     catalogLoading.value = true
     try {
       const channels = await userChannelsAPI.getAvailable()
+      // 账号在请求期间切换：旧账号的分组目录不能留给新账号。
+      if (requestSeq !== catalogRequestSeq) return
       const map: Record<string, GroupCatalog> = {}
       for (const channel of channels ?? []) {
         for (const section of channel.platforms ?? []) {
@@ -311,7 +394,7 @@ export function useToolsSettings() {
     } catch {
       // 渠道接口失败时保持空目录，由调用方退回 /v1/models 或手动输入
     } finally {
-      catalogLoading.value = false
+      if (requestSeq === catalogRequestSeq) catalogLoading.value = false
     }
   }
 
