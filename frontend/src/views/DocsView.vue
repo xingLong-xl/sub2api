@@ -453,6 +453,10 @@ onMounted(() => {
   @apply mt-2;
 }
 
+.docs-markdown .os-tablist--master + .os-tabs {
+  @apply mt-0;
+}
+
 .docs-markdown .os-tablist[hidden] {
   display: none;
 }

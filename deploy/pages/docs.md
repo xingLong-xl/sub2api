@@ -162,7 +162,8 @@ claude
 
 - `base_url` 填 `https://tokenpilot.site/v1`；
 - 在 `~/.codex/config.toml` 中定义 `model_provider`；
-- API Key 通过 `OPENAI_API_KEY` 环境变量读取。
+- API Key 通过 `OPENAI_API_KEY` 环境变量读取；
+- 下面的 `model = "gpt-5.5"` 只是示例，必须换成模型广场里当前分组可用的模型。
 
 修改配置后请重启 Codex。
 
