@@ -13,6 +13,11 @@
 
 ## 开始之前
 
+<div class="docs-cta">
+  <a class="docs-cta-btn" href="/model-plaza">模型广场</a>
+  <a class="docs-cta-btn docs-cta-btn--primary" href="/dashboard">控制台</a>
+</div>
+
 1. 登录 TokenPilot 控制台。
 2. 进入「API 密钥」（`/keys`），创建一个新的 Key。
 3. 在下面的环境变量或配置文件中，把 `sk-你的密钥` 替换成真实 Key。
@@ -362,6 +367,3 @@ codex
 2. 登录控制台，在「个人资料」（`/profile`）查看管理员配置的联系方式。
 3. 反馈时附上请求时间、模型名、错误信息和 `X-Client-Request-ID`，不要发送完整 API Key。
 
----
-
-本文档适用于 [tokenpilot.site](https://tokenpilot.site)。模型、价格和可用性以控制台与模型广场的实时展示为准。

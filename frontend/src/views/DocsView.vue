@@ -134,23 +134,6 @@
           class="docs-card rounded-3xl border border-gray-200/70 bg-white/90 p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_16px_48px_-24px_rgba(16,24,40,0.18)] backdrop-blur sm:p-8 md:p-10 dark:border-dark-800 dark:bg-dark-900/80"
         >
           <div ref="contentRef" class="docs-markdown" v-html="renderedHtml"></div>
-
-          <footer
-            class="mt-10 flex flex-col gap-3 border-t border-gray-100 pt-6 text-[12.5px] text-gray-400 sm:flex-row sm:items-center sm:justify-between dark:border-dark-800 dark:text-dark-500"
-          >
-            <span>{{ siteName }} · 模型与价格以控制台实时展示为准</span>
-            <div class="flex items-center gap-4">
-              <router-link to="/model-plaza" class="hover:text-gray-700 dark:hover:text-dark-200">
-                模型广场
-              </router-link>
-              <router-link
-                :to="isAuthenticated ? dashboardPath : '/login'"
-                class="hover:text-gray-700 dark:hover:text-dark-200"
-              >
-                控制台
-              </router-link>
-            </div>
-          </footer>
         </article>
       </div>
     </main>
@@ -160,6 +143,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useAppStore, useAuthStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
 import { buildApiUrl } from '@/api/client'
@@ -169,6 +153,7 @@ import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
 const { t } = useI18n()
+const router = useRouter()
 const appStore = useAppStore()
 const authStore = useAuthStore()
 
@@ -332,6 +317,14 @@ function enhanceContent() {
     link.setAttribute('target', '_blank')
     link.setAttribute('rel', 'noopener noreferrer')
   })
+
+  container.querySelectorAll<HTMLAnchorElement>('.docs-cta a[href^="/"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+      event.preventDefault()
+      router.push(link.getAttribute('href') || '/')
+    })
+  })
 }
 
 onMounted(() => {
@@ -381,6 +374,18 @@ onMounted(() => {
 
 .docs-markdown a {
   @apply font-medium text-primary-600 underline decoration-primary-300/70 underline-offset-2 transition-colors hover:text-primary-700 hover:decoration-primary-500 dark:text-primary-400 dark:decoration-primary-500/50 dark:hover:text-primary-300;
+}
+
+.docs-markdown .docs-cta {
+  @apply mt-5 flex flex-wrap items-center gap-2.5;
+}
+
+.docs-markdown .docs-cta-btn {
+  @apply inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-[13px] font-medium text-gray-700 no-underline shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 dark:border-dark-700 dark:bg-dark-800 dark:text-dark-200 dark:hover:bg-dark-700 dark:hover:text-white;
+}
+
+.docs-markdown .docs-cta-btn--primary {
+  @apply border-gray-900 bg-gray-900 text-white hover:border-gray-800 hover:bg-gray-800 hover:text-white dark:border-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 dark:hover:text-gray-900;
 }
 
 .docs-markdown strong {
