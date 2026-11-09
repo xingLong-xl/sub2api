@@ -13,13 +13,8 @@
 
 ## 开始之前
 
-<div class="docs-cta">
-  <a class="docs-cta-btn" href="/model-plaza">模型广场</a>
-  <a class="docs-cta-btn docs-cta-btn--primary" href="/dashboard">控制台</a>
-</div>
-
-1. 登录 TokenPilot 控制台。
-2. 进入「API 密钥」（`/keys`），创建一个新的 Key。
+1. 登录 TokenPilot [控制台](/dashboard)。
+2. 进入 [API 密钥](/keys)，创建一个新的 Key。
 3. 在下面的环境变量或配置文件中，把 `sk-你的密钥` 替换成真实 Key。
 4. 修改配置后，重新打开终端，或完全退出并重启 Claude Code / Codex。
 

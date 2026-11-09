@@ -318,7 +318,7 @@ function enhanceContent() {
     link.setAttribute('rel', 'noopener noreferrer')
   })
 
-  container.querySelectorAll<HTMLAnchorElement>('.docs-cta a[href^="/"]').forEach((link) => {
+  container.querySelectorAll<HTMLAnchorElement>('a[href^="/"]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       event.preventDefault()
@@ -374,18 +374,6 @@ onMounted(() => {
 
 .docs-markdown a {
   @apply font-medium text-primary-600 underline decoration-primary-300/70 underline-offset-2 transition-colors hover:text-primary-700 hover:decoration-primary-500 dark:text-primary-400 dark:decoration-primary-500/50 dark:hover:text-primary-300;
-}
-
-.docs-markdown .docs-cta {
-  @apply mt-5 flex flex-wrap items-center gap-2.5;
-}
-
-.docs-markdown .docs-cta-btn {
-  @apply inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-[13px] font-medium text-gray-700 no-underline shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 dark:border-dark-700 dark:bg-dark-800 dark:text-dark-200 dark:hover:bg-dark-700 dark:hover:text-white;
-}
-
-.docs-markdown .docs-cta-btn--primary {
-  @apply border-gray-900 bg-gray-900 text-white hover:border-gray-800 hover:bg-gray-800 hover:text-white dark:border-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 dark:hover:text-gray-900;
 }
 
 .docs-markdown strong {
