@@ -436,6 +436,10 @@ onMounted(() => {
   @apply mt-2;
 }
 
+.docs-markdown .os-tablist[hidden] {
+  display: none;
+}
+
 .docs-markdown .os-tab {
   @apply rounded-lg px-4 py-1.5 text-[13px] font-medium text-gray-600 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-dark-300 dark:hover:text-white;
 }
