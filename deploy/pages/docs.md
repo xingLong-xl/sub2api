@@ -24,24 +24,40 @@
 
 适合使用 Claude 系列模型进行项目开发。配置后，在项目目录执行 `claude` 即可进入交互式编码环境。
 
-环境变量适合当前终端快速验证；`settings.json` 适合长期使用。修改后请重启 Claude Code。
+`setx` 或 `settings.json` 适合长期使用；当前终端环境变量适合临时验证。修改后请重启 Claude Code。
 
 #### Windows
 
-##### 安装 Claude Code
+##### 打开 Windows PowerShell
+
+1. 点击开始菜单
+2. 搜索 PowerShell
+3. 点击打开 Windows PowerShell 或 Terminal
+
+##### 安装 Node.js LTS
 
 ```powershell
 winget install OpenJS.NodeJS.LTS
 ```
 
-安装 Node.js 后重新打开 PowerShell，再执行：
+安装后重新打开 PowerShell，确保 `npm` 可用。
+
+##### 安装 Claude Code
 
 ```powershell
 npm install -g @anthropic-ai/claude-code
-claude --version
 ```
 
-##### 写入当前终端环境
+##### 写入用户环境变量
+
+```powershell
+setx ANTHROPIC_AUTH_TOKEN "sk-你的密钥"
+setx ANTHROPIC_BASE_URL "https://tokenpilot.site"
+```
+
+`setx` 不会影响已经打开的窗口，执行后请重新打开 PowerShell。
+
+##### 可选：写入当前 PowerShell 会话
 
 ```powershell
 $env:ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
@@ -73,15 +89,10 @@ claude
 ##### 安装 Claude Code
 
 ```bash
-# Ubuntu / Debian：先安装 Node.js 20/22
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
 npm install -g @anthropic-ai/claude-code
-claude --version
 ```
 
-其他发行版请先安装 Node.js 20+，再执行 `npm install -g @anthropic-ai/claude-code`。
+需要 Node.js 18+；如果提示 `npm: command not found`，请先安装 Node.js LTS。
 
 ##### 写入当前终端环境
 
@@ -117,15 +128,10 @@ claude
 ##### 安装 Claude Code
 
 ```bash
-# 已安装 Node.js 18+ 可跳过
-brew install node
-node -v
-
 npm install -g @anthropic-ai/claude-code
-claude --version
 ```
 
-没有 Homebrew 时，可以从 [nodejs.org](https://nodejs.org/) 下载 LTS 安装包。
+需要 Node.js 18+；如果提示 `npm: command not found`，请先安装 Node.js LTS。
 
 ##### 写入当前终端环境
 
@@ -158,58 +164,66 @@ claude
 
 ## Codex
 
-适合使用 GPT 系列模型进行代码生成、修改和审查。Codex 使用 OpenAI Responses 协议，因此：
+适合使用 GPT 系列模型进行代码生成、修改和审查。配置后，在项目目录执行 `codex` 即可开始使用。
 
-- `base_url` 填 `https://tokenpilot.site/v1`；
-- 在 `~/.codex/config.toml` 中定义 `model_provider`；
-- API Key 通过 `OPENAI_API_KEY` 环境变量读取；
-- 下面的 `model = "gpt-5.5"` 只是示例，必须换成模型广场里当前分组可用的模型。
-
-修改配置后请重启 Codex。
+Codex 以 `config.toml` 定义 provider，API Key 通过 `OPENAI_API_KEY` 环境变量读取。修改后请重启 Codex。
 
 #### Windows
 
-##### 安装 Codex CLI
+##### 打开 Windows PowerShell
+
+1. 点击开始菜单
+2. 搜索 PowerShell
+3. 点击打开 Windows PowerShell 或 Terminal
+
+##### 安装 Node.js LTS
 
 ```powershell
 winget install OpenJS.NodeJS.LTS
 ```
 
-安装 Node.js 后重新打开 PowerShell，再执行：
+安装后重新打开 PowerShell，确保 `npm` 可用。
+
+##### 安装 Codex CLI
 
 ```powershell
 npm install -g @openai/codex
-codex --version
 ```
 
-##### 写入 config.toml
+##### 推荐：写入持久配置
 
 ```powershell
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex" | Out-Null
 @'
-model_provider = "tokenpilot"
 model = "gpt-5.5"
-review_model = "gpt-5.5"
-model_reasoning_effort = "high"
-disable_response_storage = true
+model_provider = "tokenpilot"
+model_reasoning_effort = "xhigh"
 
 [model_providers.tokenpilot]
 name = "TokenPilot"
 base_url = "https://tokenpilot.site/v1"
-env_key = "OPENAI_API_KEY"
 wire_api = "responses"
+env_key = "OPENAI_API_KEY"
 requires_openai_auth = false
 supports_websockets = false
 '@ | Set-Content "$env:USERPROFILE\.codex\config.toml"
 ```
 
-##### 写入 API Key
+`model = "gpt-5.5"` 是示例，请换成模型广场里当前分组可用的模型。
+
+##### 推荐：持久写入 API Key
 
 ```powershell
 setx OPENAI_API_KEY "sk-你的密钥"
 ```
 
 `setx` 不会影响已经打开的窗口，执行后请重新打开 PowerShell。
+
+##### 可选：写入当前 PowerShell 会话
+
+```powershell
+$env:OPENAI_API_KEY="sk-你的密钥"
+```
 
 ##### 启动或重启 Codex
 
@@ -222,36 +236,31 @@ codex
 ##### 安装 Codex CLI
 
 ```bash
-# Ubuntu / Debian：先安装 Node.js 20/22
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
 npm install -g @openai/codex
-codex --version
 ```
 
-其他发行版请先安装 Node.js 20+，再执行 `npm install -g @openai/codex`。
+需要 Node.js 18+；如果提示 `npm: command not found`，请先安装 Node.js LTS。
 
-##### 写入 config.toml
+##### 写入持久配置
 
 ```bash
 mkdir -p ~/.codex
 cat > ~/.codex/config.toml <<'TOML'
-model_provider = "tokenpilot"
 model = "gpt-5.5"
-review_model = "gpt-5.5"
-model_reasoning_effort = "high"
-disable_response_storage = true
+model_provider = "tokenpilot"
+model_reasoning_effort = "xhigh"
 
 [model_providers.tokenpilot]
 name = "TokenPilot"
 base_url = "https://tokenpilot.site/v1"
-env_key = "OPENAI_API_KEY"
 wire_api = "responses"
+env_key = "OPENAI_API_KEY"
 requires_openai_auth = false
 supports_websockets = false
 TOML
 ```
+
+`model = "gpt-5.5"` 是示例，请换成模型广场里当前分组可用的模型。
 
 ##### 写入 API Key
 
@@ -270,34 +279,31 @@ codex
 ##### 安装 Codex CLI
 
 ```bash
-# 已安装 Node.js 18+ 可跳过
-brew install node
-node -v
-
 npm install -g @openai/codex
-codex --version
 ```
 
-##### 写入 config.toml
+需要 Node.js 18+；如果提示 `npm: command not found`，请先安装 Node.js LTS。
+
+##### 写入持久配置
 
 ```bash
 mkdir -p ~/.codex
 cat > ~/.codex/config.toml <<'TOML'
-model_provider = "tokenpilot"
 model = "gpt-5.5"
-review_model = "gpt-5.5"
-model_reasoning_effort = "high"
-disable_response_storage = true
+model_provider = "tokenpilot"
+model_reasoning_effort = "xhigh"
 
 [model_providers.tokenpilot]
 name = "TokenPilot"
 base_url = "https://tokenpilot.site/v1"
-env_key = "OPENAI_API_KEY"
 wire_api = "responses"
+env_key = "OPENAI_API_KEY"
 requires_openai_auth = false
 supports_websockets = false
 TOML
 ```
+
+`model = "gpt-5.5"` 是示例，请换成模型广场里当前分组可用的模型。
 
 ##### 写入 API Key
 

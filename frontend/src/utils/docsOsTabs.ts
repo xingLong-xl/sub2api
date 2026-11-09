@@ -107,6 +107,7 @@ function buildGroup(container: HTMLElement, sections: OsSection[], groupIndex: n
     const panel = doc.createElement('div')
     panel.className = 'os-panel'
     panel.id = panelId
+    panel.dataset.os = section.key
     panel.setAttribute('role', 'tabpanel')
     panel.setAttribute('aria-labelledby', tabId)
     panel.hidden = true
