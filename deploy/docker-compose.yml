@@ -19,6 +19,13 @@
 #   4. docker-compose -f docker-compose.local.yml up -d
 # =============================================================================
 
+# Cap each container's json-file logs at 4 x 30 MB = 120 MB.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "30m"
+    max-file: "4"
+
 services:
   # ===========================================================================
   # Sub2API Application
@@ -26,6 +33,7 @@ services:
   tokenpilot:
     image: 682821438397.dkr.ecr.us-east-2.amazonaws.com/xl/tokenpilot:v1.0.0
     container_name: TokenPilot
+    logging: *default-logging
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -226,6 +234,7 @@ services:
   postgres:
     image: postgres:18-alpine
     container_name: sub2api-postgres
+    logging: *default-logging
     restart: unless-stopped
     ulimits:
       nofile:
@@ -257,6 +266,7 @@ services:
   redis:
     image: redis:8-alpine
     container_name: sub2api-redis
+    logging: *default-logging
     restart: unless-stopped
     ulimits:
       nofile:

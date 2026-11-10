@@ -8,6 +8,13 @@
 #   docker compose -f docker-compose.dev.yml up --build
 # =============================================================================
 
+# Cap each container's json-file logs at 4 x 30 MB = 120 MB.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "30m"
+    max-file: "4"
+
 services:
   sub2api:
     build:
@@ -16,6 +23,7 @@ services:
       args:
         NPM_CONFIG_REGISTRY: ${NPM_CONFIG_REGISTRY:-https://registry.npmmirror.com}
     container_name: sub2api-dev
+    logging: *default-logging
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -124,6 +132,7 @@ services:
   postgres:
     image: postgres:18-alpine
     container_name: sub2api-postgres-dev
+    logging: *default-logging
     restart: unless-stopped
     volumes:
       - ./postgres_data:/var/lib/postgresql/data:Z
@@ -145,6 +154,7 @@ services:
   redis:
     image: redis:8-alpine
     container_name: sub2api-redis-dev
+    logging: *default-logging
     restart: unless-stopped
     volumes:
       - ./redis_data:/data:Z

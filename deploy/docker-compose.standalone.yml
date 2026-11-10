@@ -10,10 +10,18 @@
 #   3. Access: http://localhost:8080
 # =============================================================================
 
+# Cap each container's json-file logs at 4 x 30 MB = 120 MB.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "30m"
+    max-file: "4"
+
 services:
   sub2api:
     image: weishaw/sub2api:latest
     container_name: sub2api
+    logging: *default-logging
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
