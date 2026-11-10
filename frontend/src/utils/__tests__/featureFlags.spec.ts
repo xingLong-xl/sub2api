@@ -40,6 +40,21 @@ describe('FeatureFlags.subscription', () => {
   })
 })
 
+describe('FeatureFlags.toolsChat', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('is opt-out: visible by default and hidden only on explicit false', () => {
+    expect(FeatureFlags.toolsChat.key).toBe('tools_chat_enabled')
+    expect(FeatureFlags.toolsChat.mode).toBe('opt-out')
+    expect(resolveFeatureFlag(undefined, FeatureFlags.toolsChat)).toBe(true)
+    expect(resolveFeatureFlag({}, FeatureFlags.toolsChat)).toBe(true)
+    expect(resolveFeatureFlag({ tools_chat_enabled: true }, FeatureFlags.toolsChat)).toBe(true)
+    expect(resolveFeatureFlag({ tools_chat_enabled: false }, FeatureFlags.toolsChat)).toBe(false)
+  })
+})
+
 describe('resolveFeatureFlag', () => {
   beforeEach(() => {
     setActivePinia(createPinia())

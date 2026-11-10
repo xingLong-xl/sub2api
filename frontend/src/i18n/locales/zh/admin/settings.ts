@@ -62,11 +62,13 @@ export default {
         },
         tools: {
           title: '工具页功能',
-          description: '控制用户端「图像生成」和「视频生成」入口是否显示。默认关闭，开启后立即显示。',
+          description: '控制用户端「AI 聊天」「图像生成」和「视频生成」入口是否显示。AI 聊天默认开启，图像/视频默认关闭。',
+          chatEnabled: '启用 AI 聊天',
+          chatHint: '关闭后侧边栏入口隐藏，直接访问 /tools/chat 会跳回仪表盘；已保存的聊天记录不受影响。',
           imageEnabled: '启用图像生成',
-          imageHint: '关闭后侧边栏入口隐藏，直接访问 /tools/image 会跳回 AI 聊天；不影响已保存的聊天记录。',
+          imageHint: '关闭后侧边栏入口隐藏，直接访问 /tools/image 会被拦截（AI 聊天也关闭时跳回仪表盘）；不影响已保存的聊天记录。',
           videoEnabled: '启用视频生成',
-          videoHint: '关闭后侧边栏入口隐藏，直接访问 /tools/video 会跳回 AI 聊天。',
+          videoHint: '关闭后侧边栏入口隐藏，直接访问 /tools/video 会被拦截（AI 聊天关闭时跳回仪表盘）。',
         },
         modelPlaza: {
           title: '模型广场',

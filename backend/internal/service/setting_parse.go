@@ -202,7 +202,9 @@ func (s *SettingService) InitializeDefaultSettings(ctx context.Context) error {
 		// Available channels feature (default disabled; opt-in)
 		SettingKeyAvailableChannelsEnabled: "false",
 
-		// Tools feature switches (default disabled; opt-in)
+		// Tools feature switches
+		// Chat defaults to enabled (opt-out); image/video default disabled (opt-in).
+		SettingKeyToolsChatEnabled:  "true",
 		SettingKeyToolsImageEnabled: "false",
 		SettingKeyToolsVideoEnabled: "false",
 
@@ -831,7 +833,8 @@ func (s *SettingService) parseSettings(settings map[string]string) *SystemSettin
 	// Available channels feature (default: disabled; strict true)
 	result.AvailableChannelsEnabled = settings[SettingKeyAvailableChannelsEnabled] == "true"
 
-	// Tools feature switches (default: disabled; strict true)
+	// Tools feature switches: chat is opt-out, image/video are opt-in.
+	result.ToolsChatEnabled = !isFalseSettingValue(settings[SettingKeyToolsChatEnabled])
 	result.ToolsImageEnabled = settings[SettingKeyToolsImageEnabled] == "true"
 	result.ToolsVideoEnabled = settings[SettingKeyToolsVideoEnabled] == "true"
 

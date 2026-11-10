@@ -433,6 +433,7 @@ func (s *SettingService) buildSystemSettingsUpdates(ctx context.Context, setting
 	updates[SettingKeyAvailableChannelsEnabled] = strconv.FormatBool(settings.AvailableChannelsEnabled)
 
 	// Tools feature switches
+	updates[SettingKeyToolsChatEnabled] = strconv.FormatBool(settings.ToolsChatEnabled)
 	updates[SettingKeyToolsImageEnabled] = strconv.FormatBool(settings.ToolsImageEnabled)
 	updates[SettingKeyToolsVideoEnabled] = strconv.FormatBool(settings.ToolsVideoEnabled)
 

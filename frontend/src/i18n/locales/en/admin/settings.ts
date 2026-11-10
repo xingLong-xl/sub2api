@@ -62,11 +62,13 @@ export default {
         },
         tools: {
           title: 'Tool Pages',
-          description: 'Control whether the Image Generation and Video Generation entries are visible to users. Off by default; enabling takes effect immediately.',
+          description: 'Control whether AI Chat, Image Generation and Video Generation entries are visible to users. AI Chat is on by default; image/video are off by default.',
+          chatEnabled: 'Enable AI Chat',
+          chatHint: 'When off, the sidebar entry is hidden and /tools/chat redirects to the dashboard. Saved chats are unaffected.',
           imageEnabled: 'Enable Image Generation',
-          imageHint: 'When off, the sidebar entry is hidden and /tools/image redirects to AI Chat. Saved chats are unaffected.',
+          imageHint: 'When off, the sidebar entry is hidden and /tools/image is blocked (it falls back to the dashboard if AI Chat is also off). Saved chats are unaffected.',
           videoEnabled: 'Enable Video Generation',
-          videoHint: 'When off, the sidebar entry is hidden and /tools/video redirects to AI Chat.',
+          videoHint: 'When off, the sidebar entry is hidden and /tools/video is blocked (it falls back to the dashboard if AI Chat is off).',
         },
         modelPlaza: {
           title: 'Model Plaza',

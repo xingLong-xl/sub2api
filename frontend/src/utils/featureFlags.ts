@@ -104,6 +104,11 @@ export const FeatureFlags = {
     mode: 'opt-in',
     label: 'Available Channels',
   }),
+  toolsChat: defineFlag({
+    key: 'tools_chat_enabled',
+    mode: 'opt-out',
+    label: 'AI Chat Tool',
+  }),
   toolsImage: defineFlag({
     key: 'tools_image_enabled',
     mode: 'opt-in',

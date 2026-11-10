@@ -245,6 +245,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
+      requiresTools: 'chat',
       title: 'AI Chat',
       titleKey: 'tools.chat.title',
       descriptionKey: 'tools.chat.description'
@@ -994,14 +995,23 @@ router.beforeEach(async (to, _from, next) => {
     return
   }
 
-  // 图像/视频工具是 opt-in 开关：未显式开启时隐藏入口并拦截直达。
+  // 工具页开关：图像/视频是 opt-in，聊天是 opt-out（只有显式关闭才拦截）。
   if (to.meta.requiresTools && appStore.publicSettingsLoaded) {
+    const tool = to.meta.requiresTools
     const enabled =
-      to.meta.requiresTools === 'image'
-        ? appStore.cachedPublicSettings?.tools_image_enabled === true
-        : appStore.cachedPublicSettings?.tools_video_enabled === true
+      tool === 'chat'
+        ? appStore.cachedPublicSettings?.tools_chat_enabled !== false
+        : tool === 'image'
+          ? appStore.cachedPublicSettings?.tools_image_enabled === true
+          : appStore.cachedPublicSettings?.tools_video_enabled === true
     if (!enabled) {
-      next('/tools/chat')
+      const fallback =
+        appStore.cachedPublicSettings?.tools_chat_enabled !== false
+          ? '/tools/chat'
+          : authStore.isAdmin
+            ? '/admin/dashboard'
+            : '/dashboard'
+      next(tool === 'chat' ? (authStore.isAdmin ? '/admin/dashboard' : '/dashboard') : fallback)
       return
     }
   }

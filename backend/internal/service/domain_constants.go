@@ -533,6 +533,11 @@ const (
 	// sidebar entry is hidden. Defaults to false (opt-in feature).
 	SettingKeyAvailableChannelsEnabled = "available_channels_enabled"
 
+	// SettingKeyToolsChatEnabled controls the user-facing AI chat tool page.
+	// Defaults to true (opt-out) so existing installations keep the page visible
+	// until an administrator explicitly turns it off.
+	SettingKeyToolsChatEnabled = "tools_chat_enabled"
+
 	// SettingKeyToolsImageEnabled controls the user-facing image generation tool page.
 	// When false, the sidebar entry and direct route are hidden. Defaults to false
 	// (opt-in) so incomplete generation features stay offline after deployment.

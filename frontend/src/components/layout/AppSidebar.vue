@@ -34,7 +34,7 @@
       <!-- Admin View: Admin menu first, then personal menu -->
       <template v-if="isAdmin">
         <!-- Tools Section -->
-        <div class="sidebar-section">
+        <div v-if="toolNavItems.length > 0" class="sidebar-section">
           <div class="sidebar-section-title" :class="{ 'sidebar-section-title-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
             <span class="sidebar-section-title-text" :class="{ 'sidebar-section-title-text-collapsed': sidebarCollapsed }">
               {{ t('nav.tools') }}
@@ -155,7 +155,7 @@
       <!-- Regular User View -->
       <template v-else-if="!appStore.backendModeEnabled">
         <!-- Tools Section -->
-        <div class="sidebar-section">
+        <div v-if="toolNavItems.length > 0" class="sidebar-section">
           <div class="sidebar-section-title" :class="{ 'sidebar-section-title-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
             <span class="sidebar-section-title-text" :class="{ 'sidebar-section-title-text-collapsed': sidebarCollapsed }">
               {{ t('nav.tools') }}
@@ -791,6 +791,7 @@ const ChevronDownIcon = {
 const flagChannelMonitor = makeSidebarFlag(FeatureFlags.channelMonitor)
 const flagPayment = makeSidebarFlag(FeatureFlags.payment)
 const flagAvailableChannels = makeSidebarFlag(FeatureFlags.availableChannels)
+const flagToolsChat = makeSidebarFlag(FeatureFlags.toolsChat)
 const flagToolsImage = makeSidebarFlag(FeatureFlags.toolsImage)
 const flagToolsVideo = makeSidebarFlag(FeatureFlags.toolsVideo)
 const flagSubscription = makeSidebarFlag(FeatureFlags.subscription)
@@ -857,7 +858,7 @@ const userNavItems = computed((): NavItem[] => finalizeNav(buildSelfNavItems(tru
 // Tools navigation items (chat / image generation / video generation).
 // Shared by both the admin view and the regular user view.
 const toolNavItems = computed((): NavItem[] => applyFeatureFlags([
-  { path: '/tools/chat', label: t('nav.toolsChat'), icon: ToolChatIcon },
+  { path: '/tools/chat', label: t('nav.toolsChat'), icon: ToolChatIcon, featureFlag: flagToolsChat },
   { path: '/tools/image', label: t('nav.toolsImage'), icon: ToolImageIcon, featureFlag: flagToolsImage },
   { path: '/tools/video', label: t('nav.toolsVideo'), icon: ToolVideoIcon, featureFlag: flagToolsVideo },
 ]))

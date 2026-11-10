@@ -325,7 +325,8 @@ type SystemSettings struct {
 	// Available Channels feature switch (user-facing aggregate view)
 	AvailableChannelsEnabled bool `json:"available_channels_enabled"`
 
-	// Tools feature switches (image/video generation)
+	// Tools feature switches (chat/image/video generation)
+	ToolsChatEnabled  bool `json:"tools_chat_enabled"`
 	ToolsImageEnabled bool `json:"tools_image_enabled"`
 	ToolsVideoEnabled bool `json:"tools_video_enabled"`
 
@@ -443,6 +444,7 @@ type PublicSettings struct {
 
 	AvailableChannelsEnabled bool `json:"available_channels_enabled"`
 
+	ToolsChatEnabled  bool `json:"tools_chat_enabled"`
 	ToolsImageEnabled bool `json:"tools_image_enabled"`
 	ToolsVideoEnabled bool `json:"tools_video_enabled"`
 

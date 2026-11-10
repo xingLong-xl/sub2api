@@ -742,7 +742,8 @@ export interface SystemSettings {
   // Available Channels feature switch
   available_channels_enabled: boolean;
 
-  // Tools feature switches (image/video generation)
+  // Tools feature switches (chat/image/video generation)
+  tools_chat_enabled: boolean;
   tools_image_enabled: boolean;
   tools_video_enabled: boolean;
 
@@ -1058,7 +1059,8 @@ export interface UpdateSettingsRequest {
   // Available Channels feature switch
   available_channels_enabled?: boolean;
 
-  // Tools feature switches (image/video generation)
+  // Tools feature switches (chat/image/video generation)
+  tools_chat_enabled?: boolean;
   tools_image_enabled?: boolean;
   tools_video_enabled?: boolean;
 

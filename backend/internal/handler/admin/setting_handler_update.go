@@ -350,7 +350,8 @@ type UpdateSettingsRequest struct {
 	// Available Channels feature switch (user-facing)
 	AvailableChannelsEnabled *bool `json:"available_channels_enabled"`
 
-	// Tools feature switches (image/video generation)
+	// Tools feature switches (chat/image/video generation)
+	ToolsChatEnabled  *bool `json:"tools_chat_enabled"`
 	ToolsImageEnabled *bool `json:"tools_image_enabled"`
 	ToolsVideoEnabled *bool `json:"tools_video_enabled"`
 
@@ -1982,6 +1983,12 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 			}
 			return previousSettings.AvailableChannelsEnabled
 		}(),
+		ToolsChatEnabled: func() bool {
+			if req.ToolsChatEnabled != nil {
+				return *req.ToolsChatEnabled
+			}
+			return previousSettings.ToolsChatEnabled
+		}(),
 		ToolsImageEnabled: func() bool {
 			if req.ToolsImageEnabled != nil {
 				return *req.ToolsImageEnabled
@@ -2458,6 +2465,7 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		GrokDefaultBaseURLMode:         updatedSettings.GrokDefaultBaseURLMode,
 
 		AvailableChannelsEnabled: updatedSettings.AvailableChannelsEnabled,
+		ToolsChatEnabled:         updatedSettings.ToolsChatEnabled,
 		ToolsImageEnabled:        updatedSettings.ToolsImageEnabled,
 		ToolsVideoEnabled:        updatedSettings.ToolsVideoEnabled,
 		SubscriptionEnabled:      updatedSettings.SubscriptionEnabled,

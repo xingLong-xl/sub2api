@@ -235,6 +235,7 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SettingKeyChannelMonitorShowQuota,
 		SettingKeyChannelMonitorHideUserRanking,
 		SettingKeyAvailableChannelsEnabled,
+		SettingKeyToolsChatEnabled,
 		SettingKeyToolsImageEnabled,
 		SettingKeyToolsVideoEnabled,
 		SettingKeySubscriptionEnabled,
@@ -368,6 +369,7 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 
 		AvailableChannelsEnabled: settings[SettingKeyAvailableChannelsEnabled] == "true",
 
+		ToolsChatEnabled:  !isFalseSettingValue(settings[SettingKeyToolsChatEnabled]),
 		ToolsImageEnabled: settings[SettingKeyToolsImageEnabled] == "true",
 		ToolsVideoEnabled: settings[SettingKeyToolsVideoEnabled] == "true",
 
@@ -641,6 +643,7 @@ type PublicSettingsInjectionPayload struct {
 	ChannelMonitorHideUserRanking bool `json:"channel_monitor_hide_user_ranking"`
 	ChannelMonitorShowQuota       bool `json:"channel_monitor_show_quota"`
 	AvailableChannelsEnabled      bool `json:"available_channels_enabled"`
+	ToolsChatEnabled              bool `json:"tools_chat_enabled"`
 	ToolsImageEnabled             bool `json:"tools_image_enabled"`
 	ToolsVideoEnabled             bool `json:"tools_video_enabled"`
 	SubscriptionEnabled           bool `json:"subscription_enabled"`
@@ -727,6 +730,7 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		ChannelMonitorShowQuota:              settings.ChannelMonitorShowQuota,
 		ChannelMonitorHideUserRanking:        settings.ChannelMonitorHideUserRanking,
 		AvailableChannelsEnabled:             settings.AvailableChannelsEnabled,
+		ToolsChatEnabled:                     settings.ToolsChatEnabled,
 		ToolsImageEnabled:                    settings.ToolsImageEnabled,
 		ToolsVideoEnabled:                    settings.ToolsVideoEnabled,
 		SubscriptionEnabled:                  settings.SubscriptionEnabled,

@@ -26,6 +26,7 @@ const appStore = vi.hoisted(() => ({
     payment_enabled?: boolean
     risk_control_enabled?: boolean
     subscription_enabled?: boolean
+    tools_chat_enabled?: boolean
     tools_image_enabled?: boolean
     tools_video_enabled?: boolean
     custom_menu_items?: []
@@ -181,7 +182,7 @@ describe('feature route guard', () => {
   })
 })
 
-describe('tools route guard (opt-in flags)', () => {
+describe('tools route guard', () => {
   beforeEach(() => {
     authStore.isAdmin = false
     authStore.isSimpleMode = false
@@ -204,6 +205,8 @@ describe('tools route guard (opt-in flags)', () => {
   })
 
   it.each([
+    ['chat (missing defaults on)', { requiresTools: 'chat' }, {}],
+    ['chat (explicitly enabled)', { requiresTools: 'chat' }, { tools_chat_enabled: true }],
     ['image', { requiresTools: 'image' }, { tools_image_enabled: true }],
     ['video', { requiresTools: 'video' }, { tools_video_enabled: true }],
   ])('lets %s through when enabled', async (_name, meta, settings) => {
@@ -214,6 +217,20 @@ describe('tools route guard (opt-in flags)', () => {
 
     expect(next).toHaveBeenCalledOnce()
     expect(next).toHaveBeenCalledWith()
+  })
+
+  it.each([
+    ['user', false, '/dashboard'],
+    ['admin', true, '/admin/dashboard'],
+  ])('redirects a %s away from AI Chat when tools_chat_enabled is false', async (_name, isAdmin, target) => {
+    authStore.isAdmin = isAdmin
+    appStore.cachedPublicSettings = { tools_chat_enabled: false }
+
+    const { navigation, next } = runGuard({ requiresTools: 'chat' }, '/tools/chat')
+    await navigation
+
+    expect(next).toHaveBeenCalledOnce()
+    expect(next).toHaveBeenCalledWith(target)
   })
 })
 

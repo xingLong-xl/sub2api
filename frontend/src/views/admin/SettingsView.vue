@@ -7339,6 +7339,17 @@
             <div class="flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('admin.settings.features.tools.chatEnabled') }}
+                </label>
+                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  {{ t('admin.settings.features.tools.chatHint') }}
+                </p>
+              </div>
+              <Toggle v-model="form.tools_chat_enabled" />
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.tools.imageEnabled') }}
                 </label>
                 <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -10092,7 +10103,8 @@ const form = reactive<SettingsForm>({
   channel_monitor_hide_user_ranking: false,
   // Available Channels feature switch
   available_channels_enabled: false,
-  // Tools feature switches (image/video generation)
+  // Tools feature switches (chat/image/video generation)
+  tools_chat_enabled: true,
   tools_image_enabled: false,
   tools_video_enabled: false,
   // Subscription feature switch (user sidebar "My Subscriptions" entry)
@@ -11830,7 +11842,8 @@ async function saveSettings() {
       channel_monitor_hide_user_ranking: Boolean(form.channel_monitor_hide_user_ranking),
       // Available Channels feature switch
       available_channels_enabled: form.available_channels_enabled,
-      // Tools feature switches (image/video generation)
+      // Tools feature switches (chat/image/video generation)
+      tools_chat_enabled: form.tools_chat_enabled,
       tools_image_enabled: form.tools_image_enabled,
       tools_video_enabled: form.tools_video_enabled,
       // Subscription feature switch

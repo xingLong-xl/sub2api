@@ -277,6 +277,8 @@ export interface PublicSettings {
   /** When true, user monitor hides the user ranking tab and /users payload. */
   channel_monitor_hide_user_ranking?: boolean
   available_channels_enabled: boolean
+  /** When false, the AI chat tool is hidden. Default true (opt-out). */
+  tools_chat_enabled: boolean
   /** When true, the image generation tool is visible. Default false (opt-in). */
   tools_image_enabled: boolean
   /** When true, the video generation tool is visible. Default false (opt-in). */
