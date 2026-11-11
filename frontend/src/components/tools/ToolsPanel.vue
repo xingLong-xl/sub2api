@@ -2,6 +2,7 @@
   <section class="flex min-h-[340px] flex-col overflow-hidden xl:min-h-0">
     <header class="flex h-9 shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-3 dark:border-dark-700">
       <div class="flex min-w-0 items-center gap-2">
+        <slot name="leading" />
         <Icon v-if="icon" :name="icon" size="sm" class="shrink-0 text-gray-400 dark:text-dark-500" />
         <h2 class="truncate text-sm font-semibold text-gray-900 dark:text-white" :title="titleTooltip || undefined">{{ title }}</h2>
         <span
@@ -13,6 +14,7 @@
       </div>
       <div class="flex shrink-0 items-center gap-1">
         <slot name="actions" />
+        <slot name="trailing" />
       </div>
     </header>
     <div class="min-h-0 flex-1 overflow-y-auto p-3" :class="bodyClass">

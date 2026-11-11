@@ -42,6 +42,10 @@ const icons = {
   chevronDown: 'M19.5 8.25l-7.5 7.5-7.5-7.5',
   chevronRight: 'M8.25 4.5l7.5 7.5-7.5 7.5',
   chevronLeft: 'M15.75 19.5L8.25 12l7.5-7.5',
+  panelLeftOpen: 'M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zM9 3v18M14 9l3 3-3 3',
+  panelLeftClose: 'M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zM9 3v18M16 15l-3-3 3-3',
+  panelRightOpen: 'M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zM15 3v18M10 15l-3-3 3-3',
+  panelRightClose: 'M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zM15 3v18M8 9l3 3-3 3',
 
   // UI Elements
   check: 'M4.5 12.75l6 6 9-13.5',

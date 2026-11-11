@@ -4,28 +4,11 @@
       <div
         class="grid min-h-0 flex-1 grid-cols-1 divide-y divide-gray-200 overflow-y-auto dark:divide-dark-700 xl:divide-x xl:divide-y-0 xl:overflow-hidden"
         :class="sessionsCollapsed
-          ? (paramsCollapsed ? 'xl:grid-cols-[48px_minmax(0,1fr)_48px]' : 'xl:grid-cols-[48px_minmax(0,1fr)_380px]')
-          : (paramsCollapsed ? 'xl:grid-cols-[260px_minmax(0,1fr)_48px]' : 'xl:grid-cols-[260px_minmax(0,1fr)_380px]')"
+          ? (paramsCollapsed ? 'xl:grid-cols-[0px_minmax(0,1fr)_0px]' : 'xl:grid-cols-[0px_minmax(0,1fr)_380px]')
+          : (paramsCollapsed ? 'xl:grid-cols-[260px_minmax(0,1fr)_0px]' : 'xl:grid-cols-[260px_minmax(0,1fr)_380px]')"
       >
         <!-- 第一栏：对话记录（可折叠，向左收起） -->
-        <section
-          v-if="sessionsCollapsed"
-          class="flex min-h-[56px] items-center justify-center gap-2 py-2 xl:min-h-0 xl:flex-col xl:justify-start xl:pt-3"
-        >
-          <button
-            type="button"
-            class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-dark-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
-            :title="t('tools.chat.expandSessions')"
-            @click="sessionsCollapsed = false"
-          >
-            <Icon name="chevronRight" size="sm" />
-          </button>
-          <span class="text-xs text-gray-500 dark:text-dark-400 xl:[writing-mode:vertical-rl]">
-            {{ t('tools.chat.sessions') }}
-          </span>
-        </section>
-
-        <ToolsPanel v-else :title="t('tools.chat.sessions')" icon="chatBubble" :badge="sessions.length">
+        <ToolsPanel v-if="!sessionsCollapsed" class="xl:col-start-1" :title="t('tools.chat.sessions')" icon="chatBubble" :badge="sessions.length">
           <template #actions>
             <button
               type="button"
@@ -34,14 +17,6 @@
             >
               <Icon name="plus" size="xs" />
               {{ t('tools.chat.newSession') }}
-            </button>
-            <button
-              type="button"
-              class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-dark-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
-              :title="t('tools.chat.collapseSessions')"
-              @click="sessionsCollapsed = true"
-            >
-              <Icon name="chevronLeft" size="sm" />
             </button>
           </template>
 
@@ -79,7 +54,35 @@
         </ToolsPanel>
 
         <!-- 第二栏：对话 -->
-        <ToolsPanel :title="activeTitle" :title-tooltip="firstUserMessage" icon="chat" body-class="!overflow-hidden !p-0">
+        <ToolsPanel
+          class="xl:col-start-2"
+          :title="activeTitle"
+          :title-tooltip="firstUserMessage"
+          icon="chat"
+          body-class="!overflow-hidden !p-0"
+        >
+          <template #leading>
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-dark-300 dark:hover:bg-dark-700 dark:hover:text-dark-200"
+              :title="sessionsCollapsed ? t('tools.chat.expandSessions') : t('tools.chat.collapseSessions')"
+              :aria-label="sessionsCollapsed ? t('tools.chat.expandSessions') : t('tools.chat.collapseSessions')"
+              @click="sessionsCollapsed = !sessionsCollapsed"
+            >
+              <Icon :name="sessionsCollapsed ? 'panelLeftOpen' : 'panelLeftClose'" size="sm" :stroke-width="2" />
+            </button>
+          </template>
+          <template #trailing>
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-dark-300 dark:hover:bg-dark-700 dark:hover:text-dark-200"
+              :title="paramsCollapsed ? t('tools.chat.expandParams') : t('tools.chat.collapseParams')"
+              :aria-label="paramsCollapsed ? t('tools.chat.expandParams') : t('tools.chat.collapseParams')"
+              @click="paramsCollapsed = !paramsCollapsed"
+            >
+              <Icon :name="paramsCollapsed ? 'panelRightOpen' : 'panelRightClose'" size="sm" :stroke-width="2" />
+            </button>
+          </template>
           <template #actions>
             <button
               v-if="messages.length"
@@ -196,24 +199,7 @@
         </ToolsPanel>
 
         <!-- 第三栏：对话参数（可折叠，两列布局） -->
-        <section
-          v-if="paramsCollapsed"
-          class="flex min-h-[56px] items-center justify-center gap-2 py-2 xl:min-h-0 xl:flex-col xl:justify-start xl:pt-3"
-        >
-          <button
-            type="button"
-            class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-dark-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
-            :title="t('tools.chat.expandParams')"
-            @click="paramsCollapsed = false"
-          >
-            <Icon name="chevronLeft" size="sm" />
-          </button>
-          <span class="text-xs text-gray-500 dark:text-dark-400 xl:[writing-mode:vertical-rl]">
-            {{ t('tools.chat.params') }}
-          </span>
-        </section>
-
-        <ToolsPanel v-else :title="t('tools.chat.params')" icon="arrowsUpDown" body-class="flex flex-col">
+        <ToolsPanel v-if="!paramsCollapsed" class="xl:col-start-3" :title="t('tools.chat.params')" icon="arrowsUpDown" body-class="flex flex-col">
           <template #actions>
             <button
               type="button"
@@ -221,14 +207,6 @@
               @click="resetParams"
             >
               {{ t('tools.chat.resetParams') }}
-            </button>
-            <button
-              type="button"
-              class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-dark-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
-              :title="t('tools.chat.collapseParams')"
-              @click="paramsCollapsed = true"
-            >
-              <Icon name="chevronRight" size="sm" />
             </button>
           </template>
 
