@@ -6,6 +6,7 @@
         v-model="keyChoice"
         :class="groupSelectClass"
         :aria-label="t('tools.connection.selectGroup')"
+        :title="selectedGroupLabel || t('tools.connection.selectGroup')"
         @focus="refreshConnectionData"
       >
         <option value="">{{ t('tools.connection.selectGroup') }}</option>
@@ -19,12 +20,13 @@
       <span v-if="!inline" class="text-xs font-medium text-gray-500 dark:text-dark-400">
         {{ t('tools.connection.model') }}
       </span>
-      <div class="flex items-center gap-1.5" :class="inline ? 'min-w-0 flex-1' : ''">
+      <div class="flex items-center gap-1.5" :class="inline ? 'min-w-0' : ''">
         <select
           v-if="!hasGroup"
           disabled
           :class="[modelSelectClass, 'cursor-not-allowed text-gray-400 dark:text-dark-500']"
           :aria-label="t('tools.connection.model')"
+          :title="t('tools.connection.selectGroupFirst')"
         >
           <option>{{ t('tools.connection.selectGroupFirst') }}</option>
         </select>
@@ -33,6 +35,7 @@
           disabled
           :class="[modelSelectClass, 'cursor-not-allowed text-gray-400 dark:text-dark-500']"
           :aria-label="t('tools.connection.model')"
+          :title="t('tools.common.loading')"
         >
           <option>{{ t('tools.common.loading') }}</option>
         </select>
@@ -41,6 +44,7 @@
           v-model="model"
           :class="modelSelectClass"
           :aria-label="t('tools.connection.model')"
+          :title="model || t('tools.connection.selectModel')"
         >
           <option value="">{{ t('tools.connection.selectModel') }}</option>
           <option v-for="item in modelOptions" :key="item" :value="item">{{ item }}</option>
@@ -50,6 +54,7 @@
           disabled
           :class="[modelSelectClass, 'cursor-not-allowed text-gray-400 dark:text-dark-500']"
           :aria-label="t('tools.connection.model')"
+          :title="t('tools.connection.noModels')"
         >
           <option>{{ t('tools.connection.noModels') }}</option>
         </select>
@@ -147,16 +152,16 @@ const rootClass = computed(() => {
 })
 
 const groupSelectClass = computed(() => [
-  'input !rounded-lg !px-2.5 !py-1.5 text-sm',
+  'input !rounded-lg !px-2.5 !py-1.5 text-sm truncate',
   props.inline
-    ? '!w-auto min-w-[110px] max-w-[145px]'
+    ? '!w-auto min-w-[150px] max-w-[200px]'
     : '!w-auto min-w-[180px] max-w-[280px]',
 ])
 
 const modelSelectClass = computed(() => [
-  'input !rounded-lg !px-2.5 !py-1.5 text-sm',
+  'input !rounded-lg !px-2.5 !py-1.5 text-sm truncate',
   props.inline
-    ? '!w-full min-w-0'
+    ? '!w-auto min-w-[150px] max-w-[200px]'
     : '!w-auto min-w-[220px] max-w-[360px]',
 ])
 
@@ -207,6 +212,11 @@ const keyChoice = computed({
       emit('update:modelValue', '')
     }
   },
+})
+
+const selectedGroupLabel = computed(() => {
+  const option = keyOptions.value.find((item) => item.id === keyChoice.value)
+  return option?.label ?? ''
 })
 
 const model = computed({
