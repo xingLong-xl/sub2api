@@ -111,7 +111,7 @@
                 <div
                   class="group relative max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed"
                   :class="message.role === 'user'
-                    ? 'rounded-br-md bg-primary-600 text-white'
+                    ? 'rounded-br-md border border-primary-200 bg-primary-100 text-primary-900 selection:bg-primary-600 selection:text-white dark:border-primary-700/60 dark:bg-primary-900/40 dark:text-primary-100'
                     : 'rounded-bl-md border border-gray-200 bg-gray-50 text-gray-900 dark:border-dark-700 dark:bg-dark-700/50 dark:text-dark-100'"
                 >
                   <div v-if="message.role === 'user'" class="whitespace-pre-wrap break-words">{{ message.content }}</div>
@@ -122,15 +122,19 @@
                       <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:150ms]"></span>
                       <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:300ms]"></span>
                     </div>
-                    <span
-                      v-if="message.content && !streaming"
-                      class="absolute -bottom-5 left-1 hidden cursor-pointer items-center gap-1 text-xs text-gray-400 group-hover:flex hover:text-gray-600 dark:hover:text-dark-200"
-                      @click="copyToClipboard(message.content)"
-                    >
-                      <Icon name="copy" size="xs" />
-                      {{ t('common.copy') }}
-                    </span>
                   </template>
+                  <button
+                    v-if="message.content && (message.role === 'user' || !streaming)"
+                    type="button"
+                    class="absolute -bottom-5 hidden cursor-pointer items-center gap-1 text-xs text-gray-400 group-hover:flex hover:text-gray-600 dark:hover:text-dark-200"
+                    :class="message.role === 'user' ? 'right-1' : 'left-1'"
+                    :aria-label="t('common.copy')"
+                    :title="t('common.copy')"
+                    @click.stop="copyToClipboard(message.content)"
+                  >
+                    <Icon name="copy" size="xs" />
+                    {{ t('common.copy') }}
+                  </button>
                 </div>
               </div>
 
@@ -364,6 +368,8 @@ import { useClipboard } from '@/composables/useClipboard'
 import { GatewayError, useToolsSettings } from '@/composables/useToolsSettings'
 import { toolChatAPI } from '@/api/toolChat'
 import { useAuthStore } from '@/stores/auth'
+import { useAppStore } from '@/stores/app'
+import { extractApiErrorMessage } from '@/utils/apiError'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -427,6 +433,7 @@ const { t } = useI18n()
 const { hasApiKey, chatModel, gatewayFetch } = useToolsSettings()
 const { copyToClipboard } = useClipboard()
 const authStore = useAuthStore()
+const appStore = useAppStore()
 
 function currentOwnerId(): string {
   const id = authStore.user?.id
@@ -558,6 +565,16 @@ function persistLocal(): void {
 
 let serverSaveTimer: ReturnType<typeof setTimeout> | null = null
 let serverSaveQueue: Promise<void> = Promise.resolve()
+let lastSaveErrorNotice = ''
+
+/** 把服务端保存限制翻译成用户能理解、可操作的提示。 */
+function serverSaveErrorMessage(err: unknown): string {
+  const reason = extractApiErrorMessage(err, '').toLowerCase()
+  if (reason.includes('content is too long')) return t('tools.chat.historyMessageTooLong')
+  if (reason.includes('content is too large')) return t('tools.chat.historySessionTooLarge')
+  if (reason.includes('too many sessions')) return t('tools.chat.historyTooManySessions')
+  return t('tools.chat.historySaveFailed')
+}
 
 /** 合并短时间内的多次变更，并串行写入服务端，避免旧快照覆盖新快照。 */
 function scheduleServerSave(): void {
@@ -577,8 +594,17 @@ function scheduleServerSave(): void {
     serverSaveQueue = serverSaveQueue
       .catch(() => undefined)
       .then(() => toolChatAPI.save(snapshot))
+      .then(() => {
+        lastSaveErrorNotice = ''
+      })
       .catch((err) => {
         console.warn('Failed to save chat history to server', err)
+        const message = serverSaveErrorMessage(err)
+        // 同一类保存失败只提示一次，避免每次防抖重试都弹 toast。
+        if (message !== lastSaveErrorNotice) {
+          lastSaveErrorNotice = message
+          appStore.showError(message)
+        }
       })
   }, 300)
 }
