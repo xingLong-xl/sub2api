@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { buildGatewayUrl } from '@/api/url'
 import { keysAPI } from '@/api/keys'
-import { userChannelsAPI } from '@/api/channels'
+import { userChannelsAPI, type UserSupportedModelPricing } from '@/api/channels'
 import { useAuthStore } from '@/stores/auth'
 import { toolChatPreferencesAPI } from '@/api/toolChat'
 import type { ToolChatPreferences } from '@/api/toolChat'
@@ -90,6 +90,7 @@ const modelsError = ref('')
 export interface CatalogModel {
   name: string
   capability: ToolCapability
+  pricing?: UserSupportedModelPricing | null
 }
 
 export interface GroupCatalog {
@@ -269,8 +270,8 @@ function capabilityFromBillingMode(mode: BillingMode | undefined, modelID: strin
   return inferModelCapability(modelID)
 }
 
-/** 平台能力：图像仅 openai/grok，视频仅 grok（合成分组可路由到 grok） */
-const IMAGE_PLATFORMS = ['openai', 'grok']
+/** 平台能力：图像支持 openai/grok/gemini，视频仅 grok（合成分组可路由到 grok） */
+const IMAGE_PLATFORMS = ['openai', 'grok', 'gemini']
 const VIDEO_PLATFORMS = ['grok', 'composite']
 
 /** 网关错误：带 HTTP 状态码与业务码（code），视图层据此做本地化提示 */
@@ -448,9 +449,16 @@ export function useToolsSettings() {
    * 返回原始 Response，便于调用方按需读流（聊天 SSE）或读 JSON。
    */
   async function gatewayFetch(path: string, init: RequestInit = {}): Promise<Response> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...authHeaders(),
+    const headers = new Headers(init.headers)
+    // FormData 必须让浏览器自己带 multipart boundary，不能强制 JSON。
+    const isFormData = typeof FormData !== 'undefined' && init.body instanceof FormData
+    if (isFormData) {
+      headers.delete('Content-Type')
+    } else if (!headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json')
+    }
+    for (const [key, value] of Object.entries(authHeaders())) {
+      headers.set(key, value)
     }
     const res = await fetch(buildGatewayUrl(path), { ...init, headers })
     if (!res.ok) {
@@ -482,6 +490,7 @@ export function useToolsSettings() {
           const models: CatalogModel[] = (section.supported_models ?? []).map((model) => ({
             name: model.name,
             capability: capabilityFromBillingMode(model.pricing?.billing_mode, model.name),
+            pricing: model.pricing,
           }))
           for (const group of section.groups ?? []) {
             const key = String(group.id)

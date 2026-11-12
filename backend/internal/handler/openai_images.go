@@ -171,9 +171,14 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 
 	for {
 		reqLog.Debug("openai.images.account_selecting", zap.Int("excluded_account_count", len(failedAccountIDs)))
+		imagePlatform := service.PlatformOpenAI
+		if apiKey.Group != nil && apiKey.Group.Platform != "" && apiKey.Group.Platform != service.PlatformComposite {
+			imagePlatform = apiKey.Group.Platform
+		}
 		selection, scheduleDecision, err := h.gatewayService.SelectAccountWithSchedulerForImages(
 			requestCtx,
 			apiKey.GroupID,
+			imagePlatform,
 			sessionHash,
 			routingModel,
 			failedAccountIDs,

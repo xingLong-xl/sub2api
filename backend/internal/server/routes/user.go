@@ -103,6 +103,12 @@ func RegisterUserRoutes(
 			chat.PUT("/sessions", h.ToolChat.SaveSessions)
 			chat.GET("/preferences", h.ToolChat.GetPreferences)
 			chat.PUT("/preferences", h.ToolChat.SavePreferences)
+
+			image := tools.Group("/image")
+			image.GET("/history", h.ToolImageHistory.ListHistory)
+			image.POST("/history", h.ToolImageHistory.SaveHistory)
+			image.PUT("/history/:id", h.ToolImageHistory.UpdateHistory)
+			image.DELETE("/history/:id", h.ToolImageHistory.DeleteHistory)
 		}
 
 		// 使用记录（聚合统计属重查询，叠加更严格的按用户限流）

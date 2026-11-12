@@ -1,6 +1,9 @@
 <template>
   <div :class="rootClass">
     <div>
+      <span v-if="fullWidth" class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-dark-400">
+        {{ t('tools.connection.group') }}
+      </span>
       <select
         id="tools-connection-group"
         v-model="keyChoice"
@@ -16,11 +19,17 @@
       </select>
     </div>
 
-    <div :class="inline ? 'flex min-w-0 flex-1 flex-wrap items-center gap-[8px]' : 'ml-auto flex flex-wrap items-center gap-2'">
-      <span v-if="!inline" class="text-xs font-medium text-gray-500 dark:text-dark-400">
+    <div :class="fullWidth ? 'w-full' : inline ? 'flex min-w-0 flex-1 flex-wrap items-center gap-[8px]' : 'ml-auto flex flex-wrap items-center gap-2'">
+      <span v-if="!inline && !fullWidth" class="text-xs font-medium text-gray-500 dark:text-dark-400">
         {{ t('tools.connection.model') }}
       </span>
-      <div class="flex items-center gap-1.5" :class="inline ? 'min-w-0' : ''">
+      <div
+        class="flex items-center gap-1.5"
+        :class="fullWidth ? 'w-full min-w-0 flex-col items-stretch gap-1' : inline ? 'min-w-0' : ''"
+      >
+        <span v-if="fullWidth" class="text-[11px] font-medium text-gray-500 dark:text-dark-400">
+          {{ t('tools.connection.model') }}
+        </span>
         <select
           v-if="!hasGroup"
           disabled
@@ -115,6 +124,8 @@ const props = defineProps<{
   modelValue: string
   /** 内联模式：去掉分割线与外边距，用于嵌在输入区内部 */
   inline?: boolean
+  /** 窄侧栏模式：分组与模型上下排列，避免两个下拉框被挤到换行 */
+  fullWidth?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -147,22 +158,27 @@ const {
 } = useToolsSettings()
 
 const rootClass = computed(() => {
+  if (props.fullWidth) return 'flex flex-col items-stretch gap-2'
   if (props.inline) return 'flex flex-wrap items-center gap-[8px]'
   return 'flex shrink-0 flex-wrap items-center gap-2 border-b border-gray-200 px-3 py-1.5 dark:border-dark-700'
 })
 
 const groupSelectClass = computed(() => [
   'input !rounded-lg !px-2.5 !py-1.5 text-sm truncate',
-  props.inline
-    ? '!w-auto min-w-[150px] max-w-[200px]'
-    : '!w-auto min-w-[180px] max-w-[280px]',
+  props.fullWidth
+    ? '!w-full min-w-0 max-w-none'
+    : props.inline
+      ? '!w-auto min-w-[150px] max-w-[200px]'
+      : '!w-auto min-w-[180px] max-w-[280px]',
 ])
 
 const modelSelectClass = computed(() => [
   'input !rounded-lg !px-2.5 !py-1.5 text-sm truncate',
-  props.inline
-    ? '!w-auto min-w-[150px] max-w-[200px]'
-    : '!w-auto min-w-[220px] max-w-[360px]',
+  props.fullWidth
+    ? '!w-full min-w-0 max-w-none'
+    : props.inline
+      ? '!w-auto min-w-[150px] max-w-[200px]'
+      : '!w-auto min-w-[220px] max-w-[360px]',
 ])
 
 

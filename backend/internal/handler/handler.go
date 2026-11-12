@@ -68,6 +68,7 @@ type Handlers struct {
 	ModelPlaza       *ModelPlazaHandler
 	AsyncImage       *AsyncImageHandler
 	ToolChat         *ToolChatHandler
+	ToolImageHistory *ToolImageHistoryHandler
 	BatchImage       *BatchImageHandler
 }
 

@@ -203,6 +203,7 @@ func ProvideHandlers(
 	asyncImageHandler *AsyncImageHandler,
 	batchImageHandler *BatchImageHandler,
 	toolChatHandler *ToolChatHandler,
+	toolImageHistoryHandler *ToolImageHistoryHandler,
 	_ *service.IdempotencyCoordinator,
 	_ *service.IdempotencyCleanupService,
 	_ *service.OpenAIQuotaAutoResetService,
@@ -229,6 +230,7 @@ func ProvideHandlers(
 		ModelPlaza:       modelPlazaHandler,
 		AsyncImage:       asyncImageHandler,
 		ToolChat:         toolChatHandler,
+		ToolImageHistory: toolImageHistoryHandler,
 		BatchImage:       batchImageHandler,
 	}
 }
@@ -257,6 +259,7 @@ var ProviderSet = wire.NewSet(
 	NewAsyncImageHandler,
 	ProvideBatchImageHandler,
 	NewToolChatHandler,
+	NewToolImageHistoryHandler,
 
 	// Admin handlers
 	admin.NewDashboardHandler,

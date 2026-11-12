@@ -17,7 +17,7 @@
         <slot name="trailing" />
       </div>
     </header>
-    <div class="min-h-0 flex-1 overflow-y-auto p-3" :class="bodyClass">
+    <div class="min-h-0 flex-1 overflow-y-auto p-3 [scrollbar-gutter:stable]" :class="bodyClass">
       <slot />
     </div>
   </section>
