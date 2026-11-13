@@ -8,7 +8,7 @@
           : (historyCollapsed ? 'xl:grid-cols-[380px_minmax(0,1fr)_0px]' : 'xl:grid-cols-[380px_minmax(0,1fr)_300px]')"
       >
         <!-- 第一栏：生成参数 -->
-        <ToolsPanel v-if="!paramsCollapsed" class="xl:col-start-1" :title="t('tools.image.params')" icon="cog">
+        <ToolsPanel v-if="!paramsCollapsed" class="xl:col-start-1" :title="t('tools.image.params')" icon="cog" body-class="!overflow-hidden !p-0 ![scrollbar-gutter:auto]">
           <template #actions>
             <button
               type="button"
@@ -20,6 +20,8 @@
             </button>
           </template>
 
+          <div class="flex h-full min-h-0 flex-col">
+            <div class="min-h-0 flex-1 overflow-y-auto p-3 [scrollbar-gutter:stable]">
           <fieldset :disabled="generating" class="min-w-0 space-y-3 border-0 p-0">
             <ToolsConnectionBar
               v-model="imageModel"
@@ -31,28 +33,33 @@
             <div class="grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 dark:bg-dark-700/60">
               <button
                 type="button"
-                class="rounded-md px-2 py-1.5 text-xs font-medium transition-colors"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors"
                 :class="mode === 'generate'
                   ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-800 dark:text-dark-100'
                   : 'text-gray-500 hover:text-gray-700 dark:text-dark-400 dark:hover:text-dark-200'"
                 @click="mode = 'generate'"
               >
-                {{ t('tools.image.modeGenerate') }}
+                <Icon name="sparkles" size="sm" />
+                <span>{{ t('tools.image.modeGenerate') }}</span>
               </button>
               <button
                 type="button"
-                class="rounded-md px-2 py-1.5 text-xs font-medium transition-colors"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors"
                 :class="mode === 'edit'
                   ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-800 dark:text-dark-100'
                   : 'text-gray-500 hover:text-gray-700 dark:text-dark-400 dark:hover:text-dark-200'"
                 @click="mode = 'edit'"
               >
-                {{ t('tools.image.modeEdit') }}
+                <Icon name="edit" size="sm" />
+                <span>{{ t('tools.image.modeEdit') }}</span>
               </button>
             </div>
 
             <p class="-mt-1 text-[11px] leading-4 text-gray-400 dark:text-dark-500">
               {{ t('tools.image.modeHint') }}
+            </p>
+            <p v-if="mode === 'edit' && family === 'gemini'" class="-mt-1 rounded-lg bg-amber-50 px-2.5 py-2 text-[11px] leading-4 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+              {{ t('tools.image.geminiEditUnsupported') }}
             </p>
 
             <div>
@@ -62,9 +69,9 @@
               <textarea
                 id="tools-image-prompt"
                 v-model="prompt"
-                rows="4"
+                rows="6"
                 :placeholder="mode === 'edit' ? t('tools.image.editPromptPlaceholder') : t('tools.image.promptPlaceholder')"
-                class="input resize-none text-sm"
+                class="input min-h-[140px] resize-none text-sm"
               ></textarea>
             </div>
 
@@ -319,20 +326,24 @@
               </div>
             </div>
 
-            <button
-              type="button"
-              class="btn btn-primary w-full"
-              :disabled="!canGenerate"
-              @click="generate"
-            >
-              <Icon name="sparkles" size="sm" />
-              {{ generateLabel }}
-            </button>
-
-            <p v-if="error" class="rounded-lg bg-red-50 px-2.5 py-2 text-xs text-red-600 dark:bg-red-900/20 dark:text-red-400">
-              {{ error }}
-            </p>
           </fieldset>
+            </div>
+
+            <div class="shrink-0 border-t border-gray-200 px-3 py-3 dark:border-dark-700">
+              <p v-if="error" class="mb-2 rounded-lg bg-red-50 px-2.5 py-2 text-xs text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                {{ error }}
+              </p>
+              <button
+                type="button"
+                class="btn btn-primary w-full"
+                :disabled="!canGenerate"
+                @click="generate"
+              >
+                <Icon name="sparkles" size="sm" />
+                {{ generateLabel }}
+              </button>
+            </div>
+          </div>
         </ToolsPanel>
 
         <!-- 第二栏：生成结果 -->
@@ -341,7 +352,7 @@
           :title="t('tools.image.results')"
           icon="grid"
           :badge="activeRecord ? activeRecord.images.length : null"
-          body-class="!overflow-hidden !p-0"
+          body-class="!overflow-hidden !p-0 ![scrollbar-gutter:auto]"
         >
           <template #leading>
             <button
@@ -379,7 +390,7 @@
           <div class="flex h-full min-h-0 flex-col">
             <div class="flex min-h-0 flex-1 p-3">
               <div class="flex min-h-0 flex-1 overflow-hidden rounded-xl border border-gray-200 bg-gray-50/40 dark:border-dark-700 dark:bg-dark-900/30">
-                <div class="flex min-h-0 flex-1 overflow-auto p-3">
+                <div class="flex min-h-0 flex-1 overflow-auto p-3 [scrollbar-gutter:stable]">
                   <div :class="activeRecord && activeRecord.images.length > 1 ? 'h-full w-full' : 'm-auto w-full'">
           <div v-if="generating" class="mx-auto flex min-h-full w-full flex-col items-center justify-center px-8 py-12 text-center">
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
@@ -395,7 +406,7 @@
               <div
                 class="h-full rounded-full bg-primary-500 transition-all duration-500 dark:bg-primary-400"
                 :class="progress.done === 0 ? 'animate-pulse' : ''"
-                :style="{ width: progressPercent + '%' }"
+                :style="{ width: animatedProgress + '%' }"
               ></div>
             </div>
             <p class="mt-2.5 text-[11px] tabular-nums text-gray-400 dark:text-dark-500">
@@ -437,8 +448,9 @@
                 </button>
                 <button
                   type="button"
-                  class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-300"
-                  :title="t('tools.image.loadToEdit')"
+                  class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40 dark:text-primary-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-300"
+                  :disabled="family === 'gemini'"
+                  :title="family === 'gemini' ? t('tools.image.geminiEditUnsupported') : t('tools.image.loadToEdit')"
                   @click="loadImageForEdit(image)"
                 >
                   <Icon name="edit" size="xs" />
@@ -620,7 +632,9 @@
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+            class="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            :disabled="family === 'gemini'"
+            :title="family === 'gemini' ? t('tools.image.geminiEditUnsupported') : t('tools.image.loadToEdit')"
             @click="loadImageForEdit(previewImage)"
           >
             <Icon name="edit" size="xs" />
@@ -745,25 +759,40 @@ const generating = ref(false)
 const error = ref('')
 const progress = ref({ done: 0, total: 0 })
 const elapsedSeconds = ref(0)
+const animatedProgress = ref(8)
 let elapsedTimer: ReturnType<typeof setInterval> | null = null
-
-const progressPercent = computed(() => {
-  if (!progress.value.total) return 8
-  return Math.min(100, Math.max(8, Math.round((progress.value.done / progress.value.total) * 100)))
-})
+let progressTimer: ReturnType<typeof setInterval> | null = null
 
 function startGenerationTimer(): void {
   stopGenerationTimer()
   elapsedSeconds.value = 0
+  animatedProgress.value = 8
   elapsedTimer = setInterval(() => {
     elapsedSeconds.value += 1
   }, 1000)
+  // 上游没有流式进度，按已完成的请求数和等待时间做平滑推进，避免 0→100 跳变。
+  progressTimer = setInterval(() => {
+    const total = progress.value.total
+    const done = progress.value.done
+    if (!total || done >= total) return
+    const ceiling = Math.min(92, ((done + 0.9) / total) * 100)
+    if (animatedProgress.value < ceiling) {
+      animatedProgress.value = Math.min(
+        ceiling,
+        animatedProgress.value + Math.max(0.5, (ceiling - animatedProgress.value) * 0.08),
+      )
+    }
+  }, 200)
 }
 
 function stopGenerationTimer(): void {
   if (elapsedTimer !== null) {
     clearInterval(elapsedTimer)
     elapsedTimer = null
+  }
+  if (progressTimer !== null) {
+    clearInterval(progressTimer)
+    progressTimer = null
   }
 }
 
@@ -997,7 +1026,7 @@ const canGenerate = computed(
     imageModel.value.trim() !== '' &&
     hasApiKey.value &&
     !hasBatchOverflow.value &&
-    (mode.value === 'generate' || sourceFile.value !== null),
+    (mode.value === 'generate' || (sourceFile.value !== null && family.value !== 'gemini')),
 )
 const generateLabel = computed(() => {
   if (!generating.value) return t('tools.image.generate')
@@ -1107,12 +1136,12 @@ function currentParams(): HistoryParams {
   }
 }
 
-function buildPayload(promptText: string): Record<string, unknown> {
+function buildPayload(promptText: string, countOverride = effectiveCount.value): Record<string, unknown> {
   return buildImageGenerationPayload({
     family: family.value,
     model: imageModel.value,
     prompt: promptText,
-    count: effectiveCount.value,
+    count: countOverride,
     size: size.value,
     quality: quality.value,
     style: style.value,
@@ -1183,32 +1212,44 @@ async function generate(): Promise<void> {
   startGenerationTimer()
   const startedAt = performance.now()
   error.value = ''
-  progress.value = { done: 0, total: segments.length }
+  // 编辑接口与 Gemini 上游都不稳定支持单次 n>1；按 1 张拆成多次请求。
+  const perRequestCount = mode.value === 'edit' || family.value === 'gemini' ? 1 : effectiveCount.value
+  const requestGroups = Math.max(1, Math.ceil(effectiveCount.value / perRequestCount))
+  progress.value = { done: 0, total: segments.length * requestGroups }
   const images: GeneratedImage[] = []
+  let completedRequests = 0
   try {
-    for (const [index, segment] of segments.entries()) {
-      try {
-        const payload = buildPayload(segment)
-        let res: Response
-        if (mode.value === 'edit') {
-          res = await gatewayFetch('/v1/images/edits', {
-            method: 'POST',
-            body: buildEditForm(payload),
-          })
-        } else {
-          res = await gatewayFetch('/v1/images/generations', {
-            method: 'POST',
-            body: JSON.stringify(payload),
-          })
+    for (const segment of segments) {
+      for (let offset = 0; offset < effectiveCount.value; offset += perRequestCount) {
+        try {
+          const batchCount = Math.min(perRequestCount, effectiveCount.value - offset)
+          const payload = buildPayload(segment, batchCount)
+          let res: Response
+          if (mode.value === 'edit') {
+            res = await gatewayFetch('/v1/images/edits', {
+              method: 'POST',
+              body: buildEditForm(payload),
+            })
+          } else {
+            res = await gatewayFetch('/v1/images/generations', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            })
+          }
+          const body: unknown = await res.json()
+          images.push(...parseImages(body, size.value))
+          completedRequests += 1
+          progress.value = { done: completedRequests, total: segments.length * requestGroups }
+        } catch (err) {
+          // 某一批失败时，保留已经生成成功的图片。
+          error.value = localizedError(err)
+          if (mode.value === 'edit' && err instanceof GatewayError && err.status === 400) {
+            error.value = t('tools.image.editInvalidRequest')
+          }
+          break
         }
-        const body: unknown = await res.json()
-        images.push(...parseImages(body, size.value))
-        progress.value = { done: index + 1, total: segments.length }
-      } catch (err) {
-        // 多段提示词中某一段失败时，保留已经生成成功的图片。
-        error.value = localizedError(err)
-        break
       }
+      if (error.value) break
     }
     if (images.length > 0) {
       saveRecord(images, Math.max(0, Math.round(performance.now() - startedAt)))
@@ -1265,7 +1306,33 @@ function restoreDefaults(): void {
   error.value = ''
 }
 
-function onFileChange(kind: 'source' | 'mask', event: Event): void {
+/**
+ * 上游编辑接口对大 PNG 会返回 INVALID_REQUEST，但同图转成 JPEG 就正常。
+ * 编辑前统一转 JPEG；保留原始宽高，避免和用户上传的遮罩尺寸不一致。
+ */
+async function normalizeEditSource(source: Blob): Promise<File> {
+  const bitmap = await createImageBitmap(source)
+  const width = Math.max(1, bitmap.width)
+  const height = Math.max(1, bitmap.height)
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    bitmap.close()
+    throw new Error('canvas 2d context unavailable')
+  }
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, width, height)
+  ctx.drawImage(bitmap, 0, 0, width, height)
+  bitmap.close()
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((value) => (value ? resolve(value) : reject(new Error('canvas toBlob failed'))), 'image/jpeg', 0.92)
+  })
+  return new File([blob], `edit-source-${Date.now()}.jpg`, { type: 'image/jpeg' })
+}
+
+async function onFileChange(kind: 'source' | 'mask', event: Event): Promise<void> {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
@@ -1280,14 +1347,25 @@ function onFileChange(kind: 'source' | 'mask', event: Event): void {
     input.value = ''
     return
   }
+  let selectedFile = file
+  if (kind === 'source') {
+    try {
+      selectedFile = await normalizeEditSource(file)
+    } catch (err) {
+      console.warn('Failed to normalize edit source image', err)
+      error.value = t('tools.image.invalidImage')
+      input.value = ''
+      return
+    }
+  }
   if (kind === 'source') {
     if (sourcePreview.value) URL.revokeObjectURL(sourcePreview.value)
-    sourceFile.value = file
-    sourcePreview.value = URL.createObjectURL(file)
+    sourceFile.value = selectedFile
+    sourcePreview.value = URL.createObjectURL(selectedFile)
   } else {
     if (maskPreview.value) URL.revokeObjectURL(maskPreview.value)
-    maskFile.value = file
-    maskPreview.value = URL.createObjectURL(file)
+    maskFile.value = selectedFile
+    maskPreview.value = URL.createObjectURL(selectedFile)
   }
   error.value = ''
   input.value = ''
@@ -1319,6 +1397,14 @@ function onGlobalKeydown(event: KeyboardEvent): void {
 watch(previewImage, (image) => {
   document.body.style.overflow = image ? 'hidden' : ''
 })
+
+watch(
+  mode,
+  (next) => {
+    if (next === 'edit') count.value = 1
+  },
+  { flush: 'sync' },
+)
 
 // 同一浏览器切换账号时，清掉上一个账号的图片历史，避免跨账号展示。
 watch(
@@ -1428,6 +1514,10 @@ function onPreviewLoaded(event: Event): void {
 }
 
 async function loadImageForEdit(image: GeneratedImage): Promise<void> {
+  if (family.value === 'gemini') {
+    appStore.showError(t('tools.image.geminiEditUnsupported'))
+    return
+  }
   try {
     const response = await fetch(image.src)
     if (!response.ok) throw new Error(`image fetch failed: ${response.status}`)
@@ -1436,9 +1526,7 @@ async function loadImageForEdit(image: GeneratedImage): Promise<void> {
       appStore.showError(t('tools.image.imageTooLarge', { max: 20 }))
       return
     }
-    const mime = image.mime || blob.type || 'image/png'
-    const extension = imageExtensionFromMime(mime)
-    const file = new File([blob], `edit-source-${Date.now()}.${extension}`, { type: mime })
+    const file = await normalizeEditSource(blob)
     clearFile('source')
     clearFile('mask')
     sourceFile.value = file

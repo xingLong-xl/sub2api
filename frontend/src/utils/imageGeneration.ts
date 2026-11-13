@@ -15,12 +15,20 @@ export interface ImageSizePreset {
 export const IMAGE_SIZE_PRESETS: ImageSizePreset[] = [
   { value: 'auto', label: 'Auto', ratio: '', resolution: '' },
   { value: '1024x1024', label: '1024 × 1024 · 1:1 · 1K', ratio: '1:1', resolution: '1K' },
-  { value: '1536x1024', label: '1536 × 1024 · 3:2', ratio: '3:2', resolution: '2K' },
-  { value: '1024x1536', label: '1024 × 1536 · 2:3', ratio: '2:3', resolution: '2K' },
+  { value: '1536x1024', label: '1536 × 1024 · 3:2 · 2K', ratio: '3:2', resolution: '2K' },
+  { value: '1024x1536', label: '1024 × 1536 · 2:3 · 2K', ratio: '2:3', resolution: '2K' },
   { value: '2048x2048', label: '2048 × 2048 · 1:1 · 2K', ratio: '1:1', resolution: '2K' },
   { value: '2048x1152', label: '2048 × 1152 · 16:9 · 2K', ratio: '16:9', resolution: '2K' },
   { value: '1152x2048', label: '1152 × 2048 · 9:16 · 2K', ratio: '9:16', resolution: '2K' },
+  { value: '4096x4096', label: '4096 × 4096 · 1:1 · 4K', ratio: '1:1', resolution: '4K' },
+  { value: '4096x2304', label: '4096 × 2304 · 16:9 · 4K', ratio: '16:9', resolution: '4K' },
+  { value: '2304x4096', label: '2304 × 4096 · 9:16 · 4K', ratio: '9:16', resolution: '4K' },
+  { value: '4096x2730', label: '4096 × 2730 · 3:2 · 4K', ratio: '3:2', resolution: '4K' },
+  { value: '2730x4096', label: '2730 × 4096 · 2:3 · 4K', ratio: '2:3', resolution: '4K' },
 ]
+
+/** 分辨率档位；尺寸下拉仍保留具体宽高，档位用于快速切换。 */
+export const IMAGE_SIZE_TIERS = ['auto', '1K', '2K', '4K'] as const
 
 export function detectImageModelFamily(model: string): ImageModelFamily {
   const normalized = model.trim().toLowerCase()
