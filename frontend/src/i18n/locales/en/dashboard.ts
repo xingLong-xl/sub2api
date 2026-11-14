@@ -66,6 +66,15 @@ export default {
 
   // API Keys
   keys: {
+    apiAccess: {
+      title: 'API Access',
+      main: 'Main Endpoint',
+      mainTag: 'Fast · Low latency',
+      mainDesc: 'Recommended default endpoint for OpenAI-format requests.',
+      claude: 'Claude Endpoint',
+      claudeTag: 'Claude only',
+      claudeDesc: 'Do not append /v1 for Claude requests.',
+    },
     title: 'API Keys',
     description: 'Manage your API keys and access tokens',
     searchPlaceholder: 'Search name or key...',

@@ -66,6 +66,15 @@ export default {
 
   // API Keys
   keys: {
+    apiAccess: {
+      title: 'API 接入信息',
+      main: '主请求地址',
+      mainTag: '高速 · 低延迟',
+      mainDesc: '默认推荐接入点，OpenAI 格式请求请使用此地址。',
+      claude: 'Claude 请求地址',
+      claudeTag: 'Claude 专用',
+      claudeDesc: 'Claude 接口请勿携带 /v1 后缀。',
+    },
     title: 'API 密钥',
     description: '管理您的 API 密钥和访问令牌',
     searchPlaceholder: '搜索名称或Key...',

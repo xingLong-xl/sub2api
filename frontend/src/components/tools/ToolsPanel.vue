@@ -1,6 +1,6 @@
 <template>
-  <section class="flex min-h-[340px] flex-col overflow-hidden xl:min-h-0">
-    <header class="flex h-9 shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-3 dark:border-dark-700">
+  <section class="flex min-h-[340px] flex-col overflow-hidden bg-white xl:min-h-0 dark:bg-dark-800">
+    <header class="flex h-9 shrink-0 items-center justify-between gap-2 border-b border-gray-200 bg-gray-50/70 px-3 dark:border-dark-700 dark:bg-dark-800/60">
       <div class="flex min-w-0 items-center gap-2">
         <slot name="leading" />
         <Icon v-if="icon" :name="icon" size="sm" class="shrink-0 text-gray-400 dark:text-dark-500" />

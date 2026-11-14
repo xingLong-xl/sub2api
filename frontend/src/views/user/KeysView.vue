@@ -3,31 +3,40 @@
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-col gap-3">
-          <div class="flex flex-wrap items-center gap-3">
-            <SearchInput
-              v-model="filterSearch"
-              :placeholder="t('keys.searchPlaceholder')"
-              class="w-full sm:w-64"
-              @search="onFilterChange"
-            />
-            <Select
-              :model-value="filterGroupId"
-              class="w-40"
-              :options="groupFilterOptions"
-              @update:model-value="onGroupFilterChange"
-            />
-            <Select
-              :model-value="filterStatus"
-              class="w-40"
-              :options="statusFilterOptions"
-              @update:model-value="onStatusFilterChange"
-            />
-          </div>
-          <EndpointPopover
-            v-if="publicSettings?.api_base_url || (publicSettings?.custom_endpoints?.length ?? 0) > 0"
-            :api-base-url="publicSettings?.api_base_url || ''"
-            :custom-endpoints="publicSettings?.custom_endpoints || []"
-          />
+          <section class="rounded-2xl border border-gray-200 bg-white p-4 shadow-card dark:border-dark-700 dark:bg-dark-800">
+            <div class="mb-3 flex items-center gap-2">
+              <Icon name="bolt" size="sm" class="text-primary-600 dark:text-primary-400" />
+              <h2 class="text-sm font-semibold text-gray-900 dark:text-white">{{ t('keys.apiAccess.title') }}</h2>
+            </div>
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div
+                v-for="ep in apiEndpoints"
+                :key="ep.url"
+                class="rounded-xl border border-gray-200 bg-gray-50/60 p-3 dark:border-dark-600 dark:bg-dark-900/40"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-semibold text-gray-900 dark:text-gray-100">{{ ep.label }}</span>
+                  <span class="shrink-0 rounded bg-primary-50 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">{{ ep.tag }}</span>
+                </div>
+                <p class="mt-1 text-[11px] leading-4 text-gray-500 dark:text-dark-400">{{ ep.desc }}</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                  <code
+                    class="min-w-0 flex-1 truncate rounded bg-white px-2 py-1 font-mono text-[11px] text-gray-700 ring-1 ring-gray-200 dark:bg-dark-800 dark:text-gray-300 dark:ring-dark-600"
+                    :title="ep.url"
+                  >{{ ep.url }}</code>
+                  <button
+                    type="button"
+                    class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
+                    :title="t('keys.copyToClipboard')"
+                    @click="copyEndpoint(ep.url)"
+                  >
+                    <Icon v-if="copiedEndpoint === ep.url" name="check" size="sm" class="text-green-600" />
+                    <Icon v-else name="clipboard" size="sm" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
           <div v-if="selectedIds.length" class="flex flex-wrap items-center gap-3 text-sm">
             <span class="text-gray-600 dark:text-gray-300">
               {{ t('keys.bulkEdit.selectedCount', { count: selectedIds.length }) }}
@@ -48,7 +57,28 @@
       </template>
 
       <template #actions>
-        <div class="flex justify-end gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-3">
+            <SearchInput
+              v-model="filterSearch"
+              :placeholder="t('keys.searchPlaceholder')"
+              class="w-full sm:w-64"
+              @search="onFilterChange"
+            />
+            <Select
+              :model-value="filterGroupId"
+              class="w-40"
+              :options="groupFilterOptions"
+              @update:model-value="onGroupFilterChange"
+            />
+            <Select
+              :model-value="filterStatus"
+              class="w-40"
+              :options="statusFilterOptions"
+              @update:model-value="onStatusFilterChange"
+            />
+          </div>
+          <div class="flex items-center gap-3">
           <button
             @click="loadApiKeys"
             :disabled="loading"
@@ -93,6 +123,7 @@
             <Icon name="plus" size="md" class="mr-2" />
             {{ t('keys.createKey') }}
           </button>
+          </div>
         </div>
       </template>
 
@@ -1220,7 +1251,6 @@ import BulkEditKeysModal from '@/components/keys/BulkEditKeysModal.vue'
 	import SearchInput from '@/components/common/SearchInput.vue'
 	import Icon from '@/components/icons/Icon.vue'
 	import UseKeyModal from '@/components/keys/UseKeyModal.vue'
-	import EndpointPopover from '@/components/keys/EndpointPopover.vue'
 	import GroupBadge from '@/components/common/GroupBadge.vue'
 	import GroupOptionItem from '@/components/common/GroupOptionItem.vue'
 	import type { ApiKey, Group, PublicSettings, SubscriptionType, GroupPlatform, UpdateApiKeyRequest } from '@/types'
@@ -1261,6 +1291,59 @@ interface GroupOption {
 const appStore = useAppStore()
 const onboardingStore = useOnboardingStore()
 const { copyToClipboard: clipboardCopy } = useClipboard()
+
+const CANONICAL_SITE_URL = 'https://tokenpilot.site'
+
+/** localhost / 回环 / 内网地址不是有效的对外接入地址。 */
+function isPublicHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
+    const host = url.hostname.toLowerCase()
+    if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return false
+    if (host === '::1' || host.startsWith('127.')) return false
+    if (host.startsWith('10.') || host.startsWith('192.168.') || /^172\.(1[6-9]|2\d|3[01])\./.test(host)) return false
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** 接入地址：优先系统配置的 api_base_url，其次当前访问域名；本地/内网访问时回退正式域名。 */
+const apiAccessBase = computed(() => {
+  const configured = (publicSettings.value?.api_base_url || '').trim().replace(/\/+$/, '')
+  if (configured && isPublicHttpUrl(configured)) return configured
+  if (isPublicHttpUrl(window.location.origin)) return window.location.origin
+  return CANONICAL_SITE_URL
+})
+
+const apiEndpoints = computed(() => [
+  {
+    label: t('keys.apiAccess.main'),
+    tag: t('keys.apiAccess.mainTag'),
+    desc: t('keys.apiAccess.mainDesc'),
+    url: `${apiAccessBase.value}/v1`,
+  },
+  {
+    label: t('keys.apiAccess.claude'),
+    tag: t('keys.apiAccess.claudeTag'),
+    desc: t('keys.apiAccess.claudeDesc'),
+    url: apiAccessBase.value,
+  },
+])
+
+const copiedEndpoint = ref('')
+let copiedEndpointTimer: ReturnType<typeof setTimeout> | null = null
+
+async function copyEndpoint(url: string): Promise<void> {
+  const ok = await clipboardCopy(url, t('keys.copied'))
+  if (!ok) return
+  copiedEndpoint.value = url
+  if (copiedEndpointTimer) clearTimeout(copiedEndpointTimer)
+  copiedEndpointTimer = setTimeout(() => {
+    copiedEndpoint.value = ''
+  }, 1500)
+}
 
 const allColumns = computed<Column[]>(() => [
   { key: 'name', label: t('common.name'), sortable: true },
@@ -2103,3 +2186,16 @@ onUnmounted(() => {
   if (resetTimer) clearInterval(resetTimer)
 })
 </script>
+
+<style scoped>
+/* 密钥列表紧凑行高：覆盖 TablePageLayout 默认的 py-4 单元格内边距 */
+:deep(.table-scroll-container table th) {
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}
+
+:deep(.table-scroll-container table td) {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+</style>
