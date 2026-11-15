@@ -569,7 +569,6 @@
   .sidebar-link-active {
     @apply bg-gray-200 dark:bg-dark-700;
     @apply text-gray-900 dark:text-white;
-    @apply font-semibold;
     @apply hover:bg-gray-300 dark:hover:bg-dark-600;
   }
 
