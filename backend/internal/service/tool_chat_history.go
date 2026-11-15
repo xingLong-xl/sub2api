@@ -28,6 +28,7 @@ const (
 type ToolChatMessage struct {
 	Role      string `json:"role"`
 	Content   string `json:"content"`
+	Reasoning string `json:"reasoning,omitempty"`
 	CreatedAt int64  `json:"createdAt,omitempty"`
 }
 
@@ -188,8 +189,16 @@ func NormalizeToolChatSessions(input []ToolChatSession) ([]ToolChatSession, erro
 			if len(message.Content) > toolChatMaxMessageBytes {
 				return nil, fmt.Errorf("session %d message %d: content is too long", index, messageIndex)
 			}
-			sessionBytes += len(message.Content)
-			messages = append(messages, ToolChatMessage{Role: role, Content: message.Content, CreatedAt: message.CreatedAt})
+			if len(message.Reasoning) > toolChatMaxMessageBytes {
+				return nil, fmt.Errorf("session %d message %d: reasoning is too long", index, messageIndex)
+			}
+			sessionBytes += len(message.Content) + len(message.Reasoning)
+			messages = append(messages, ToolChatMessage{
+				Role:      role,
+				Content:   message.Content,
+				Reasoning: message.Reasoning,
+				CreatedAt: message.CreatedAt,
+			})
 		}
 		if sessionBytes > toolChatMaxSessionBytes {
 			return nil, fmt.Errorf("session %d: content is too large", index)

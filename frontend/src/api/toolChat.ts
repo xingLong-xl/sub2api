@@ -3,6 +3,7 @@ import { apiClient } from './client'
 export interface ToolChatMessage {
   role: 'user' | 'assistant'
   content: string
+  reasoning?: string
   createdAt?: number
 }
 

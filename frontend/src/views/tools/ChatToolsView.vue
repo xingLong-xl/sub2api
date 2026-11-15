@@ -119,8 +119,19 @@
                 >
                   <div v-if="message.role === 'user'" class="whitespace-pre-wrap break-words">{{ message.content }}</div>
                   <template v-else>
+                    <details
+                      v-if="message.reasoning"
+                      class="mb-2 overflow-hidden rounded-lg border border-primary-200/70 bg-primary-50/50 dark:border-primary-800/50 dark:bg-primary-950/20"
+                      :open="!message.content"
+                    >
+                      <summary class="flex cursor-pointer list-none items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-primary-700 select-none dark:text-primary-300">
+                        <Icon name="sparkles" size="xs" />
+                        <span>{{ message.content ? t('tools.chat.reasoningDone') : t('tools.chat.reasoningActive') }}</span>
+                      </summary>
+                      <div class="max-h-52 overflow-y-auto whitespace-pre-wrap border-t border-primary-200/60 px-2.5 py-2 text-[11px] leading-relaxed text-gray-500 dark:border-primary-800/40 dark:text-dark-400">{{ message.reasoning }}</div>
+                    </details>
                     <div v-if="message.content" class="markdown-body prose prose-sm max-w-none break-words dark:prose-invert" v-html="renderMarkdown(message.content)"></div>
-                    <div v-else class="flex items-center gap-1.5 py-1 text-gray-400 dark:text-dark-500">
+                    <div v-else-if="!message.reasoning" class="flex items-center gap-1.5 py-1 text-gray-400 dark:text-dark-500">
                       <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:0ms]"></span>
                       <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:150ms]"></span>
                       <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:300ms]"></span>
@@ -304,7 +315,22 @@
               />
               <p class="mt-0.5 text-[11px] leading-4 text-gray-400 dark:text-dark-500">{{ t('tools.chat.presencePenaltyHint') }}</p>
             </div>
-            <label class="col-span-2 flex h-[34px] w-full cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-2.5 dark:border-dark-600">
+            <div>
+              <label class="mb-1 block text-xs font-medium text-gray-600 dark:text-dark-300" for="tools-chat-reasoning">
+                {{ t('tools.chat.reasoningEffort') }}
+              </label>
+              <select
+                id="tools-chat-reasoning"
+                v-model="reasoningEffort"
+                class="input !py-1.5 text-sm"
+              >
+                <option value="">{{ t('tools.chat.reasoningAuto') }}</option>
+                <option value="low">{{ t('tools.chat.reasoningLow') }}</option>
+                <option value="medium">{{ t('tools.chat.reasoningMedium') }}</option>
+                <option value="high">{{ t('tools.chat.reasoningHigh') }}</option>
+              </select>
+            </div>
+            <label class="flex h-[34px] w-full cursor-pointer items-center gap-2 self-end rounded-lg border border-gray-200 px-2.5 dark:border-dark-600">
               <input
                 v-model="streamEnabled"
                 type="checkbox"
@@ -352,6 +378,7 @@ import { extractApiErrorMessage } from '@/utils/apiError'
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
+  reasoning?: string
   createdAt?: number
 }
 
@@ -397,6 +424,7 @@ function loadSessions(): ChatSession[] {
           .map((m) => ({
             role: m.role,
             content: m.content,
+            reasoning: typeof m.reasoning === 'string' && m.reasoning ? m.reasoning : undefined,
             createdAt: typeof m.createdAt === 'number' && m.createdAt > 0 ? m.createdAt : createdAt,
           })),
       })
@@ -450,6 +478,7 @@ const frequencyPenalty = ref<number | ''>('')
 const presencePenalty = ref<number | ''>('')
 const systemPrompt = ref('')
 const streamEnabled = ref(true)
+const reasoningEffort = ref('')
 
 // 左右两栏折叠状态（记忆到本地，刷新后保持）
 const SESSIONS_COLLAPSED_KEY = 'tools_chat_sessions_collapsed'
@@ -566,6 +595,7 @@ function scheduleServerSave(): void {
       messages: session.messages.map((message) => ({
         role: message.role,
         content: message.content,
+        reasoning: message.reasoning,
         createdAt: message.createdAt,
       })),
     }))
@@ -760,31 +790,54 @@ function resetParams(): void {
 }
 
 /** 从 SSE data 行解析增量文本，兼容 OpenAI chat.completion.chunk 结构 */
-function extractDeltaText(jsonText: string): string {
+interface DeltaParts {
+  content: string
+  reasoning: string
+}
+
+function pickText(value: unknown): string {
+  return typeof value === 'string' ? value : ''
+}
+
+/** 流式解析：正文和思考内容分开返回，兼容 reasoning_content / reasoning / thinking。 */
+function extractDeltaParts(jsonText: string): DeltaParts {
   try {
     const chunk: unknown = JSON.parse(jsonText)
     const choices = (chunk as { choices?: unknown })?.choices
-    if (!Array.isArray(choices) || choices.length === 0) return ''
-    const delta = (choices[0] as { delta?: { content?: unknown } })?.delta
-    const content = delta?.content
-    return typeof content === 'string' ? content : ''
+    if (!Array.isArray(choices) || choices.length === 0) return { content: '', reasoning: '' }
+    const delta = (choices[0] as { delta?: Record<string, unknown> })?.delta
+    if (!delta) return { content: '', reasoning: '' }
+    return {
+      content: pickText(delta.content),
+      reasoning:
+        pickText(delta.reasoning_content) ||
+        pickText(delta.reasoning) ||
+        pickText(delta.thinking),
+    }
   } catch {
-    return ''
+    return { content: '', reasoning: '' }
   }
 }
 
-/** 非流式响应：从 choices[0].message.content 取正文（兼容字符串与分段数组） */
-function extractMessageContent(body: unknown): string {
+/** 非流式响应：分别取正文和思考内容（兼容字符串与分段数组）。 */
+function extractMessageParts(body: unknown): DeltaParts {
   const choices = (body as { choices?: unknown })?.choices
-  if (!Array.isArray(choices) || choices.length === 0) return ''
-  const content = (choices[0] as { message?: { content?: unknown } })?.message?.content
-  if (typeof content === 'string') return content
-  if (Array.isArray(content)) {
-    return content
+  if (!Array.isArray(choices) || choices.length === 0) return { content: '', reasoning: '' }
+  const message = (choices[0] as { message?: Record<string, unknown> })?.message
+  if (!message) return { content: '', reasoning: '' }
+  let content = ''
+  if (typeof message.content === 'string') {
+    content = message.content
+  } else if (Array.isArray(message.content)) {
+    content = message.content
       .map((part) => (part && typeof (part as { text?: unknown }).text === 'string' ? (part as { text: string }).text : ''))
       .join('')
   }
-  return ''
+  const reasoning =
+    pickText(message.reasoning_content) ||
+    pickText(message.reasoning) ||
+    pickText(message.thinking)
+  return { content, reasoning }
 }
 
 function buildPayload(history: ChatMessage[]): Record<string, unknown> {
@@ -808,6 +861,7 @@ function buildPayload(history: ChatMessage[]): Record<string, unknown> {
   if (typeof seed.value === 'number') payload.seed = seed.value
   if (typeof frequencyPenalty.value === 'number') payload.frequency_penalty = frequencyPenalty.value
   if (typeof presencePenalty.value === 'number') payload.presence_penalty = presencePenalty.value
+  if (reasoningEffort.value) payload.reasoning_effort = reasoningEffort.value
   return payload
 }
 
@@ -854,7 +908,11 @@ async function sendMessage(): Promise<void> {
     if (!streamEnabled.value) {
       const body: unknown = await res.json()
       const assistant = assistantMessage()
-      if (assistant) assistant.content = extractMessageContent(body)
+      if (assistant) {
+        const parts = extractMessageParts(body)
+        assistant.content = parts.content
+        if (parts.reasoning) assistant.reasoning = parts.reasoning
+      }
       return
     }
 
@@ -877,10 +935,13 @@ async function sendMessage(): Promise<void> {
         if (!trimmed.startsWith('data:')) continue
         const payload = trimmed.slice(5).trim()
         if (payload === '[DONE]') continue
-        const delta = extractDeltaText(payload)
-        if (delta) {
+        const delta = extractDeltaParts(payload)
+        if (delta.content || delta.reasoning) {
           const assistant = assistantMessage()
-          if (assistant) assistant.content += delta
+          if (assistant) {
+            if (delta.reasoning) assistant.reasoning = (assistant.reasoning ?? '') + delta.reasoning
+            if (delta.content) assistant.content += delta.content
+          }
           void scrollToBottom()
         }
       }
@@ -894,7 +955,7 @@ async function sendMessage(): Promise<void> {
     streaming.value = false
     abortController.value = null
     const assistant = assistantMessage()
-    if (assistant && !assistant.content) {
+    if (assistant && !assistant.content && !assistant.reasoning) {
       // 中断或空响应时不要留下空的助手气泡
       session.messages.splice(assistantIndex, 1)
     }
