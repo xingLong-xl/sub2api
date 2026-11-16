@@ -120,7 +120,13 @@
               "
               @click="handleMenuItemClick(item.path)"
             >
-              <span v-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
+              <img
+                v-if="customMenuIconUrl(item)"
+                :src="customMenuIconUrl(item)"
+                alt=""
+                class="h-5 w-5 flex-shrink-0 object-contain"
+              />
+              <span v-else-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
               <component v-else :is="item.icon" class="h-5 w-5 flex-shrink-0" />
               <span class="sidebar-label" :class="{ 'sidebar-label-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">{{ item.label }}</span>
             </router-link>
@@ -145,7 +151,13 @@
             :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
             @click="handleMenuItemClick(item.path)"
           >
-            <span v-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
+            <img
+              v-if="customMenuIconUrl(item)"
+              :src="customMenuIconUrl(item)"
+              alt=""
+              class="h-5 w-5 flex-shrink-0 object-contain"
+            />
+            <span v-else-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
             <component v-else :is="item.icon" class="h-5 w-5 flex-shrink-0" />
             <span class="sidebar-label" :class="{ 'sidebar-label-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">{{ item.label }}</span>
           </router-link>
@@ -192,7 +204,13 @@
             :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
             @click="handleMenuItemClick(item.path)"
           >
-            <span v-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
+            <img
+              v-if="customMenuIconUrl(item)"
+              :src="customMenuIconUrl(item)"
+              alt=""
+              class="h-5 w-5 flex-shrink-0 object-contain"
+            />
+            <span v-else-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
             <component v-else :is="item.icon" class="h-5 w-5 flex-shrink-0" />
             <span class="sidebar-label" :class="{ 'sidebar-label-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">{{ item.label }}</span>
           </router-link>
@@ -869,6 +887,21 @@ const toolNavItems = computed((): NavItem[] => applyFeatureFlags([
 const personalNavItems = computed((): NavItem[] => finalizeNav(buildSelfNavItems(false)))
 
 // Custom menu items filtered by visibility
+/** 自定义菜单图标：支持内联 SVG，也支持 public 下的静态地址。 */
+const CUSTOM_MENU_ICON_FALLBACKS: Record<string, string> = {
+  'ccs-guide': '/custom-icons/ccs-guide.svg',
+}
+
+function customMenuIconUrl(item: NavItem): string {
+  const icon = (item.iconSvg || '').trim()
+  if (icon && /^(\/|https?:|data:image\/)/i.test(icon)) return icon
+  if (!icon) {
+    const fallback = CUSTOM_MENU_ICON_FALLBACKS[item.path.replace('/custom/', '')]
+    if (fallback) return fallback
+  }
+  return ''
+}
+
 const customMenuItemsForUser = computed(() => {
   const items = appStore.cachedPublicSettings?.custom_menu_items ?? []
   return items
