@@ -30,15 +30,9 @@
         <!-- Markdown mode with TOC -->
         <div v-else-if="isMarkdownMode" class="flex h-full overflow-hidden">
           <!-- TOC Sidebar -->
-          <aside
-            v-show="tocVisible"
-            class="toc-sidebar"
-          >
+          <aside class="toc-sidebar">
             <div class="toc-header">
               <span class="toc-title">{{ t('customPage.tableOfContents') }}</span>
-              <button class="toc-close-btn" @click="tocVisible = false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
             </div>
             <nav class="toc-nav">
               <a
@@ -56,16 +50,6 @@
               </a>
             </nav>
           </aside>
-
-          <!-- TOC Toggle Button (when collapsed) -->
-          <button
-            v-show="!tocVisible && tocItems.length > 0"
-            class="toc-toggle-btn"
-            @click="tocVisible = true"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-            <span class="ml-1 text-xs">{{ t('customPage.tableOfContents') }}</span>
-          </button>
 
           <!-- Content -->
           <div
@@ -157,7 +141,6 @@ const pageTheme = ref<'light' | 'dark'>('light')
 const renderedHtml = ref('')
 const markdownContainer = ref<HTMLElement | null>(null)
 const tocItems = ref<TocItem[]>([])
-const tocVisible = ref(typeof window !== 'undefined' ? window.innerWidth > 768 : true)
 const activeHeadingId = ref('')
 let themeObserver: MutationObserver | null = null
 let markdownRequestVersion = 0
@@ -315,7 +298,7 @@ async function fetchAndRenderMarkdown(slug: string) {
     const html = marked.parse(raw) as string
     const sanitized = DOMPurify.sanitize(html, {
       ADD_TAGS: ['iframe'],
-      ADD_ATTR: ['allowfullscreen', 'frameborder', 'src'],
+      ADD_ATTR: ['allowfullscreen', 'frameborder', 'src', 'target', 'rel'],
     })
 
     // Inject IDs into headings and build TOC
@@ -355,9 +338,6 @@ function scrollToHeading(id: string) {
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     activeHeadingId.value = id
-    if (window.innerWidth <= 640) {
-      tocVisible.value = false
-    }
   }
 }
 
@@ -459,62 +439,48 @@ onUnmounted(() => {
 }
 
 .toc-sidebar {
-  @apply flex flex-col h-full border-r border-gray-200 dark:border-dark-600 bg-gray-50 dark:bg-dark-800;
-  width: min(240px, 30%);
-  min-width: 160px;
-  max-width: 280px;
+  @apply flex flex-col h-full border-r border-gray-200/80 dark:border-dark-700/80;
+  @apply bg-gray-50/40 dark:bg-dark-900/20;
+  width: min(228px, 28%);
+  min-width: 168px;
+  max-width: 248px;
   overflow: hidden;
 }
 
 @media (max-width: 640px) {
+  /* 小屏不展示目录，避免遮挡正文；不再提供折叠/展开交互。 */
   .toc-sidebar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 20;
-    width: 70%;
-    max-width: 240px;
-    height: 100%;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    display: none;
   }
 }
 
 .toc-header {
-  @apply flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-dark-600;
+  @apply flex items-center justify-between px-5 pb-2 pt-5;
 }
 
 .toc-title {
-  @apply text-sm font-semibold text-gray-700 dark:text-dark-200;
-}
-
-.toc-close-btn {
-  @apply p-1 rounded text-gray-400 hover:text-gray-600 dark:hover:text-dark-200 hover:bg-gray-200 dark:hover:bg-dark-600 transition-colors;
+  @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-dark-500;
 }
 
 .toc-nav {
-  @apply flex-1 overflow-y-auto py-2 px-2;
+  @apply flex-1 space-y-0.5 overflow-y-auto px-3 py-2;
+  scrollbar-gutter: stable;
 }
 
 .toc-item {
-  @apply block px-2 py-1.5 text-sm rounded transition-colors truncate;
-  @apply text-gray-600 dark:text-dark-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-dark-600;
+  @apply block truncate rounded-r-md border-l-2 border-transparent py-1.5 pl-3 pr-2 text-[13px] leading-5 transition-colors;
+  @apply text-gray-500 hover:bg-gray-100/80 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-800/60 dark:hover:text-dark-100;
 }
 
 .toc-item.toc-active {
-  @apply text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium;
+  @apply border-primary-500 bg-primary-50/70 font-medium text-primary-700;
+  @apply dark:border-primary-400 dark:bg-primary-900/20 dark:text-primary-300;
 }
 
-.toc-level-1 { padding-left: 8px; }
-.toc-level-2 { padding-left: 20px; }
-.toc-level-3 { padding-left: 32px; }
-.toc-level-4 { padding-left: 44px; }
-
-.toc-toggle-btn {
-  @apply absolute left-2 top-2 z-10 flex items-center px-2 py-1.5 rounded-md text-sm;
-  @apply bg-white dark:bg-dark-700 border border-gray-200 dark:border-dark-500;
-  @apply text-gray-600 dark:text-dark-300 hover:bg-gray-100 dark:hover:bg-dark-600;
-  @apply shadow-sm transition-colors cursor-pointer;
-}
+.toc-level-1 { padding-left: 12px; }
+.toc-level-2 { padding-left: 24px; }
+.toc-level-3 { padding-left: 36px; }
+.toc-level-4 { padding-left: 48px; }
 
 .custom-embed-shell {
   @apply relative;
@@ -544,6 +510,82 @@ onUnmounted(() => {
 .markdown-page-content {
   line-height: 1.7;
   color: inherit;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.markdown-page-content .guide-hero {
+  margin: 0 0 2rem;
+  padding: 1.75rem 1.75rem 1.5rem;
+  border: 1px solid rgb(196 181 253 / 0.7);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 100% 0%, rgb(237 233 254 / 0.9), transparent 46%),
+    linear-gradient(135deg, rgb(245 243 255), rgb(255 255 255));
+}
+
+.dark .markdown-page-content .guide-hero {
+  border-color: rgb(109 40 217 / 0.45);
+  background:
+    radial-gradient(circle at 100% 0%, rgb(76 29 149 / 0.35), transparent 46%),
+    linear-gradient(135deg, rgb(30 27 75 / 0.7), rgb(17 24 39 / 0.35));
+}
+
+.markdown-page-content .guide-eyebrow {
+  margin-bottom: 0.65rem;
+  color: rgb(124 58 237);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.markdown-page-content .guide-hero h1 {
+  margin: 0 0 0.7rem;
+  padding: 0;
+  border: 0;
+  font-size: 1.85rem;
+  line-height: 1.3;
+}
+
+.markdown-page-content .guide-hero p {
+  margin: 0;
+  max-width: 42rem;
+  color: rgb(75 85 99);
+  font-size: 0.95rem;
+}
+
+.dark .markdown-page-content .guide-hero p {
+  color: rgb(209 213 219);
+}
+
+.markdown-page-content .guide-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.1rem;
+}
+
+.markdown-page-content .guide-meta span {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgb(221 214 254);
+  border-radius: 999px;
+  color: rgb(109 40 217);
+  font-size: 0.72rem;
+}
+
+.dark .markdown-page-content .guide-meta span {
+  border-color: rgb(91 33 182 / 0.6);
+  color: rgb(196 181 253);
+}
+
+.markdown-page-content h2 {
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid rgb(229 231 235);
+}
+
+.dark .markdown-page-content h2 {
+  border-bottom-color: rgb(55 65 81);
 }
 .markdown-page-content h1 { @apply text-3xl font-bold mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-dark-600; }
 .markdown-page-content h2 { @apply text-2xl font-bold mt-6 mb-3; }
@@ -560,7 +602,7 @@ onUnmounted(() => {
 .markdown-page-content th { @apply border border-gray-300 dark:border-dark-500 px-3 py-2 bg-gray-50 dark:bg-dark-700 font-semibold text-left; }
 .markdown-page-content td { @apply border border-gray-300 dark:border-dark-500 px-3 py-2; }
 .markdown-page-content code { @apply bg-gray-100 dark:bg-dark-700 px-1.5 py-0.5 rounded text-sm font-mono; }
-.markdown-page-content pre { @apply bg-gray-900 dark:bg-dark-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4 relative; }
+.markdown-page-content pre { @apply bg-gray-100 dark:bg-dark-900/70 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-dark-700 p-4 rounded-lg overflow-x-auto my-4 relative; }
 .markdown-page-content pre code { @apply bg-transparent p-0 text-inherit; }
 .markdown-page-content hr { @apply my-6 border-gray-200 dark:border-dark-600; }
 
@@ -571,14 +613,20 @@ onUnmounted(() => {
   padding: 4px 10px;
   font-size: 12px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #e2e8f0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s, background 0.2s;
   font-family: inherit;
 }
-.copy-btn:hover { background: rgba(255, 255, 255, 0.25); }
+.copy-btn:hover { background: #ffffff; }
+.dark .copy-btn {
+  background: rgba(55, 65, 81, 0.9);
+  color: #e5e7eb;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.dark .copy-btn:hover { background: #374151; }
 pre:hover .copy-btn { opacity: 1; }
 </style>

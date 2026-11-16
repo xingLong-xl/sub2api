@@ -2117,7 +2117,8 @@ const importToCcswitch = (row: ApiKey) => {
 }
 
 const executeCcsImport = (row: ApiKey, clientType: CcSwitchClientType) => {
-  const baseUrl = publicSettings.value?.api_base_url || window.location.origin
+  // 与 API 接入信息一致：localhost / 内网访问时回退正式域名，避免导入 localhost。
+  const baseUrl = apiAccessBase.value
   const platform = row.group?.platform || 'anthropic'
 
   const usageScript = CC_SWITCH_USAGE_SCRIPT
