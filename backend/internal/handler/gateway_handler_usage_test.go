@@ -49,3 +49,27 @@ func TestUsageUnrestrictedIncludesWeeklyWindowStart(t *testing.T) {
 	require.NotNil(t, response.Subscription.WeeklyWindowStart)
 	require.True(t, weeklyWindowStart.Equal(*response.Subscription.WeeklyWindowStart))
 }
+
+func TestConvertUsageAmountsUSD(t *testing.T) {
+	payload := map[string]any{
+		"unit":      "CNY",
+		"remaining": 72.0,
+		"quota": map[string]any{
+			"unit":      "CNY",
+			"limit":     72.0,
+			"used":      0.0,
+			"remaining": 72.0,
+		},
+		"daily_usage": []any{
+			map[string]any{"cost": 7.2, "actual_cost": 7.2},
+		},
+	}
+	convertUsageAmounts(payload, 1/7.2, "USD")
+	require.Equal(t, "USD", payload["unit"])
+	require.InDelta(t, 10.0, payload["remaining"], 0.0001)
+	quota := payload["quota"].(map[string]any)
+	require.Equal(t, "USD", quota["unit"])
+	require.InDelta(t, 10.0, quota["remaining"], 0.0001)
+	daily := payload["daily_usage"].([]any)[0].(map[string]any)
+	require.InDelta(t, 1.0, daily["cost"], 0.0001)
+}

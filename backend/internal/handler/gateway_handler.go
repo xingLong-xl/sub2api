@@ -1722,11 +1722,7 @@ func (h *GatewayHandler) writeUsageResponse(c *gin.Context, ctx context.Context,
 	if currency == service.UsageCurrencyUSD {
 		factor = 1 / rate
 	}
-	if factor == 1 {
-		c.JSON(http.StatusOK, resp)
-		return
-	}
-	// 结构化字段（如 daily_usage 的 struct 数组）先转成通用 JSON，再统一换算。
+	// 统一走通用 JSON：即使 CNY 不需要换算，也要把嵌套的 unit 字段统一成当前币种。
 	raw, err := json.Marshal(resp)
 	if err != nil {
 		c.JSON(http.StatusOK, resp)
@@ -1737,31 +1733,32 @@ func (h *GatewayHandler) writeUsageResponse(c *gin.Context, ctx context.Context,
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	convertUsageAmounts(generic, factor)
+	convertUsageAmounts(generic, factor, currency)
 	c.JSON(http.StatusOK, generic)
 }
 
-func convertUsageAmounts(value any, factor float64) {
+func convertUsageAmounts(value any, factor float64, currency string) {
 	switch v := value.(type) {
 	case gin.H:
-		convertUsageMap(v, factor)
+		convertUsageMap(v, factor, currency)
 	case map[string]any:
-		convertUsageMap(v, factor)
+		convertUsageMap(v, factor, currency)
 	case []gin.H:
 		for _, item := range v {
-			convertUsageAmounts(item, factor)
+			convertUsageAmounts(item, factor, currency)
 		}
 	case []any:
 		for _, item := range v {
-			convertUsageAmounts(item, factor)
+			convertUsageAmounts(item, factor, currency)
 		}
 	}
 }
 
-func convertUsageMap(m map[string]any, factor float64) {
+func convertUsageMap(m map[string]any, factor float64, currency string) {
 	for key, value := range m {
 		lower := strings.ToLower(strings.TrimSpace(key))
 		if lower == "unit" {
+			m[key] = currency
 			continue
 		}
 		if number, ok := value.(float64); ok {
@@ -1771,7 +1768,7 @@ func convertUsageMap(m map[string]any, factor float64) {
 			}
 			continue
 		}
-		convertUsageAmounts(value, factor)
+		convertUsageAmounts(value, factor, currency)
 	}
 }
 
