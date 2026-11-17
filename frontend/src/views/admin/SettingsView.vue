@@ -11605,7 +11605,9 @@ async function saveSettings() {
       site_subtitle: form.site_subtitle,
       api_base_url: form.api_base_url,
       usage_currency: form.usage_currency,
-      usd_cny_rate: form.usd_cny_rate,
+      usd_cny_rate: Number.isFinite(Number(form.usd_cny_rate)) && Number(form.usd_cny_rate) > 0
+        ? Number(form.usd_cny_rate)
+        : 7.2,
       contact_info: form.contact_info,
       doc_url: form.doc_url,
       home_content: form.home_content,

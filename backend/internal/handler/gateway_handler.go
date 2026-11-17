@@ -1765,7 +1765,8 @@ func convertUsageMap(m map[string]any, factor float64) {
 			continue
 		}
 		if number, ok := value.(float64); ok {
-			if number >= 0 && (lower == "remaining" || lower == "balance" || lower == "limit" || lower == "used" || lower == "cost" || lower == "actual_cost" || strings.HasSuffix(lower, "_usd")) {
+			// -1 表示“无限制”，不能按金额换算；其余负数（欠费/退款）正常换算。
+			if number != -1 && (lower == "remaining" || lower == "balance" || lower == "limit" || lower == "used" || lower == "cost" || lower == "actual_cost" || strings.HasSuffix(lower, "_usd")) {
 				m[key] = number * factor
 			}
 			continue
