@@ -6469,6 +6469,41 @@
                 </p>
               </div>
 
+              <!-- 用量币种 -->
+              <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t("admin.settings.site.usageCurrency") }}
+                </label>
+                <Select
+                  :model-value="form.usage_currency"
+                  :options="[
+                    { value: 'CNY', label: t('admin.settings.site.usageCurrencyCny') },
+                    { value: 'USD', label: t('admin.settings.site.usageCurrencyUsd') },
+                  ]"
+                  @update:model-value="(v) => (form.usage_currency = v as 'CNY' | 'USD')"
+                />
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  {{ t("admin.settings.site.usageCurrencyHint") }}
+                </p>
+              </div>
+
+              <div v-if="form.usage_currency === 'USD'">
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300" for="usage-cny-rate">
+                  {{ t("admin.settings.site.usdCnyRate") }}
+                </label>
+                <input
+                  id="usage-cny-rate"
+                  v-model.number="form.usd_cny_rate"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  class="input text-sm"
+                />
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  {{ t("admin.settings.site.usdCnyRateHint") }}
+                </p>
+              </div>
+
               <!-- Global Table Preferences -->
               <div class="border-t border-gray-100 pt-4 dark:border-dark-700">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">
@@ -9856,6 +9891,8 @@ const form = reactive<SettingsForm>({
   site_logo: "",
   site_subtitle: "Subscription to API Conversion Platform",
   api_base_url: "",
+  usage_currency: "CNY" as "CNY" | "USD",
+  usd_cny_rate: 7.2,
   contact_info: "",
   doc_url: "",
   home_content: "",
@@ -11567,6 +11604,8 @@ async function saveSettings() {
       site_logo: form.site_logo,
       site_subtitle: form.site_subtitle,
       api_base_url: form.api_base_url,
+      usage_currency: form.usage_currency,
+      usd_cny_rate: form.usd_cny_rate,
       contact_info: form.contact_info,
       doc_url: form.doc_url,
       home_content: form.home_content,

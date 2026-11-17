@@ -72,6 +72,8 @@ func (h *SettingHandler) GetPublicSettings(c *gin.Context) {
 		SiteLogo:                            settings.SiteLogo,
 		SiteSubtitle:                        settings.SiteSubtitle,
 		APIBaseURL:                          settings.APIBaseURL,
+		UsageCurrency:                       settings.UsageCurrency,
+		USDCNYRate:                          settings.USDCNYRate,
 		ContactInfo:                         settings.ContactInfo,
 		DocURL:                              settings.DocURL,
 		HomeContent:                         settings.HomeContent,

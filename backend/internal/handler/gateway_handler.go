@@ -1710,6 +1710,70 @@ func (h *GatewayHandler) buildAPIKeyDailyUsage(c *gin.Context, userID, apiKeyID 
 	return stats
 }
 
+// writeUsageResponse 按系统设置的用量币种转换金额后输出；数据库金额始终是 CNY。
+func (h *GatewayHandler) writeUsageResponse(c *gin.Context, ctx context.Context, resp gin.H) {
+	currency := service.UsageCurrencyCNY
+	rate := service.DefaultUSDCNYRate
+	if h.settingService != nil {
+		currency, rate = h.settingService.GetUsageCurrency(ctx)
+	}
+	resp["unit"] = currency
+	factor := 1.0
+	if currency == service.UsageCurrencyUSD {
+		factor = 1 / rate
+	}
+	if factor == 1 {
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	// 结构化字段（如 daily_usage 的 struct 数组）先转成通用 JSON，再统一换算。
+	raw, err := json.Marshal(resp)
+	if err != nil {
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	var generic map[string]any
+	if err := json.Unmarshal(raw, &generic); err != nil {
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	convertUsageAmounts(generic, factor)
+	c.JSON(http.StatusOK, generic)
+}
+
+func convertUsageAmounts(value any, factor float64) {
+	switch v := value.(type) {
+	case gin.H:
+		convertUsageMap(v, factor)
+	case map[string]any:
+		convertUsageMap(v, factor)
+	case []gin.H:
+		for _, item := range v {
+			convertUsageAmounts(item, factor)
+		}
+	case []any:
+		for _, item := range v {
+			convertUsageAmounts(item, factor)
+		}
+	}
+}
+
+func convertUsageMap(m map[string]any, factor float64) {
+	for key, value := range m {
+		lower := strings.ToLower(strings.TrimSpace(key))
+		if lower == "unit" {
+			continue
+		}
+		if number, ok := value.(float64); ok {
+			if number >= 0 && (lower == "remaining" || lower == "balance" || lower == "limit" || lower == "used" || lower == "cost" || lower == "actual_cost" || strings.HasSuffix(lower, "_usd")) {
+				m[key] = number * factor
+			}
+			continue
+		}
+		convertUsageAmounts(value, factor)
+	}
+}
+
 // usageQuotaLimited 处理 quota_limited 模式的响应
 func (h *GatewayHandler) usageQuotaLimited(c *gin.Context, ctx context.Context, apiKey *service.APIKey, usageData gin.H, dailyUsage any, modelStats any) {
 	resp := gin.H{
@@ -1800,7 +1864,7 @@ func (h *GatewayHandler) usageQuotaLimited(c *gin.Context, ctx context.Context, 
 		resp["model_stats"] = modelStats
 	}
 
-	c.JSON(http.StatusOK, resp)
+	h.writeUsageResponse(c, ctx, resp)
 }
 
 // usageUnrestricted 处理 unrestricted 模式的响应（向后兼容）
@@ -1840,7 +1904,7 @@ func (h *GatewayHandler) usageUnrestricted(c *gin.Context, ctx context.Context, 
 		if modelStats != nil {
 			resp["model_stats"] = modelStats
 		}
-		c.JSON(http.StatusOK, resp)
+		h.writeUsageResponse(c, ctx, resp)
 		return
 	}
 
@@ -1868,7 +1932,7 @@ func (h *GatewayHandler) usageUnrestricted(c *gin.Context, ctx context.Context, 
 	if modelStats != nil {
 		resp["model_stats"] = modelStats
 	}
-	c.JSON(http.StatusOK, resp)
+	h.writeUsageResponse(c, ctx, resp)
 }
 
 // calculateSubscriptionRemaining 计算订阅剩余可用额度

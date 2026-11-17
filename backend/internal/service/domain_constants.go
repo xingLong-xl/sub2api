@@ -377,6 +377,8 @@ const (
 	SettingKeySiteLogo                    = "site_logo"                     // 网站Logo (base64)
 	SettingKeySiteSubtitle                = "site_subtitle"                 // 网站副标题
 	SettingKeyAPIBaseURL                  = "api_base_url"                  // API端点地址（用于客户端配置和导入）
+	SettingKeyUsageCurrency               = "usage_currency"                // 用量展示币种：CNY / USD
+	SettingKeyUSDCNYRate                  = "usd_cny_rate"                  // 1 USD 对应的人民币金额
 	SettingKeyContactInfo                 = "contact_info"                  // 客服联系方式
 	SettingKeyDocURL                      = "doc_url"                       // 文档链接
 	SettingKeyHomeContent                 = "home_content"                  // 首页内容（支持 Markdown/HTML，或 URL 作为 iframe src）

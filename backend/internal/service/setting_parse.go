@@ -369,6 +369,8 @@ func (s *SettingService) parseSettings(settings map[string]string) *SystemSettin
 		SiteLogo:                               settings[SettingKeySiteLogo],
 		SiteSubtitle:                           s.getStringOrDefault(settings, SettingKeySiteSubtitle, "Subscription to API Conversion Platform"),
 		APIBaseURL:                             settings[SettingKeyAPIBaseURL],
+		UsageCurrency:                          normalizeUsageCurrency(settings[SettingKeyUsageCurrency]),
+		USDCNYRate:                             parsePositiveFloatDefault(settings[SettingKeyUSDCNYRate], 7.2),
 		ContactInfo:                            settings[SettingKeyContactInfo],
 		DocURL:                                 settings[SettingKeyDocURL],
 		HomeContent:                            settings[SettingKeyHomeContent],

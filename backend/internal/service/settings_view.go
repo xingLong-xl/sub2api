@@ -153,6 +153,8 @@ type SystemSettings struct {
 	SiteLogo                    string
 	SiteSubtitle                string
 	APIBaseURL                  string
+	UsageCurrency               string
+	USDCNYRate                  float64
 	ContactInfo                 string
 	DocURL                      string
 	HomeContent                 string
@@ -360,6 +362,8 @@ type PublicSettings struct {
 	SiteLogo                            string
 	SiteSubtitle                        string
 	APIBaseURL                          string
+	UsageCurrency                       string
+	USDCNYRate                          float64
 	ContactInfo                         string
 	DocURL                              string
 	HomeContent                         string

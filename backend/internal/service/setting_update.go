@@ -340,6 +340,8 @@ func (s *SettingService) buildSystemSettingsUpdates(ctx context.Context, setting
 	updates[SettingKeySiteLogo] = settings.SiteLogo
 	updates[SettingKeySiteSubtitle] = settings.SiteSubtitle
 	updates[SettingKeyAPIBaseURL] = settings.APIBaseURL
+	updates[SettingKeyUsageCurrency] = normalizeUsageCurrency(settings.UsageCurrency)
+	updates[SettingKeyUSDCNYRate] = strconv.FormatFloat(normalizeUSDCNYRate(settings.USDCNYRate), 'f', 4, 64)
 	updates[SettingKeyContactInfo] = settings.ContactInfo
 	updates[SettingKeyDocURL] = settings.DocURL
 	updates[SettingKeyHomeContent] = settings.HomeContent

@@ -262,6 +262,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAppStore, useAuthStore, useOnboardingStore } from '@/stores'
 import { useAdminSettingsStore } from '@/stores/adminSettings'
+import { useUsageCurrency } from '@/composables/useUsageCurrency'
 import SubscriptionProgressMini from '@/components/common/SubscriptionProgressMini.vue'
 import AnnouncementBell from '@/components/common/AnnouncementBell.vue'
 import Icon from '@/components/icons/Icon.vue'
@@ -273,6 +274,7 @@ import { resolveSiteBillingMode } from '@/utils/siteBillingMode'
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
+const { formatUsageMoney } = useUsageCurrency()
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const adminSettingsStore = useAdminSettingsStore()
@@ -378,8 +380,7 @@ function handleReplayGuide() {
 }
 
 function formatHeaderMoney(value: number) {
-  if (!Number.isFinite(value)) return '¥0.00'
-  return `¥${value.toFixed(2)}`
+  return formatUsageMoney(value, 2)
 }
 
 function handleClickOutside(event: MouseEvent) {

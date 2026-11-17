@@ -120,8 +120,14 @@
               "
               @click="handleMenuItemClick(item.path)"
             >
+              <span
+                v-if="customMenuIconUsesMask(item)"
+                class="sidebar-mask-icon h-5 w-5 flex-shrink-0"
+                :style="customMenuMaskStyle(item)"
+                aria-hidden="true"
+              ></span>
               <img
-                v-if="customMenuIconUrl(item)"
+                v-else-if="customMenuIconUrl(item)"
                 :src="customMenuIconUrl(item)"
                 alt=""
                 class="h-5 w-5 flex-shrink-0 object-contain"
@@ -151,8 +157,14 @@
             :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
             @click="handleMenuItemClick(item.path)"
           >
+            <span
+              v-if="customMenuIconUsesMask(item)"
+              class="sidebar-mask-icon h-5 w-5 flex-shrink-0"
+              :style="customMenuMaskStyle(item)"
+              aria-hidden="true"
+            ></span>
             <img
-              v-if="customMenuIconUrl(item)"
+              v-else-if="customMenuIconUrl(item)"
               :src="customMenuIconUrl(item)"
               alt=""
               class="h-5 w-5 flex-shrink-0 object-contain"
@@ -204,8 +216,14 @@
             :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
             @click="handleMenuItemClick(item.path)"
           >
+            <span
+              v-if="customMenuIconUsesMask(item)"
+              class="sidebar-mask-icon h-5 w-5 flex-shrink-0"
+              :style="customMenuMaskStyle(item)"
+              aria-hidden="true"
+            ></span>
             <img
-              v-if="customMenuIconUrl(item)"
+              v-else-if="customMenuIconUrl(item)"
               :src="customMenuIconUrl(item)"
               alt=""
               class="h-5 w-5 flex-shrink-0 object-contain"
@@ -276,6 +294,8 @@ interface NavItem {
   label: string
   icon: unknown
   iconSvg?: string
+  /** 自定义页面的 markdown slug（不是后端生成的菜单 id） */
+  customPageSlug?: string
   hideInSimpleMode?: boolean
   children?: NavItem[]
   /**
@@ -859,6 +879,7 @@ function buildSelfNavItems(withDashboard: boolean): NavItem[] {
       label: item.label,
       icon: null,
       iconSvg: item.icon_svg,
+      customPageSlug: item.page_slug || (item.url?.startsWith('md:') ? item.url.slice(3) : ''),
     })),
   )
   return items
@@ -887,19 +908,24 @@ const toolNavItems = computed((): NavItem[] => applyFeatureFlags([
 const personalNavItems = computed((): NavItem[] => finalizeNav(buildSelfNavItems(false)))
 
 // Custom menu items filtered by visibility
-/** 自定义菜单图标：支持内联 SVG，也支持 public 下的静态地址。 */
-const CUSTOM_MENU_ICON_FALLBACKS: Record<string, string> = {
-  'ccs-guide': '/custom-icons/ccs-guide.svg',
-}
-
+/** 自定义菜单图标：支持内联 SVG，也支持 public/custom-icons/<slug>.svg。 */
 function customMenuIconUrl(item: NavItem): string {
   const icon = (item.iconSvg || '').trim()
   if (icon && /^(\/|https?:|data:image\/)/i.test(icon)) return icon
-  if (!icon) {
-    const fallback = CUSTOM_MENU_ICON_FALLBACKS[item.path.replace('/custom/', '')]
-    if (fallback) return fallback
-  }
+  if (icon) return ''
+  const slug = (item.customPageSlug || '').trim()
+  if (slug) return `/custom-icons/${encodeURIComponent(slug)}.svg`
   return ''
+}
+
+function customMenuIconUsesMask(item: NavItem): boolean {
+  return customMenuIconUrl(item).startsWith('/custom-icons/')
+}
+
+function customMenuMaskStyle(item: NavItem): Record<string, string> {
+  const url = customMenuIconUrl(item)
+  if (!url.startsWith('/custom-icons/')) return {}
+  return { '--sidebar-icon-url': `url("${url}")` }
 }
 
 const customMenuItemsForUser = computed(() => {
@@ -990,14 +1016,26 @@ const adminNavItems = computed((): NavItem[] => {
     filtered.push({ path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon })
     filtered.push({ path: '/admin/settings', label: t('nav.settings'), icon: CogIcon })
     for (const cm of customMenuItemsForAdmin.value) {
-      filtered.push({ path: `/custom/${cm.id}`, label: cm.label, icon: null, iconSvg: cm.icon_svg })
+      filtered.push({
+        path: `/custom/${cm.id}`,
+        label: cm.label,
+        icon: null,
+        iconSvg: cm.icon_svg,
+        customPageSlug: cm.page_slug || (cm.url?.startsWith('md:') ? cm.url.slice(3) : ''),
+      })
     }
     return filtered
   }
 
   visible.push({ path: '/admin/settings', label: t('nav.settings'), icon: CogIcon })
   for (const cm of customMenuItemsForAdmin.value) {
-    visible.push({ path: `/custom/${cm.id}`, label: cm.label, icon: null, iconSvg: cm.icon_svg })
+    visible.push({
+      path: `/custom/${cm.id}`,
+      label: cm.label,
+      icon: null,
+      iconSvg: cm.icon_svg,
+      customPageSlug: cm.page_slug || (cm.url?.startsWith('md:') ? cm.url.slice(3) : ''),
+    })
   }
   return visible
 })
@@ -1236,6 +1274,18 @@ onBeforeUnmount(() => {
 }
 
 /* Custom SVG icon in sidebar: constrain size without overriding uploaded SVG colors */
+.sidebar-mask-icon {
+  background-color: currentColor;
+  -webkit-mask-image: var(--sidebar-icon-url);
+  mask-image: var(--sidebar-icon-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
 .sidebar-svg-icon {
   color: currentColor;
 }

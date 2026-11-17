@@ -184,6 +184,8 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SettingKeySiteLogo,
 		SettingKeySiteSubtitle,
 		SettingKeyAPIBaseURL,
+		SettingKeyUsageCurrency,
+		SettingKeyUSDCNYRate,
 		SettingKeyContactInfo,
 		SettingKeyDocURL,
 		SettingKeyHomeContent,
@@ -331,6 +333,8 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SiteLogo:                            settings[SettingKeySiteLogo],
 		SiteSubtitle:                        s.getStringOrDefault(settings, SettingKeySiteSubtitle, "Subscription to API Conversion Platform"),
 		APIBaseURL:                          settings[SettingKeyAPIBaseURL],
+		UsageCurrency:                       normalizeUsageCurrency(settings[SettingKeyUsageCurrency]),
+		USDCNYRate:                          parsePositiveFloatDefault(settings[SettingKeyUSDCNYRate], 7.2),
 		ContactInfo:                         settings[SettingKeyContactInfo],
 		DocURL:                              settings[SettingKeyDocURL],
 		HomeContent:                         settings[SettingKeyHomeContent],
@@ -594,6 +598,8 @@ type PublicSettingsInjectionPayload struct {
 	SiteLogo                            string                   `json:"site_logo"`
 	SiteSubtitle                        string                   `json:"site_subtitle"`
 	APIBaseURL                          string                   `json:"api_base_url"`
+	UsageCurrency                       string                   `json:"usage_currency"`
+	USDCNYRate                          float64                  `json:"usd_cny_rate"`
 	ContactInfo                         string                   `json:"contact_info"`
 	DocURL                              string                   `json:"doc_url"`
 	HomeContent                         string                   `json:"home_content"`
@@ -691,6 +697,8 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		SiteLogo:                            settings.SiteLogo,
 		SiteSubtitle:                        settings.SiteSubtitle,
 		APIBaseURL:                          settings.APIBaseURL,
+		UsageCurrency:                       settings.UsageCurrency,
+		USDCNYRate:                          settings.USDCNYRate,
 		ContactInfo:                         settings.ContactInfo,
 		DocURL:                              settings.DocURL,
 		HomeContent:                         settings.HomeContent,

@@ -153,6 +153,8 @@ type SystemSettings struct {
 	SiteLogo                    string           `json:"site_logo"`
 	SiteSubtitle                string           `json:"site_subtitle"`
 	APIBaseURL                  string           `json:"api_base_url"`
+	UsageCurrency               string           `json:"usage_currency"`
+	USDCNYRate                  float64          `json:"usd_cny_rate"`
 	ContactInfo                 string           `json:"contact_info"`
 	DocURL                      string           `json:"doc_url"`
 	HomeContent                 string           `json:"home_content"`
@@ -398,6 +400,8 @@ type PublicSettings struct {
 	SiteLogo                            string                   `json:"site_logo"`
 	SiteSubtitle                        string                   `json:"site_subtitle"`
 	APIBaseURL                          string                   `json:"api_base_url"`
+	UsageCurrency                       string                   `json:"usage_currency"`
+	USDCNYRate                          float64                  `json:"usd_cny_rate"`
 	ContactInfo                         string                   `json:"contact_info"`
 	DocURL                              string                   `json:"doc_url"`
 	HomeContent                         string                   `json:"home_content"`

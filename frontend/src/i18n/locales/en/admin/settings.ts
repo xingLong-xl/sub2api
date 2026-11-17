@@ -654,6 +654,12 @@ export default {
         siteSubtitlePlaceholder: 'Subscription to API Conversion Platform',
         siteSubtitleHint: 'Displayed on login and register pages',
         apiBaseUrl: 'API Base URL',
+        usageCurrency: 'Usage display currency',
+        usageCurrencyCny: 'Chinese Yuan (CNY)',
+        usageCurrencyUsd: 'US Dollar (USD)',
+        usageCurrencyHint: 'Affects usage, quota, balance and CCS display only. Payments and top-ups always use CNY.',
+        usdCnyRate: 'USD → CNY rate',
+        usdCnyRateHint: 'For example, 7.2 means 1 USD = 7.2 CNY. Usage amounts are converted for display.',
         apiBaseUrlPlaceholder: 'https://api.example.com',
         apiBaseUrlHint:
           'Used for "Use Key", "Import to CC Switch", and callback URL suggestions. Leave empty to use current site URL.',
