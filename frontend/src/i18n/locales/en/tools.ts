@@ -162,6 +162,8 @@ export default {
       loadToEdit: 'Edit this image',
       geminiEditUnsupported: 'Gemini image models do not support image editing here. Switch to gpt-image-2 / gpt-image-2.5-flare to use Load for editing.',
       loadToEditFailed: 'Could not load this image for editing. Download it first, then upload it.',
+      unsupportedParameter: 'This model does not support the "{param}" parameter. Set "{param}" to Auto and retry.',
+      unsupportedParamsHint: 'This model does not support the current parameter combination. Set Output format / Quality / Style / Background / Response format / Moderation to Auto and retry.',
       editInvalidRequest: 'The edit request was rejected by the upstream. Set count to 1 and re-upload a PNG/JPEG/WebP image, then retry.',
       actualSize: 'Actual size',
       fitScreen: 'Fit screen',

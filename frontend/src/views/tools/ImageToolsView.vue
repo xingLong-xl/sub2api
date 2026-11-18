@@ -748,9 +748,9 @@ const quality = ref('')
 const style = ref('')
 const responseFormat = ref('')
 const background = ref('')
-const outputFormat = ref('png')
+const outputFormat = ref('')
 const moderation = ref('')
-const outputCompression = ref('100')
+const outputCompression = ref('')
 const partialImages = ref('')
 const inputFidelity = ref('')
 const showAdvanced = ref(false)
@@ -1056,12 +1056,45 @@ function normalizeOutputCompression(): void {
   outputCompression.value = String(Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 100)
 }
 
-function localizedError(err: unknown): string {
+const IMAGE_PARAMETER_LABELS: Record<string, string> = {
+  output_format: 'tools.image.outputFormat',
+  output_compression: 'tools.image.outputCompression',
+  quality: 'tools.image.quality',
+  style: 'tools.image.style',
+  response_format: 'tools.image.responseFormat',
+  background: 'tools.image.background',
+  moderation: 'tools.image.moderation',
+  input_fidelity: 'tools.image.inputFidelity',
+}
+
+function imageUnsupportedParameterMessage(
+  err: unknown,
+  payload: Record<string, unknown>,
+): string | null {
+  if (!(err instanceof GatewayError) || err.status !== 400) return null
+  const message = String(err.message || '').toLowerCase()
+  const normalized = message.replace(/[_-]+/g, ' ')
+  for (const [key, labelKey] of Object.entries(IMAGE_PARAMETER_LABELS)) {
+    const token = key.replace(/_/g, ' ')
+    if (normalized.includes(token)) {
+      return t('tools.image.unsupportedParameter', { param: t(labelKey) })
+    }
+  }
+  const hasOptionalParam = Object.keys(IMAGE_PARAMETER_LABELS).some((key) => key in payload)
+  if (hasOptionalParam && /(not supported|unsupported|unknown|invalid|unexpected|不支持|未支持|无效)/i.test(message)) {
+    return t('tools.image.unsupportedParamsHint')
+  }
+  return null
+}
+
+function localizedError(err: unknown, payload: Record<string, unknown> = {}): string {
   if (err instanceof GatewayError) {
     if (err.code === 'INSUFFICIENT_BALANCE') return t('tools.errors.insufficientBalance')
     if (err.status === 401) return t('tools.errors.unauthorized')
     if (err.status === 403) return t('tools.errors.forbidden')
     if (err.status === 429) return t('tools.errors.rateLimited')
+    const parameterMessage = imageUnsupportedParameterMessage(err, payload)
+    if (parameterMessage) return parameterMessage
     return err.message
   }
   return err instanceof Error ? err.message : t('tools.errors.unknown')
@@ -1221,9 +1254,10 @@ async function generate(): Promise<void> {
   try {
     for (const segment of segments) {
       for (let offset = 0; offset < effectiveCount.value; offset += perRequestCount) {
+        let payload: Record<string, unknown> = {}
         try {
           const batchCount = Math.min(perRequestCount, effectiveCount.value - offset)
-          const payload = buildPayload(segment, batchCount)
+          payload = buildPayload(segment, batchCount)
           let res: Response
           if (mode.value === 'edit') {
             res = await gatewayFetch('/v1/images/edits', {
@@ -1242,8 +1276,14 @@ async function generate(): Promise<void> {
           progress.value = { done: completedRequests, total: segments.length * requestGroups }
         } catch (err) {
           // 某一批失败时，保留已经生成成功的图片。
-          error.value = localizedError(err)
-          if (mode.value === 'edit' && err instanceof GatewayError && err.status === 400) {
+          const parameterMessage = imageUnsupportedParameterMessage(err, payload)
+          error.value = parameterMessage || localizedError(err, payload)
+          if (
+            !parameterMessage &&
+            mode.value === 'edit' &&
+            err instanceof GatewayError &&
+            err.status === 400
+          ) {
             error.value = t('tools.image.editInvalidRequest')
           }
           break
@@ -1295,9 +1335,9 @@ function restoreDefaults(): void {
   style.value = ''
   responseFormat.value = ''
   background.value = ''
-  outputFormat.value = 'png'
+  outputFormat.value = ''
   moderation.value = ''
-  outputCompression.value = '100'
+  outputCompression.value = ''
   partialImages.value = ''
   inputFidelity.value = ''
   showAdvanced.value = false

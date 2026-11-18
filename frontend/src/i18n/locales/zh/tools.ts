@@ -162,6 +162,8 @@ export default {
       loadToEdit: '载入编辑',
       geminiEditUnsupported: '当前 Gemini 模型不支持图片编辑，请切换到 gpt-image-2 / gpt-image-2.5-flare 后再使用载入编辑。',
       loadToEditFailed: '图片载入编辑失败，请先下载后重新上传。',
+      unsupportedParameter: '当前模型不支持「{param}」参数，请将「{param}」设置为「自动」后重试。',
+      unsupportedParamsHint: '当前模型不支持当前参数组合。请把「输出格式 / 质量 / 风格 / 背景 / 响应格式 / 审核」都设置为「自动」后重试。',
       editInvalidRequest: '编辑请求被上游拒绝：请确认数量为 1，并重新上传 PNG/JPEG/WebP 图片后重试。',
       actualSize: '原始尺寸',
       fitScreen: '适应屏幕',
