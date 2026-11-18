@@ -13,20 +13,22 @@
               @input="debounceLoad"
             />
           </div>
-          <input
-            v-model="filters.start_at"
-            type="date"
-            class="input w-full sm:w-44"
-            :title="t('admin.affiliates.records.startAt')"
+          <DateRangePicker
+            :start-date="filters.start_at"
+            :end-date="filters.end_at"
+            @update:start-date="(value) => (filters.start_at = value)"
+            @update:end-date="(value) => (filters.end_at = value)"
             @change="reloadFromFirstPage"
           />
-          <input
-            v-model="filters.end_at"
-            type="date"
-            class="input w-full sm:w-44"
-            :title="t('admin.affiliates.records.endAt')"
-            @change="reloadFromFirstPage"
-          />
+          <button
+            v-if="filters.start_at || filters.end_at"
+            type="button"
+            class="btn btn-secondary px-3"
+            :title="t('common.clear')"
+            @click="clearDates"
+          >
+            {{ t('common.clear') }}
+          </button>
           <button class="btn btn-secondary px-2 md:px-3" :disabled="loading" :title="t('common.refresh')" @click="loadStats">
             <Icon name="refresh" size="md" :class="loading ? 'animate-spin' : ''" />
           </button>
@@ -97,6 +99,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import DateRangePicker from '@/components/common/DateRangePicker.vue'
 import Icon from '@/components/icons/Icon.vue'
 import type { Column } from '@/components/common/types'
 import { affiliatesAPI, type AffiliateCodeStats } from '@/api/admin/affiliates'
@@ -153,6 +156,12 @@ async function loadStats() {
 function debounceLoad() {
   if (debounceTimer) clearTimeout(debounceTimer)
   debounceTimer = setTimeout(reloadFromFirstPage, 300)
+}
+
+function clearDates() {
+  filters.start_at = ''
+  filters.end_at = ''
+  reloadFromFirstPage()
 }
 
 function reloadFromFirstPage() {
