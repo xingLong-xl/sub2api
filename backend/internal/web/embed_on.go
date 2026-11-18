@@ -99,8 +99,19 @@ func (s *FrontendServer) Middleware() gin.HandlerFunc {
 			cleanPath = "index.html"
 		}
 
-		// For index.html or SPA routes, serve with injected settings
-		if cleanPath == "index.html" || !s.fileExists(cleanPath) {
+		// For index.html or SPA routes, serve with injected settings.
+		// Missing static assets must not fall back to HTML: a browser loading
+		// /assets/old-hash.js as HTML would fail with "Unexpected token '<'".
+		if cleanPath == "index.html" {
+			s.serveIndexHTML(c)
+			return
+		}
+		if !s.fileExists(cleanPath) {
+			if shouldReturnNotFoundForMissingAsset(cleanPath) {
+				c.String(http.StatusNotFound, "Not Found")
+				c.Abort()
+				return
+			}
 			s.serveIndexHTML(c)
 			return
 		}
@@ -114,6 +125,30 @@ func (s *FrontendServer) Middleware() gin.HandlerFunc {
 		applyStaticAssetCacheHeaders(c.Writer.Header(), cleanPath)
 		s.fileServer.ServeHTTP(c.Writer, c.Request)
 		c.Abort()
+	}
+}
+
+// shouldReturnNotFoundForMissingAsset reports whether a missing path looks like
+// a static asset rather than an SPA route. This prevents returning index.html
+// for stale asset hashes, which browsers would try to parse as JS/CSS.
+func shouldReturnNotFoundForMissingAsset(path string) bool {
+	cleanPath := strings.TrimPrefix(strings.TrimSpace(path), "/")
+	if cleanPath == "" {
+		return false
+	}
+	for _, prefix := range []string{"assets/", "static/", "images/", "fonts/"} {
+		if strings.HasPrefix(cleanPath, prefix) {
+			return true
+		}
+	}
+	switch strings.ToLower(filepath.Ext(cleanPath)) {
+	case ".js", ".mjs", ".css", ".map", ".json", ".html",
+		".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".ico",
+		".woff", ".woff2", ".ttf", ".otf", ".eot", ".wasm",
+		".txt", ".xml", ".webmanifest":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -329,6 +364,12 @@ func ServeEmbeddedFrontend() gin.HandlerFunc {
 			}
 			applyStaticAssetCacheHeaders(c.Writer.Header(), cleanPath)
 			fileServer.ServeHTTP(c.Writer, c.Request)
+			c.Abort()
+			return
+		}
+
+		if shouldReturnNotFoundForMissingAsset(cleanPath) {
+			c.String(http.StatusNotFound, "Not Found")
 			c.Abort()
 			return
 		}

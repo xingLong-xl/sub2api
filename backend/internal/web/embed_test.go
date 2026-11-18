@@ -949,3 +949,48 @@ func BenchmarkFrontendServerServeIndexHTML(b *testing.B) {
 		server.serveIndexHTML(c)
 	}
 }
+
+func TestEmbeddedFrontendReturns404ForMissingAssets(t *testing.T) {
+	provider := &mockSettingsProvider{settings: map[string]string{"test": "value"}}
+	server, err := NewFrontendServer(provider)
+	require.NoError(t, err)
+
+	router := gin.New()
+	router.Use(server.Middleware())
+
+	for _, path := range []string{
+		"/assets/does-not-exist-xyz.js",
+		"/assets/does-not-exist-xyz.css",
+		"/static/missing.png",
+		"/images/missing.svg",
+		"/favicon.ico",
+	} {
+		t.Run(path, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, http.StatusNotFound, w.Code)
+			assert.NotContains(t, w.Header().Get("Content-Type"), "text/html")
+		})
+	}
+}
+
+func TestServeEmbeddedFrontendReturns404ForMissingAssets(t *testing.T) {
+	router := gin.New()
+	router.Use(ServeEmbeddedFrontend())
+
+	for _, path := range []string{
+		"/assets/does-not-exist-xyz.js",
+		"/assets/does-not-exist-xyz.css",
+	} {
+		t.Run(path, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, http.StatusNotFound, w.Code)
+			assert.NotContains(t, w.Header().Get("Content-Type"), "text/html")
+		})
+	}
+}
