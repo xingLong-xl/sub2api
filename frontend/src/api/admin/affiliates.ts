@@ -206,6 +206,38 @@ function recordParams(params: ListAffiliateRecordsParams = {}) {
   }
 }
 
+export interface AffiliateCodeStats {
+  aff_code: string
+  inviter_id: number
+  inviter_email: string
+  inviter_username: string
+  invited_count: number
+  recharge_user_count: number
+  recharge_order_count: number
+  recharge_amount: number
+  rebate_amount: number
+  last_recharge_at?: string | null
+}
+
+export async function listCodeStats(
+  params: ListAffiliateRecordsParams = {},
+): Promise<PaginatedResponse<AffiliateCodeStats>> {
+  const { data } = await apiClient.get<PaginatedResponse<AffiliateCodeStats>>(
+    '/admin/affiliates/code-stats',
+    {
+      params: {
+        page: params.page ?? 1,
+        page_size: params.page_size ?? 20,
+        search: params.search ?? '',
+        start_at: params.start_at,
+        end_at: params.end_at,
+        timezone: params.timezone,
+      },
+    },
+  )
+  return data
+}
+
 export async function listInviteRecords(
   params: ListAffiliateRecordsParams = {},
 ): Promise<PaginatedResponse<AffiliateInviteRecord>> {
@@ -273,6 +305,7 @@ export const affiliatesAPI = {
   clearUserSettings,
   batchSetRate,
   listInviteRecords,
+  listCodeStats,
   listRebateRecords,
   listTransferRecords,
   getUserOverview,

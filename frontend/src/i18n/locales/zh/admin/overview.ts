@@ -422,6 +422,16 @@ export default {
     },
 
     affiliates: {
+      codeStats: {
+        description: '按邀请码查看邀请人数、充值人数、充值金额和返利',
+        searchPlaceholder: '搜索邀请码、邮箱或用户名',
+        affCode: '邀请码',
+        invitedCount: '邀请人数',
+        rechargeUserCount: '充值人数',
+        rechargeOrderCount: '充值笔数',
+        rechargeAmount: '充值金额',
+        lastRechargeAt: '最近充值',
+      },
       invitesDescription: '查看全站邀请关系和被邀请用户累计返利',
       rebatesDescription: '查看每一笔返利入账，包括充值订单、兑换码和管理员充值产生的返利',
       transfersDescription: '查看返利额度转入余额与线下提现的流水',

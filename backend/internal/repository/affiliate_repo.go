@@ -548,6 +548,128 @@ LIMIT $2`, inviterID, limit)
 	return invitees, nil
 }
 
+// ListAffiliateCodeStats aggregates recharge activity per affiliate code.
+// Only paid balance top-ups count as recharges; subscription purchases and
+// admin balance adjustments are intentionally excluded.
+func (r *affiliateRepository) ListAffiliateCodeStats(ctx context.Context, filter service.AffiliateRecordFilter) ([]service.AffiliateCodeStats, int64, error) {
+	client := clientFromContext(ctx, r.client)
+	search := strings.TrimSpace(filter.Search)
+	searchPattern := ""
+	if search != "" {
+		searchPattern = "%" + search + "%"
+	}
+
+	var startAt, endAt any
+	if filter.StartAt != nil {
+		startAt = *filter.StartAt
+	}
+	if filter.EndAt != nil {
+		endAt = *filter.EndAt
+	}
+
+	const baseCTE = `
+WITH paid AS (
+    SELECT ua.inviter_id,
+           ua.user_id AS invitee_id,
+           po.id AS order_id,
+           po.pay_amount::double precision AS pay_amount,
+           COALESCE(po.paid_at, po.created_at) AS paid_at
+    FROM user_affiliates ua
+    JOIN payment_orders po ON po.user_id = ua.user_id
+    WHERE ua.inviter_id IS NOT NULL
+      AND po.order_type = 'balance'
+      AND po.status IN ('PAID', 'COMPLETED')
+      AND ($1::timestamptz IS NULL OR COALESCE(po.paid_at, po.created_at) >= $1)
+      AND ($2::timestamptz IS NULL OR COALESCE(po.paid_at, po.created_at) < $2)
+),
+recharge AS (
+    SELECT inviter_id,
+           COUNT(DISTINCT invitee_id)::integer AS recharge_user_count,
+           COUNT(*)::integer AS recharge_order_count,
+           COALESCE(SUM(pay_amount), 0)::double precision AS recharge_amount,
+           MAX(paid_at) AS last_recharge_at
+    FROM paid
+    GROUP BY inviter_id
+),
+invited AS (
+    SELECT inviter_id, COUNT(*)::integer AS invited_count
+    FROM user_affiliates
+    WHERE inviter_id IS NOT NULL
+    GROUP BY inviter_id
+),
+rebate AS (
+    SELECT user_id AS inviter_id, COALESCE(SUM(amount), 0)::double precision AS rebate_amount
+    FROM user_affiliate_ledger
+    WHERE action = 'accrue'
+    GROUP BY user_id
+)
+`
+
+	where := `
+FROM user_affiliates ua
+JOIN users u ON u.id = ua.user_id
+LEFT JOIN invited ON invited.inviter_id = ua.user_id
+LEFT JOIN recharge ON recharge.inviter_id = ua.user_id
+LEFT JOIN rebate ON rebate.inviter_id = ua.user_id
+WHERE ua.aff_code <> ''
+  AND ($3 = '' OR ua.aff_code ILIKE $3 OR COALESCE(u.email, '') ILIKE $3 OR COALESCE(u.username, '') ILIKE $3)
+`
+	countArgs := []any{startAt, endAt, searchPattern}
+	total, err := queryAffiliateRecordCount(ctx, client, baseCTE+`SELECT COUNT(*)`+where, countArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	args := []any{startAt, endAt, searchPattern, filter.PageSize, (filter.Page - 1) * filter.PageSize}
+	rows, err := client.QueryContext(ctx, baseCTE+`
+SELECT ua.aff_code,
+       ua.user_id,
+       COALESCE(u.email, ''),
+       COALESCE(u.username, ''),
+       COALESCE(invited.invited_count, 0)::integer,
+       COALESCE(recharge.recharge_user_count, 0)::integer,
+       COALESCE(recharge.recharge_order_count, 0)::integer,
+       COALESCE(recharge.recharge_amount, 0)::double precision,
+       COALESCE(rebate.rebate_amount, 0)::double precision,
+       recharge.last_recharge_at
+`+where+`
+ORDER BY COALESCE(recharge.recharge_user_count, 0) DESC, ua.user_id ASC
+LIMIT $4 OFFSET $5`, args...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	items := make([]service.AffiliateCodeStats, 0)
+	for rows.Next() {
+		var item service.AffiliateCodeStats
+		var lastRecharge sql.NullTime
+		if err := rows.Scan(
+			&item.AffCode,
+			&item.InviterID,
+			&item.InviterEmail,
+			&item.InviterUsername,
+			&item.InvitedCount,
+			&item.RechargeUserCount,
+			&item.RechargeOrderCount,
+			&item.RechargeAmount,
+			&item.RebateAmount,
+			&lastRecharge,
+		); err != nil {
+			return nil, 0, err
+		}
+		if lastRecharge.Valid {
+			last := lastRecharge.Time
+			item.LastRechargeAt = &last
+		}
+		items = append(items, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+	return items, total, nil
+}
+
 func (r *affiliateRepository) ListAffiliateInviteRecords(ctx context.Context, filter service.AffiliateRecordFilter) ([]service.AffiliateInviteRecord, int64, error) {
 	client := clientFromContext(ctx, r.client)
 	where, args := buildAffiliateRecordWhere(filter, "ua.created_at", []string{

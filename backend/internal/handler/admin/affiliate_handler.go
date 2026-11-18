@@ -250,6 +250,19 @@ func (h *AffiliateHandler) ListInviteRecords(c *gin.Context) {
 	response.Paginated(c, items, total, filter.Page, filter.PageSize)
 }
 
+// ListCodeStats returns recharge activity aggregated by affiliate code.
+// GET /api/v1/admin/affiliates/code-stats
+func (h *AffiliateHandler) ListCodeStats(c *gin.Context) {
+	page, pageSize := response.ParsePagination(c)
+	filter := parseAffiliateRecordFilter(c, page, pageSize)
+	items, total, err := h.affiliateService.AdminListCodeStats(c.Request.Context(), filter)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Paginated(c, items, total, filter.Page, filter.PageSize)
+}
+
 // ListRebateRecords returns every affiliate rebate accrual, with order details
 // when the rebate came from a payment order.
 // GET /api/v1/admin/affiliates/rebates

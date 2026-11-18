@@ -120,6 +120,7 @@ type AffiliateRepository interface {
 	ListAffiliateRebateRecords(ctx context.Context, filter AffiliateRecordFilter) ([]AffiliateRebateRecord, int64, error)
 	ListAffiliateTransferRecords(ctx context.Context, filter AffiliateRecordFilter) ([]AffiliateTransferRecord, int64, error)
 	GetAffiliateUserOverview(ctx context.Context, userID int64) (*AffiliateUserOverview, error)
+	ListAffiliateCodeStats(ctx context.Context, filter AffiliateRecordFilter) ([]AffiliateCodeStats, int64, error)
 }
 
 // AffiliateAdminFilter 列表筛选条件
@@ -226,6 +227,19 @@ type AffiliateUserOverview struct {
 	RebatedInviteeCount int     `json:"rebated_invitee_count"`
 	AvailableQuota      float64 `json:"available_quota"`
 	HistoryQuota        float64 `json:"history_quota"`
+}
+
+type AffiliateCodeStats struct {
+	AffCode            string     `json:"aff_code"`
+	InviterID          int64      `json:"inviter_id"`
+	InviterEmail       string     `json:"inviter_email"`
+	InviterUsername    string     `json:"inviter_username"`
+	InvitedCount       int        `json:"invited_count"`
+	RechargeUserCount  int        `json:"recharge_user_count"`
+	RechargeOrderCount int        `json:"recharge_order_count"`
+	RechargeAmount     float64    `json:"recharge_amount"`
+	RebateAmount       float64    `json:"rebate_amount"`
+	LastRechargeAt     *time.Time `json:"last_recharge_at,omitempty"`
 }
 
 type AffiliateService struct {
@@ -633,6 +647,13 @@ func (s *AffiliateService) AdminListInviteRecords(ctx context.Context, filter Af
 		return nil, 0, infraerrors.ServiceUnavailable("SERVICE_UNAVAILABLE", "affiliate service unavailable")
 	}
 	return s.repo.ListAffiliateInviteRecords(ctx, normalizeAffiliateRecordFilter(filter))
+}
+
+func (s *AffiliateService) AdminListCodeStats(ctx context.Context, filter AffiliateRecordFilter) ([]AffiliateCodeStats, int64, error) {
+	if s == nil || s.repo == nil {
+		return nil, 0, infraerrors.ServiceUnavailable("SERVICE_UNAVAILABLE", "affiliate service unavailable")
+	}
+	return s.repo.ListAffiliateCodeStats(ctx, normalizeAffiliateRecordFilter(filter))
 }
 
 func (s *AffiliateService) AdminListRebateRecords(ctx context.Context, filter AffiliateRecordFilter) ([]AffiliateRebateRecord, int64, error) {

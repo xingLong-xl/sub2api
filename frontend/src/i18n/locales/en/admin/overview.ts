@@ -422,6 +422,16 @@ export default {
     },
 
     affiliates: {
+      codeStats: {
+        description: 'Recharge conversion and rebates grouped by affiliate code',
+        searchPlaceholder: 'Search code, email or username',
+        affCode: 'Affiliate code',
+        invitedCount: 'Invited users',
+        rechargeUserCount: 'Recharged users',
+        rechargeOrderCount: 'Recharge orders',
+        rechargeAmount: 'Recharge amount',
+        lastRechargeAt: 'Last recharge',
+      },
       invitesDescription: 'View site-wide inviter and invitee relationships',
       rebatesDescription: 'View every affiliate rebate accrual from recharge orders, redeem codes, and admin recharges',
       transfersDescription: 'View affiliate quota transfers into balance and offline withdrawals',
