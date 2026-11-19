@@ -20,12 +20,12 @@ const (
 	// ToolImageHistoryMaxImages 是单条记录最多保留的图片数。
 	ToolImageHistoryMaxImages = 10
 	// ToolImageHistoryMaxBytes 是单用户图片历史 JSON 的软上限，避免 Redis 被 base64 图片撑爆。
-	ToolImageHistoryMaxBytes = 48 << 20
+	ToolImageHistoryMaxBytes = 256 << 20
 
 	toolImageHistoryMaxIDBytes     = 128
 	toolImageHistoryMaxPromptBytes = 64 << 10
 	toolImageHistoryMaxModelBytes  = 200
-	toolImageHistoryMaxImageBytes  = 24 << 20
+	toolImageHistoryMaxImageBytes  = 64 << 20
 	toolImageHistoryMaxParamBytes  = 200
 )
 

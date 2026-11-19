@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const defaultImageMaxDownloadBytes int64 = 32 << 20 // 32 MiB
+const defaultImageMaxDownloadBytes int64 = 128 << 20 // 128 MiB
 
 // ImageStorage 把图片字节写入对象存储并返回可访问 URL。
 //

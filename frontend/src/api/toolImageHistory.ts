@@ -53,6 +53,7 @@ export interface ToolImageHistoryResult {
 
 interface ToolImageHistorySaveResponse {
   saved: boolean
+  item?: ToolImageHistoryItem
   max_items?: number
   retention_days?: number
 }
@@ -66,7 +67,7 @@ export const toolImageHistoryAPI = {
     return {
       items: Array.isArray(data.items) ? data.items : [],
       maxItems: typeof data.max_items === 'number' && data.max_items > 0 ? data.max_items : 20,
-      maxBytes: typeof data.max_bytes === 'number' && data.max_bytes > 0 ? data.max_bytes : 48 * 1024 * 1024,
+      maxBytes: typeof data.max_bytes === 'number' && data.max_bytes > 0 ? data.max_bytes : 256 * 1024 * 1024,
       retentionDays:
         typeof data.retention_days === 'number' && data.retention_days > 0
           ? data.retention_days

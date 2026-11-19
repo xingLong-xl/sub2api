@@ -834,14 +834,6 @@ const historyMaxItems = ref(20)
 const historyRetentionDays = ref(7)
 const historyMaxBytes = ref(48 * 1024 * 1024)
 
-const HISTORY_STORAGE_KEY = 'tools_image_history_v1'
-const HISTORY_OWNER_KEY = 'tools_image_history_owner'
-
-function currentOwnerId(): string {
-  const id = authStore.user?.id
-  return id === undefined || id === null ? '' : String(id)
-}
-
 function newHistoryId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
@@ -896,85 +888,20 @@ function fromApiItem(item: ToolImageHistoryItem): GenerationRecord {
   }
 }
 
-function loadLocalHistory(): GenerationRecord[] {
-  const owner = currentOwnerId()
-  try {
-    const storedOwner = localStorage.getItem(HISTORY_OWNER_KEY) ?? ''
-    if (storedOwner && owner && storedOwner !== owner) return []
-    if (!storedOwner && owner) localStorage.setItem(HISTORY_OWNER_KEY, owner)
-    const raw = localStorage.getItem(HISTORY_STORAGE_KEY)
-    if (!raw) return []
-    const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    const records: GenerationRecord[] = []
-    for (const value of parsed) {
-      const item = value as Partial<ToolImageHistoryItem>
-      if (typeof item?.id !== 'string' || !Array.isArray(item.images)) continue
-      records.push(fromApiItem(item as ToolImageHistoryItem))
-    }
-    return records.slice(0, historyMaxItems.value)
-  } catch {
-    return []
-  }
-}
-
-function persistLocalHistory(): void {
-  const owner = currentOwnerId()
-  try {
-    if (owner) localStorage.setItem(HISTORY_OWNER_KEY, owner)
-    localStorage.setItem(
-      HISTORY_STORAGE_KEY,
-      JSON.stringify(history.value.slice(0, historyMaxItems.value).map(toApiItem)),
-    )
-  } catch {
-    // localStorage 容量不足时仅保留服务端历史，不影响当前页面。
-  }
-}
-
-function mergeHistory(local: GenerationRecord[], remote: GenerationRecord[]): GenerationRecord[] {
-  const merged = new Map<string, GenerationRecord>()
-  for (const record of remote) merged.set(record.id, record)
-  for (const record of local) {
-    if (!merged.has(record.id)) merged.set(record.id, record)
-  }
-  return [...merged.values()]
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    .slice(0, historyMaxItems.value)
-}
-
-async function uploadMissingHistory(local: GenerationRecord[], remote: GenerationRecord[]): Promise<void> {
-  const existing = new Set(remote.map((record) => record.id))
-  for (const record of local) {
-    if (existing.has(record.id)) continue
-    try {
-      await toolImageHistoryAPI.append(toApiItem(record))
-    } catch (error) {
-      console.warn('Failed to migrate image history to server', error)
-      break
-    }
-  }
-}
-
 async function loadHistory(): Promise<void> {
-  const local = loadLocalHistory()
-  history.value = mergeHistory(history.value, local)
-  if (!activeRecord.value) activeRecord.value = history.value[0] ?? null
   try {
     const result = await toolImageHistoryAPI.list()
     historyMaxItems.value = result.maxItems
     historyMaxBytes.value = result.maxBytes
     historyRetentionDays.value = result.retentionDays
-    const remote = result.items.map(fromApiItem)
-    // 请求期间可能刚好生成了一张图，合并当前内存而不是只合并请求前的 local。
-    history.value = mergeHistory(history.value, remote)
+    history.value = result.items.map(fromApiItem)
     if (!activeRecord.value || !history.value.some((record) => record.id === activeRecord.value?.id)) {
       activeRecord.value = history.value[0] ?? null
     }
-    persistLocalHistory()
-    // 首次上线或离线期间产生的本地记录，补写一次服务端。
-    await uploadMissingHistory(history.value, remote)
   } catch (error) {
     console.warn('Failed to load image history from server', error)
+    history.value = []
+    activeRecord.value = null
   }
 }
 
@@ -1217,21 +1144,29 @@ function saveRecord(images: GeneratedImage[], durationMs: number): void {
   history.value.unshift(record)
   history.value = history.value.slice(0, historyMaxItems.value)
   activeRecord.value = record
-  persistLocalHistory()
-  void toolImageHistoryAPI.append(toApiItem(record)).catch((err) => {
-    console.warn('Failed to save image history to server', err)
-    const reason = extractApiErrorMessage(err, '').toLowerCase()
-    const code = extractApiErrorCode(err)
-    appStore.showError(
-      code === 'TOOL_HISTORY_STORAGE_FULL'
-        ? t('tools.image.imageHistoryStorageFull')
-        : code === 'TOOL_IMAGE_STORAGE_FAILED'
-          ? t('tools.image.imageHistoryStorageFailed')
-          : reason.includes('too large')
-            ? t('tools.image.imageHistoryTooLarge')
-            : t('tools.image.imageHistorySaveFailed'),
-    )
-  })
+  void toolImageHistoryAPI
+    .append(toApiItem(record))
+    .then((result) => {
+      if (!result.item) return
+      const savedRecord = fromApiItem(result.item)
+      const index = history.value.findIndex((item) => item.id === savedRecord.id)
+      if (index >= 0) history.value[index] = savedRecord
+      if (activeRecord.value?.id === savedRecord.id) activeRecord.value = savedRecord
+    })
+    .catch((err) => {
+      console.warn('Failed to save image history to server', err)
+      const reason = extractApiErrorMessage(err, '').toLowerCase()
+      const code = extractApiErrorCode(err)
+      appStore.showError(
+        code === 'TOOL_HISTORY_STORAGE_FULL'
+          ? t('tools.image.imageHistoryStorageFull')
+          : code === 'TOOL_IMAGE_STORAGE_FAILED'
+            ? t('tools.image.imageHistoryStorageFailed')
+            : reason.includes('too large')
+              ? t('tools.image.imageHistoryTooLarge')
+              : t('tools.image.imageHistorySaveFailed'),
+      )
+    })
 }
 
 async function generate(): Promise<void> {
@@ -1431,6 +1366,14 @@ function clearFile(kind: 'source' | 'mask'): void {
 }
 
 onMounted(() => {
+  // 旧版本曾把 base64 图片历史写入 localStorage；现在只使用服务端历史，
+  // 清理旧缓存，避免高清图片继续占用浏览器配额。
+  try {
+    localStorage.removeItem('tools_image_history_v1')
+    localStorage.removeItem('tools_image_history_owner')
+  } catch {
+    // 忽略清理失败
+  }
   void loadHistory()
   window.addEventListener('keydown', onGlobalKeydown)
 })
@@ -1522,7 +1465,6 @@ async function deleteHistoryImage(record: GenerationRecord, index: number): Prom
   } else if (!activeRecord.value) {
     activeRecord.value = history.value[0] ?? null
   }
-  persistLocalHistory()
   try {
     if (nextImages.length > 0) {
       await toolImageHistoryAPI.update(toApiItem(nextRecord))

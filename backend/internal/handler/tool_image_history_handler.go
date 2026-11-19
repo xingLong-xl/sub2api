@@ -38,10 +38,11 @@ type toolImageHistoryResponse struct {
 }
 
 type toolImageHistorySaveResponse struct {
-	Saved         bool `json:"saved"`
-	MaxItems      int  `json:"max_items"`
-	MaxBytes      int  `json:"max_bytes"`
-	RetentionDays int  `json:"retention_days"`
+	Saved         bool                          `json:"saved"`
+	Item          *service.ToolImageHistoryItem `json:"item,omitempty"`
+	MaxItems      int                           `json:"max_items"`
+	MaxBytes      int                           `json:"max_bytes"`
+	RetentionDays int                           `json:"retention_days"`
 }
 
 func toolImageObjectPrefix(userID int64, itemID string) string {
@@ -234,6 +235,7 @@ func (h *ToolImageHistoryHandler) UpdateHistory(c *gin.Context) {
 	h.deleteRemovedImageObjects(c.Request.Context(), before, items)
 	response.Success(c, toolImageHistorySaveResponse{
 		Saved:         true,
+		Item:          &normalized,
 		MaxItems:      service.ToolImageHistoryMaxItems,
 		MaxBytes:      service.ToolImageHistoryMaxBytes,
 		RetentionDays: service.ToolImageHistoryRetentionDays,
@@ -332,6 +334,7 @@ func (h *ToolImageHistoryHandler) SaveHistory(c *gin.Context) {
 	h.deleteRemovedImageObjects(c.Request.Context(), existing, items)
 	response.Success(c, toolImageHistorySaveResponse{
 		Saved:         true,
+		Item:          &normalized,
 		MaxItems:      service.ToolImageHistoryMaxItems,
 		MaxBytes:      service.ToolImageHistoryMaxBytes,
 		RetentionDays: service.ToolImageHistoryRetentionDays,
