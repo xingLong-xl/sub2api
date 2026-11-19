@@ -31,7 +31,7 @@ services:
   # Sub2API Application
   # ===========================================================================
   tokenpilot:
-    image: 682821438397.dkr.ecr.us-east-2.amazonaws.com/xl/tokenpilot:v1.0.0
+    image: 682821438397.dkr.ecr.us-east-2.amazonaws.com/xl/tokenpilot:v1.1.2
     container_name: TokenPilot
     logging: *default-logging
     restart: unless-stopped
@@ -284,6 +284,10 @@ services:
       - "yes"
       - --appendfsync
       - everysec
+      - --maxmemory
+      - "1024mb"
+      - --maxmemory-policy
+      - noeviction
       - --requirepass
       - ${REDIS_PASSWORD:-}
     environment:
@@ -305,3 +309,4 @@ services:
 networks:
   sub2api-network:
     driver: bridge
+
