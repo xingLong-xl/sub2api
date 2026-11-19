@@ -83,7 +83,9 @@ func (h *ToolChatHandler) SaveSessions(c *gin.Context) {
 		return
 	}
 	if err := h.store.Save(c.Request.Context(), subject.UserID, sessions); err != nil {
-		response.ErrorFrom(c, err)
+		if !respondToolHistoryStorageError(c, err) {
+			response.ErrorFrom(c, err)
+		}
 		return
 	}
 	response.Success(c, gin.H{"saved": true})
@@ -124,7 +126,9 @@ func (h *ToolChatHandler) SavePreferences(c *gin.Context) {
 		return
 	}
 	if err := h.store.SavePreferences(c.Request.Context(), subject.UserID, preferences); err != nil {
-		response.ErrorFrom(c, err)
+		if !respondToolHistoryStorageError(c, err) {
+			response.ErrorFrom(c, err)
+		}
 		return
 	}
 	response.Success(c, toolChatPreferencesResponse{Preferences: &preferences})

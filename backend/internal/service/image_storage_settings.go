@@ -137,6 +137,24 @@ func (s *ImageStorageSettingService) Invalidate() {
 	s.mu.Unlock()
 }
 
+// UploadImage stores one image in the configured object storage.
+func (s *ImageStorageSettingService) UploadImage(ctx context.Context, keyPrefix string, index int, rawURL string) (string, string, error) {
+	uploader, enabled := s.resolve()
+	if !enabled || uploader == nil {
+		return "", "", ErrImageStorageDisabled
+	}
+	return uploader.UploadImage(ctx, keyPrefix, index, rawURL)
+}
+
+// DeleteImage removes one object if object storage is configured.
+func (s *ImageStorageSettingService) DeleteImage(ctx context.Context, key string) error {
+	uploader, enabled := s.resolve()
+	if !enabled || uploader == nil {
+		return nil
+	}
+	return uploader.DeleteImage(ctx, key)
+}
+
 // Get 返回后台设置（SecretAccessKey 已脱敏）。从未保存过时返回 config.yaml 的等价值。
 func (s *ImageStorageSettingService) Get(ctx context.Context) (*ImageStorageSettings, error) {
 	settings, err := s.load(ctx)

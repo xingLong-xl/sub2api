@@ -65,6 +65,9 @@ func (s *toolChatHistoryStore) Save(ctx context.Context, userID int64, sessions 
 		return fmt.Errorf("encode tool chat history: %w", err)
 	}
 	if err := s.rdb.Set(ctx, toolChatHistoryKey(userID), data, toolChatHistoryTTL).Err(); err != nil {
+		if service.IsRedisOOM(err) {
+			return service.ErrToolHistoryStorageFull
+		}
 		return fmt.Errorf("save tool chat history: %w", err)
 	}
 	return nil
@@ -96,6 +99,9 @@ func (s *toolChatHistoryStore) SavePreferences(ctx context.Context, userID int64
 		return fmt.Errorf("encode tool chat preferences: %w", err)
 	}
 	if err := s.rdb.Set(ctx, toolChatPreferencesKey(userID), data, 0).Err(); err != nil {
+		if service.IsRedisOOM(err) {
+			return service.ErrToolHistoryStorageFull
+		}
 		return fmt.Errorf("save tool chat preferences: %w", err)
 	}
 	return nil

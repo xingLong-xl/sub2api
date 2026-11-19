@@ -373,7 +373,7 @@ import { GatewayError, useToolsSettings } from '@/composables/useToolsSettings'
 import { toolChatAPI } from '@/api/toolChat'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
-import { extractApiErrorMessage } from '@/utils/apiError'
+import { extractApiErrorCode, extractApiErrorMessage } from '@/utils/apiError'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -576,6 +576,9 @@ let lastSaveErrorNotice = ''
 
 /** 把服务端保存限制翻译成用户能理解、可操作的提示。 */
 function serverSaveErrorMessage(err: unknown): string {
+  if (extractApiErrorCode(err) === 'TOOL_HISTORY_STORAGE_FULL') {
+    return t('tools.chat.historyStorageFull')
+  }
   const reason = extractApiErrorMessage(err, '').toLowerCase()
   if (reason.includes('content is too long')) return t('tools.chat.historyMessageTooLong')
   if (reason.includes('content is too large')) return t('tools.chat.historySessionTooLarge')

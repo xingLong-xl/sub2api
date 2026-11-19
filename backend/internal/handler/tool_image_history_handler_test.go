@@ -49,7 +49,7 @@ func TestToolImageHistoryHandlerList(t *testing.T) {
 		Images:    []service.ToolImageHistoryImage{{Src: "data:image/png;base64,aGVsbG8="}},
 		CreatedAt: now,
 	}}}
-	h := NewToolImageHistoryHandler(store)
+	h := NewToolImageHistoryHandler(store, nil)
 	ctx, rec := newToolImageHistoryTestContext(http.MethodGet, "/api/v1/tools/image/history", nil)
 	h.ListHistory(ctx)
 	require.Equal(t, http.StatusOK, rec.Code)
@@ -69,7 +69,7 @@ func TestToolImageHistoryHandlerList(t *testing.T) {
 func TestToolImageHistoryHandlerSave(t *testing.T) {
 	now := time.Now().UnixMilli()
 	store := &toolImageHistoryStoreStub{}
-	h := NewToolImageHistoryHandler(store)
+	h := NewToolImageHistoryHandler(store, nil)
 	payload, err := json.Marshal(service.ToolImageHistoryItem{
 		ID:        "img-1",
 		Prompt:    "cat",
@@ -88,7 +88,7 @@ func TestToolImageHistoryHandlerSave(t *testing.T) {
 }
 
 func TestToolImageHistoryHandlerSaveRejectsEmptyPrompt(t *testing.T) {
-	h := NewToolImageHistoryHandler(&toolImageHistoryStoreStub{})
+	h := NewToolImageHistoryHandler(&toolImageHistoryStoreStub{}, nil)
 	payload, err := json.Marshal(service.ToolImageHistoryItem{
 		ID:        "img-1",
 		Model:     "gpt-image-2",

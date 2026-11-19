@@ -7,6 +7,7 @@ export interface ToolImageHistoryImage {
   width?: number
   height?: number
   bytes?: number
+  object_key?: string
 }
 
 export interface ToolImageHistoryParams {

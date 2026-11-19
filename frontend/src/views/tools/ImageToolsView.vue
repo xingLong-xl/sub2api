@@ -679,7 +679,7 @@ import ToolsPanel from '@/components/tools/ToolsPanel.vue'
 import { GatewayError, useToolsSettings } from '@/composables/useToolsSettings'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
-import { extractApiErrorMessage } from '@/utils/apiError'
+import { extractApiErrorCode, extractApiErrorMessage } from '@/utils/apiError'
 import {
   toolImageHistoryAPI,
   type ToolImageHistoryItem,
@@ -1221,10 +1221,15 @@ function saveRecord(images: GeneratedImage[], durationMs: number): void {
   void toolImageHistoryAPI.append(toApiItem(record)).catch((err) => {
     console.warn('Failed to save image history to server', err)
     const reason = extractApiErrorMessage(err, '').toLowerCase()
+    const code = extractApiErrorCode(err)
     appStore.showError(
-      reason.includes('too large')
-        ? t('tools.image.imageHistoryTooLarge')
-        : t('tools.image.imageHistorySaveFailed'),
+      code === 'TOOL_HISTORY_STORAGE_FULL'
+        ? t('tools.image.imageHistoryStorageFull')
+        : code === 'TOOL_IMAGE_STORAGE_FAILED'
+          ? t('tools.image.imageHistoryStorageFailed')
+          : reason.includes('too large')
+            ? t('tools.image.imageHistoryTooLarge')
+            : t('tools.image.imageHistorySaveFailed'),
     )
   })
 }

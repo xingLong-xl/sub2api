@@ -38,6 +38,7 @@ type ToolImageHistoryImage struct {
 	Width     int    `json:"width,omitempty"`
 	Height    int    `json:"height,omitempty"`
 	Bytes     int    `json:"bytes,omitempty"`
+	ObjectKey string `json:"object_key,omitempty"`
 }
 
 // ToolImageHistoryParams 保存生成参数，字段与前端 HistoryParams 对齐。
@@ -153,6 +154,9 @@ func NormalizeToolImageHistoryItem(input ToolImageHistoryItem, now int64) (ToolI
 			Width:     maxImageInt(image.Width, 0),
 			Height:    maxImageInt(image.Height, 0),
 			Bytes:     maxImageInt(image.Bytes, 0),
+			// ObjectKey is server-owned. Never accept a client-supplied key,
+			// otherwise a crafted history payload could delete arbitrary R2 objects.
+			ObjectKey: "",
 		})
 	}
 

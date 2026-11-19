@@ -59,6 +59,9 @@ func (s *toolImageHistoryStore) Save(ctx context.Context, userID int64, items []
 		return fmt.Errorf("encode tool image history: %w", err)
 	}
 	if err := s.rdb.Set(ctx, toolImageHistoryKey(userID), data, toolImageHistoryTTL).Err(); err != nil {
+		if service.IsRedisOOM(err) {
+			return service.ErrToolHistoryStorageFull
+		}
 		return fmt.Errorf("save tool image history: %w", err)
 	}
 	return nil

@@ -30,6 +30,14 @@ type ImageStorage interface {
 // ImageResultUploader 是 ImageStorage 的上层编排器（与具体厂商无关）：
 // 把上游生图响应里的每张图片（b64_json 解码 / url 下载）转存到对象存储，
 // 并把响应结果改写为只含短链接的紧凑 JSON，从而避免大 base64 落 Redis。
+// ImageStorageDeleter is implemented by storage backends that can remove
+// objects. It is optional so existing ImageStorage implementations stay valid.
+type ImageStorageDeleter interface {
+	Delete(ctx context.Context, key string) error
+}
+
+var ErrImageStorageDisabled = errors.New("image storage is disabled")
+
 type ImageResultUploader struct {
 	storage          ImageStorage
 	httpClient       *http.Client
@@ -51,6 +59,40 @@ func NewImageResultUploader(storage ImageStorage, prefix string, maxDownloadByte
 		prefix:           prefix,
 		maxDownloadBytes: maxDownloadBytes,
 	}
+}
+
+// UploadImage fetches a data URL / remote image URL and stores it in the
+// configured object storage. keyPrefix is a logical key such as
+// tool-images/123/item-id; the configured storage prefix is prepended.
+func (u *ImageResultUploader) UploadImage(ctx context.Context, keyPrefix string, index int, rawURL string) (url, key string, err error) {
+	if u == nil || u.storage == nil {
+		return "", "", ErrImageStorageDisabled
+	}
+	quoted, err := json.Marshal(rawURL)
+	if err != nil {
+		return "", "", fmt.Errorf("encode image url: %w", err)
+	}
+	data, contentType, err := u.fetchImageBytes(ctx, map[string]json.RawMessage{"url": quoted})
+	if err != nil {
+		return "", "", err
+	}
+	key = u.buildKey(keyPrefix, index, contentType)
+	url, err = u.storage.Save(ctx, key, contentType, data)
+	if err != nil {
+		return "", "", err
+	}
+	return url, key, nil
+}
+
+// DeleteImage removes an object if the backing storage supports deletion.
+func (u *ImageResultUploader) DeleteImage(ctx context.Context, key string) error {
+	if u == nil || u.storage == nil || key == "" {
+		return nil
+	}
+	if deleter, ok := u.storage.(ImageStorageDeleter); ok {
+		return deleter.Delete(ctx, key)
+	}
+	return nil
 }
 
 func defaultImageDownloadHTTPClient() *http.Client {
