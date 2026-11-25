@@ -15,8 +15,7 @@
 
     <main class="mx-auto max-w-6xl px-6 py-12 sm:py-16">
       <div class="mx-auto max-w-3xl text-center">
-        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-primary-500">{{ current.title }}</span>
-        <h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">{{ current.title }}</h1>
+        <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{{ current.title }}</h1>
         <p class="mt-4 text-sm leading-7 text-gray-500 dark:text-dark-400">
           {{ current.description }}
         </p>
@@ -131,18 +130,18 @@ const current = computed(() => {
     return {
       title: '用户协议',
       description: '使用 TokenPilot 服务前，请阅读以下条款。',
-      updated: '2026 年 6 月 8 日',
-      effective: '2026 年 6 月 8 日',
-      version: 'v1.2',
+      updated: '2026 年 11 月 25 日',
+      effective: '2026 年 11 月 25 日',
+      version: 'v1.0',
       content: userAgreement,
     }
   }
   return {
     title: '隐私政策',
     description: '了解 TokenPilot 如何收集、使用、存储和保护您的信息。',
-    updated: '2026 年 6 月 8 日',
-    effective: '2026 年 6 月 8 日',
-    version: 'v1.1',
+    updated: '2026 年 11 月 25 日',
+    effective: '2026 年 11 月 25 日',
+    version: 'v1.0',
     content: privacyPolicy,
   }
 })
