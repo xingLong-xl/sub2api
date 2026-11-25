@@ -87,6 +87,7 @@ export default {
 
   // Announcements Page
   announcements: {
+    systemLabel: '系统公告',
     title: '公告',
     description: '查看系统公告',
     unreadOnly: '仅显示未读',

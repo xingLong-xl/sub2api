@@ -89,6 +89,7 @@ export default {
 
   // Announcements Page
   announcements: {
+    systemLabel: 'Announcements',
     title: 'Announcements',
     description: 'View system announcements',
     unreadOnly: 'Show unread only',
