@@ -36,8 +36,7 @@
 
         <div class="min-w-0 space-y-5">
       <section class="rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-dark-800 dark:bg-dark-900 sm:p-8">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary-500">法律文档</p>
-        <h1 class="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">TokenPilot {{ current.title }}</h1>
+        <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">TokenPilot {{ current.title }}</h1>
         <p class="mt-3 max-w-2xl text-sm leading-7 text-gray-500 dark:text-dark-400">
           {{ current.description }}
         </p>
