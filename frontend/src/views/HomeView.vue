@@ -371,7 +371,7 @@
 
             <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-7">
               <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-dark-200">产品</h3>
+                <h3 class="text-sm font-bold tracking-wide text-gray-800 dark:text-dark-200">产品</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
                   <li><router-link to="/model-plaza" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">模型价格</router-link></li>
                   <li><a :href="docUrl || '/docs'" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">配置文档</a></li>
@@ -381,7 +381,7 @@
               </div>
 
               <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-dark-200">资源</h3>
+                <h3 class="text-sm font-bold tracking-wide text-gray-800 dark:text-dark-200">资源</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
                   <li><a href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Claude Code</a></li>
                   <li><a href="https://openai.com/codex/" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Codex</a></li>
@@ -390,7 +390,7 @@
               </div>
 
               <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-dark-200">公司</h3>
+                <h3 class="text-sm font-bold tracking-wide text-gray-800 dark:text-dark-200">公司</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
                   <li><router-link to="/about" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">关于我们</router-link></li>
                   <li><span class="text-gray-500 dark:text-dark-400">Novyra Technology Limited</span></li>
