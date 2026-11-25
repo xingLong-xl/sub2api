@@ -89,6 +89,13 @@ export default {
 
   // Announcements Page
   announcements: {
+    notificationCenter: 'Notification Center',
+    notificationCenterHint: 'System notices and site announcements',
+    systemNotifications: 'System notifications',
+    siteAnnouncement: 'Announcements',
+    officialGroup: 'Official community',
+    closeToday: 'Close for today',
+    close: 'Close',
     systemLabel: 'Announcements',
     title: 'Announcements',
     description: 'View system announcements',

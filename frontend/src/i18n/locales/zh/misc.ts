@@ -87,6 +87,13 @@ export default {
 
   // Announcements Page
   announcements: {
+    notificationCenter: '通知中心',
+    notificationCenterHint: '系统通知与站点公告',
+    systemNotifications: '系统通知',
+    siteAnnouncement: '公告',
+    officialGroup: '官方社群',
+    closeToday: '今日关闭',
+    close: '关闭',
     systemLabel: '系统公告',
     title: '公告',
     description: '查看系统公告',
