@@ -397,9 +397,9 @@
               <div>
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">资源</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
-                  <li><router-link to="/docs#claude-code" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Claude Code</router-link></li>
-                  <li><router-link to="/docs#codex" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Codex</router-link></li>
-                  <li><router-link to="/docs#openai-api" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">OpenAI 兼容 API</router-link></li>
+                  <li><a href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Claude Code</a></li>
+                  <li><a href="https://openai.com/codex/" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Codex</a></li>
+                  <li><a href="https://platform.openai.com/docs/api-reference" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">OpenAI 兼容 API</a></li>
                 </ul>
               </div>
 
