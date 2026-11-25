@@ -220,12 +220,12 @@
           <!-- Left: Text Content -->
           <div class="w-full text-center">
             <h1
-              class="mb-4 bg-gradient-to-r from-primary-600 via-indigo-600 to-purple-600 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent dark:from-primary-300 dark:via-indigo-300 dark:to-purple-300 md:text-5xl lg:text-6xl"
+              class="mb-4 bg-gradient-to-r from-purple-900 via-purple-700 to-indigo-700 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent dark:from-purple-200 dark:via-purple-300 dark:to-indigo-300 md:text-5xl lg:text-6xl"
             >
               {{ siteName }}
             </h1>
-            <div class="mx-auto mb-5 h-1 w-24 rounded-full bg-gradient-to-r from-primary-500 via-indigo-500 to-purple-500 opacity-80"></div>
-            <p class="mb-8 bg-gradient-to-r from-gray-700 via-gray-600 to-primary-600 bg-clip-text text-lg font-medium text-transparent dark:from-dark-200 dark:via-dark-300 dark:to-primary-300 md:text-xl">
+            <div class="mx-auto mb-5 h-1 w-24 rounded-full bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-500 opacity-80"></div>
+            <p class="mb-8 bg-gradient-to-r from-gray-700 via-purple-900 to-purple-600 bg-clip-text text-lg font-medium text-transparent dark:from-dark-200 dark:via-purple-300 dark:to-purple-200 md:text-xl">
               {{ siteSubtitle }}
             </p>
 
