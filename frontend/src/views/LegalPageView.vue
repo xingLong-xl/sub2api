@@ -14,18 +14,6 @@
     </header>
 
     <main class="mx-auto max-w-6xl px-6 py-12 sm:py-16">
-      <div class="mx-auto max-w-3xl text-center">
-        <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{{ current.title }}</h1>
-        <p class="mt-4 text-sm leading-7 text-gray-500 dark:text-dark-400">
-          {{ current.description }}
-        </p>
-        <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-gray-400 dark:text-dark-500">
-          <span>最后更新：{{ current.updated }}</span>
-          <span>生效日期：{{ current.effective }}</span>
-          <span>版本：{{ current.version }}</span>
-        </div>
-      </div>
-
       <div class="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
         <aside class="lg:sticky lg:top-8 lg:self-start">
           <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">目录</p>
@@ -132,7 +120,7 @@ const current = computed(() => {
       description: '使用 TokenPilot 服务前，请阅读以下条款。',
       updated: '2026 年 11 月 25 日',
       effective: '2026 年 11 月 25 日',
-      version: 'v1.0',
+      version: 'v1.0.0',
       content: userAgreement,
     }
   }
@@ -141,14 +129,13 @@ const current = computed(() => {
     description: '了解 TokenPilot 如何收集、使用、存储和保护您的信息。',
     updated: '2026 年 11 月 25 日',
     effective: '2026 年 11 月 25 日',
-    version: 'v1.0',
+    version: 'v1.0.0',
     content: privacyPolicy,
   }
 })
 
 const rendered = computed(() => {
-  const body = current.value.content.replace(/^# .+\n+/, '')
-  return DOMPurify.sanitize(marked.parse(body) as string)
+  return DOMPurify.sanitize(marked.parse(current.value.content) as string)
 })
 
 const toc = computed(() =>
