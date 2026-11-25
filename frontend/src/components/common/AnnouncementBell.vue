@@ -59,7 +59,7 @@
             <!-- Tabs -->
             <div class="grid w-full grid-cols-2 border-b border-gray-200 dark:border-dark-700">
               <button
-                class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
+                class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
                 :class="activeTab === 'notifications'
                   ? 'border-b-primary-500 text-primary-600 dark:border-b-primary-400 dark:text-primary-400'
                   : 'border-b-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-800/60 dark:hover:text-white'"
@@ -71,7 +71,7 @@
                 </span>
               </button>
               <button
-                class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
+                class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
                 :class="activeTab === 'announcement'
                   ? 'border-b-primary-500 text-primary-600 dark:border-b-primary-400 dark:text-primary-400'
                   : 'border-b-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-800/60 dark:hover:text-white'"
@@ -82,7 +82,7 @@
             </div>
 
             <!-- Body -->
-            <div class="min-h-[360px] flex-1 overflow-y-auto px-6 py-5">
+            <div class="min-h-0 flex-1 overflow-y-auto px-6 py-5 [scrollbar-gutter:stable]">
               <div v-if="activeTab === 'notifications'">
                 <div v-if="loading" class="flex items-center justify-center py-20">
                   <div class="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
