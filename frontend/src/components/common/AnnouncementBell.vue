@@ -97,25 +97,28 @@
                   <p class="mt-1 text-xs text-gray-400 dark:text-dark-500">{{ t('announcements.emptyDescription') }}</p>
                 </div>
                 <div v-else class="space-y-2">
-                  <button
+                  <article
                     v-for="item in announcements"
                     :key="item.id"
-                    class="group flex w-full items-start gap-3 rounded-xl border border-transparent px-3 py-3 text-left transition-colors hover:border-gray-200 hover:bg-gray-50 dark:hover:border-dark-600 dark:hover:bg-dark-700/50"
-                    @click="openDetail(item)"
+                    class="rounded-xl border border-gray-100 bg-white px-4 py-4 dark:border-dark-700 dark:bg-dark-800/40"
                   >
-                    <span class="mt-1.5 flex-shrink-0">
-                      <span v-if="!item.read_at" class="block h-2 w-2 rounded-full bg-primary-500"></span>
-                      <span v-else class="block h-2 w-2 rounded-full bg-gray-200 dark:bg-dark-600"></span>
-                    </span>
-                    <span class="min-w-0 flex-1">
-                      <span class="block text-sm font-medium text-gray-900 dark:text-white">{{ item.title }}</span>
-                      <span class="mt-1 block line-clamp-2 text-xs leading-5 text-gray-500 dark:text-dark-400">{{ announcementPreview(item.content) }}</span>
-                      <span class="mt-1.5 block text-[11px] text-gray-400 dark:text-dark-500">
-                        {{ formatRelativeWithDateTime(item.created_at) }}
+                    <div class="flex items-start gap-3">
+                      <span class="mt-2 flex-shrink-0">
+                        <span v-if="!item.read_at" class="block h-2 w-2 rounded-full bg-primary-500"></span>
+                        <span v-else class="block h-2 w-2 rounded-full bg-gray-200 dark:bg-dark-600"></span>
                       </span>
-                    </span>
-                    <Icon name="chevronDown" size="sm" class="mt-1 -rotate-90 text-gray-300 transition-transform group-hover:translate-x-0.5 dark:text-dark-500" />
-                  </button>
+                      <div class="min-w-0 flex-1">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.title }}</h3>
+                        <div class="mt-1 text-[11px] text-gray-400 dark:text-dark-500">
+                          {{ formatRelativeWithDateTime(item.created_at) }}
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="markdown-body prose prose-sm mt-3 max-w-none text-sm leading-6 text-gray-700 dark:prose-invert dark:text-dark-200"
+                      v-html="renderMarkdown(item.content)"
+                    ></div>
+                  </article>
                 </div>
               </div>
 
@@ -387,15 +390,6 @@ function renderMarkdown(content: string): string {
   return DOMPurify.sanitize(html)
 }
 
-function announcementPreview(content: string): string {
-  return String(content || '')
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/[#>*_`~]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 140)
-}
 
 function openModal() {
   isModalOpen.value = true
@@ -414,13 +408,6 @@ function closeForToday() {
   closeModal()
 }
 
-function openDetail(announcement: UserAnnouncement) {
-  selectedAnnouncement.value = announcement
-  detailModalOpen.value = true
-  if (!announcement.read_at) {
-    markAsRead(announcement.id)
-  }
-}
 
 function closeDetail() {
   detailModalOpen.value = false
