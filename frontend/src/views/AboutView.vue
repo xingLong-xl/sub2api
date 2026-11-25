@@ -95,10 +95,6 @@
           <p class="mt-4 text-sm leading-8 text-gray-600 dark:text-dark-300">
             这些看起来朴素的事情，正是把模型能力接入真实项目时最重要的部分。
           </p>
-          <div class="mt-6 flex flex-wrap gap-3 text-sm">
-            <router-link to="/privacy-policy" class="text-primary-600 hover:underline dark:text-primary-400">隐私政策</router-link>
-            <router-link to="/user-agreement" class="text-primary-600 hover:underline dark:text-primary-400">用户协议</router-link>
-          </div>
         </div>
       </section>
     </main>
