@@ -4,7 +4,7 @@
 # =============================================================================
 # This script prepares deployment files for Sub2API:
 #   - Downloads .env.example
-#   - Generates secure secrets (JWT_SECRET, TOTP_ENCRYPTION_KEY, POSTGRES_PASSWORD)
+#   - Generates secure secrets (JWT_SECRET, TOTP_ENCRYPTION_KEY, POSTGRES_PASSWORD, PROVIDER_PRICING_SECRET)
 #   - Generates a random admin login email (ADMIN_EMAIL)
 #   - Creates necessary data directories
 #
@@ -261,11 +261,12 @@ main() {
             exit 1
         fi
 
-        local old_pg old_jwt old_totp old_admin
+        local old_pg old_jwt old_totp old_admin old_provider_secret
         old_pg="$(env_value POSTGRES_PASSWORD)"
         old_jwt="$(env_value JWT_SECRET)"
         old_totp="$(env_value TOTP_ENCRYPTION_KEY)"
         old_admin="$(env_value ADMIN_EMAIL)"
+        old_provider_secret="$(env_value PROVIDER_PRICING_SECRET)"
 
         if [ -n "$old_pg" ] && [ "$FORCE_SECRETS" = false ]; then
             POSTGRES_PASSWORD="$old_pg"
@@ -275,6 +276,7 @@ main() {
         JWT_SECRET="${old_jwt:-$(generate_secret)}"
         TOTP_ENCRYPTION_KEY="${old_totp:-$(generate_secret)}"
         ADMIN_EMAIL="${old_admin:-$(generate_admin_email)}"
+        PROVIDER_PRICING_SECRET="${old_provider_secret:-$(generate_secret)}"
 
         # A fresh password is only possible when the old one is unknown; the
         # database must then be told about it explicitly.
@@ -293,6 +295,16 @@ main() {
             added="$(append_missing_keys)"
             print_info "从新模板补齐 ${added} 个缺失配置项（已有值一律保持不变）"
 
+            # Provider Pricing HMAC secret: generate once when missing/empty.
+            if [ -z "$old_provider_secret" ]; then
+                if grep -qE '^[[:space:]]*PROVIDER_PRICING_SECRET=' .env; then
+                    sed -i "s/^[[:space:]]*PROVIDER_PRICING_SECRET=.*/PROVIDER_PRICING_SECRET=${PROVIDER_PRICING_SECRET}/" .env
+                else
+                    printf 'PROVIDER_PRICING_SECRET=%s\n' "$PROVIDER_PRICING_SECRET" >> .env
+                fi
+                print_info "已生成 PROVIDER_PRICING_SECRET（Provider Pricing HMAC 验签）"
+            fi
+
             # .env existed but carried no POSTGRES_PASSWORD: persist the new one
             if [ -z "$old_pg" ]; then
                 printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD" >> .env
@@ -307,6 +319,7 @@ main() {
             cp .env.example .env
             sed -i "s/^JWT_SECRET=.*/JWT_SECRET=${JWT_SECRET}/" .env
             sed -i "s/^TOTP_ENCRYPTION_KEY=.*/TOTP_ENCRYPTION_KEY=${TOTP_ENCRYPTION_KEY}/" .env
+            sed -i "s/^PROVIDER_PRICING_SECRET=.*/PROVIDER_PRICING_SECRET=${PROVIDER_PRICING_SECRET}/" .env
             sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${POSTGRES_PASSWORD}/" .env
             sed -i "s/^ADMIN_EMAIL=.*/ADMIN_EMAIL=${ADMIN_EMAIL}/" .env
             NEED_DB_SYNC=true
@@ -324,6 +337,7 @@ main() {
         TOTP_ENCRYPTION_KEY=$(generate_secret)
         POSTGRES_PASSWORD=$(generate_secret)
         ADMIN_EMAIL=$(generate_admin_email)
+        PROVIDER_PRICING_SECRET=$(generate_secret)
 
         cp .env.example .env
 
@@ -332,12 +346,14 @@ main() {
             # GNU sed (Linux)
             sed -i "s/^JWT_SECRET=.*/JWT_SECRET=${JWT_SECRET}/" .env
             sed -i "s/^TOTP_ENCRYPTION_KEY=.*/TOTP_ENCRYPTION_KEY=${TOTP_ENCRYPTION_KEY}/" .env
+            sed -i "s/^PROVIDER_PRICING_SECRET=.*/PROVIDER_PRICING_SECRET=${PROVIDER_PRICING_SECRET}/" .env
             sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${POSTGRES_PASSWORD}/" .env
             sed -i "s/^ADMIN_EMAIL=.*/ADMIN_EMAIL=${ADMIN_EMAIL}/" .env
         else
             # BSD sed (macOS)
             sed -i '' "s/^JWT_SECRET=.*/JWT_SECRET=${JWT_SECRET}/" .env
             sed -i '' "s/^TOTP_ENCRYPTION_KEY=.*/TOTP_ENCRYPTION_KEY=${TOTP_ENCRYPTION_KEY}/" .env
+            sed -i '' "s/^PROVIDER_PRICING_SECRET=.*/PROVIDER_PRICING_SECRET=${PROVIDER_PRICING_SECRET}/" .env
             sed -i '' "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${POSTGRES_PASSWORD}/" .env
             sed -i '' "s/^ADMIN_EMAIL=.*/ADMIN_EMAIL=${ADMIN_EMAIL}/" .env
         fi
