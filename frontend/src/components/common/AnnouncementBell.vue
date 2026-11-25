@@ -3,7 +3,7 @@
     <!-- 铃铛按钮 -->
     <button
       @click="openModal"
-      class="relative flex h-9 items-center gap-1.5 rounded-lg px-2 text-gray-600 transition-all hover:bg-gray-100 hover:scale-105 dark:text-gray-400 dark:hover:bg-dark-800"
+      class="relative flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:scale-105 dark:text-gray-400 dark:hover:bg-dark-800"
       :class="{ 'text-blue-600 dark:text-blue-400': unreadCount > 0 }"
       :aria-label="t('announcements.title')"
     >
@@ -18,7 +18,7 @@
           <span class="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
         </span>
       </span>
-      <span class="hidden whitespace-nowrap text-xs font-medium sm:inline">
+      <span class="hidden whitespace-nowrap text-sm font-medium sm:inline">
         {{ t('announcements.systemLabel') }}
       </span>
     </button>
