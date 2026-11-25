@@ -116,6 +116,9 @@ func registerRoutes(
 	// 通用路由（健康检查、状态等）
 	routes.RegisterCommonRoutes(r)
 
+	// 公开的 Provider Pricing API（hvoy 价格抓取协议）
+	r.GET("/api/provider/pricing", h.AvailableChannel.ProviderPricing)
+
 	// API v1
 	v1 := r.Group("/api/v1")
 

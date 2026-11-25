@@ -1,7 +1,12 @@
 package handler
 
 import (
+	"math"
+	"net/http"
+	"net/url"
 	"sort"
+	"strings"
+	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/pkg/response"
 	"github.com/Wei-Shaw/sub2api/internal/server/middleware"
@@ -35,6 +40,187 @@ func NewAvailableChannelHandler(
 		channelService: channelService,
 		apiKeyService:  apiKeyService,
 		settingService: settingService,
+	}
+}
+
+// providerPricingModel is one model+group row in the hvoy pricing protocol.
+type providerPricingModel struct {
+	ModelName        string            `json:"model_name"`
+	GroupName        string            `json:"group_name"`
+	PriceUnit        string            `json:"price_unit,omitempty"`
+	InputPrice       *float64          `json:"input_price,omitempty"`
+	OutputPrice      *float64          `json:"output_price,omitempty"`
+	CacheInputPrice  *float64          `json:"cache_input_price,omitempty"`
+	CacheCreatePrice *float64          `json:"cache_create_price,omitempty"`
+	CacheCreate1h    *float64          `json:"cache_create_price_1h,omitempty"`
+	UnitPrice        *float64          `json:"unit_price,omitempty"`
+	Enabled          bool              `json:"enabled"`
+	Note             string            `json:"note,omitempty"`
+	BillingBasis     map[string]string `json:"billing_basis,omitempty"`
+	Variants         []map[string]any  `json:"variants,omitempty"`
+}
+
+type providerPricingData struct {
+	Currency   string                 `json:"currency"`
+	PriceUnit  string                 `json:"price_unit"`
+	SiteName   string                 `json:"site_name,omitempty"`
+	SiteDomain string                 `json:"site_domain,omitempty"`
+	UpdatedAt  string                 `json:"updated_at"`
+	Models     []providerPricingModel `json:"models"`
+}
+
+type providerPricingResponse struct {
+	SchemaVersion string              `json:"schema_version"`
+	Success       bool                `json:"success"`
+	Message       string              `json:"message"`
+	Data          providerPricingData `json:"data"`
+}
+
+// ProviderPricing exposes the public hvoy Provider Pricing API.
+// GET /api/provider/pricing
+func (h *AvailableChannelHandler) ProviderPricing(c *gin.Context) {
+	channels, err := h.channelService.ListAvailable(c.Request.Context())
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	rate := 7.2
+	siteName := "TokenPilot"
+	siteDomain := ""
+	if h.settingService != nil {
+		if settings, err := h.settingService.GetPublicSettings(c.Request.Context()); err == nil {
+			if settings.USDCNYRate > 0 {
+				rate = settings.USDCNYRate
+			}
+			if strings.TrimSpace(settings.SiteName) != "" {
+				siteName = strings.TrimSpace(settings.SiteName)
+			}
+			if u, err := url.Parse(strings.TrimSpace(settings.APIBaseURL)); err == nil {
+				siteDomain = u.Hostname()
+			}
+		}
+	}
+	rows := make(map[string]providerPricingModel)
+	for _, ch := range channels {
+		for _, group := range ch.Groups {
+			multiplier := group.RateMultiplier
+			if multiplier <= 0 {
+				multiplier = 1
+			}
+			for _, model := range ch.SupportedModels {
+				if model.Platform != "" && group.Platform != "" && group.Platform != "composite" && model.Platform != group.Platform {
+					continue
+				}
+				if override := matchProviderGroupPricing(group.ModelPricing, model.Name); override != nil {
+					model.Pricing = override
+				}
+				if row, ok := buildProviderPricingModel(model, group.Name, multiplier, rate); ok {
+					key := group.Name + "\x00" + model.Name
+					if _, exists := rows[key]; !exists {
+						rows[key] = row
+					}
+				}
+			}
+		}
+	}
+	out := make([]providerPricingModel, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, row)
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].GroupName == out[j].GroupName {
+			return out[i].ModelName < out[j].ModelName
+		}
+		return out[i].GroupName < out[j].GroupName
+	})
+	c.JSON(http.StatusOK, providerPricingResponse{
+		SchemaVersion: "1.1",
+		Success:       true,
+		Message:       "",
+		Data: providerPricingData{
+			Currency:   "CNY",
+			PriceUnit:  "per_1m_tokens",
+			SiteName:   siteName,
+			SiteDomain: siteDomain,
+			UpdatedAt:  time.Now().UTC().Format(time.RFC3339),
+			Models:     out,
+		},
+	})
+}
+
+func matchProviderGroupPricing(entries []service.ChannelModelPricing, model string) *service.ChannelModelPricing {
+	modelLower := strings.ToLower(strings.TrimSpace(model))
+	var wildcard *service.ChannelModelPricing
+	for i := range entries {
+		entry := &entries[i]
+		for _, pattern := range entry.Models {
+			p := strings.ToLower(strings.TrimSpace(pattern))
+			if p == modelLower {
+				return entry
+			}
+			if strings.HasSuffix(p, "*") && strings.HasPrefix(modelLower, strings.TrimSuffix(p, "*")) {
+				wildcard = entry
+			}
+		}
+	}
+	return wildcard
+}
+
+func buildProviderPricingModel(model service.SupportedModel, groupName string, multiplier, rate float64) (providerPricingModel, bool) {
+	p := model.Pricing
+	if p == nil {
+		return providerPricingModel{}, false
+	}
+	round := func(v float64) float64 {
+		return math.Round(v*rate*multiplier*1e6) / 1e6
+	}
+	mode := p.BillingMode
+	switch mode {
+	case service.BillingModePerRequest, service.BillingModeImage, service.BillingModeVideo:
+		if p.PerRequestPrice == nil || *p.PerRequestPrice <= 0 {
+			return providerPricingModel{}, false
+		}
+		unit := round(*p.PerRequestPrice)
+		priceUnit := "per_call"
+		if mode == service.BillingModeVideo {
+			priceUnit = "per_call"
+		}
+		return providerPricingModel{
+			ModelName: model.Name,
+			GroupName: groupName,
+			PriceUnit: priceUnit,
+			UnitPrice: &unit,
+			Enabled:   true,
+		}, true
+	default:
+		if p.InputPrice == nil || *p.InputPrice <= 0 {
+			return providerPricingModel{}, false
+		}
+		in := round(*p.InputPrice * 1e6)
+		row := providerPricingModel{
+			ModelName:  model.Name,
+			GroupName:  groupName,
+			PriceUnit:  "per_1m_tokens",
+			InputPrice: &in,
+			Enabled:    true,
+		}
+		if p.OutputPrice != nil {
+			v := round(*p.OutputPrice * 1e6)
+			row.OutputPrice = &v
+		}
+		if p.CacheReadPrice != nil {
+			v := round(*p.CacheReadPrice * 1e6)
+			row.CacheInputPrice = &v
+		}
+		if p.CacheWritePrice != nil {
+			v := round(*p.CacheWritePrice * 1e6)
+			row.CacheCreatePrice = &v
+		}
+		if p.CacheWrite1hPrice != nil {
+			v := round(*p.CacheWrite1hPrice * 1e6)
+			row.CacheCreate1h = &v
+		}
+		return row, true
 	}
 }
 
