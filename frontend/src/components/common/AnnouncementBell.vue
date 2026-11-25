@@ -149,18 +149,19 @@
 
                 <div class="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-gray-200 bg-gray-50/60 px-5 py-7 text-center dark:border-dark-600 dark:bg-dark-900/20">
                   <p class="text-sm font-medium text-gray-700 dark:text-dark-200">扫码加入 QQ 群</p>
-                  <div class="flex h-48 w-48 items-center justify-center overflow-hidden rounded-xl bg-white p-2 shadow-sm dark:bg-dark-800">
+                  <div class="flex h-52 w-52 items-center justify-center overflow-hidden rounded-2xl border border-gray-100 bg-white p-3 shadow-lg shadow-primary-500/10 ring-1 ring-black/5 dark:border-dark-600">
                     <img
                       v-if="!qrLoadFailed"
                       :src="qrImageUrl"
                       alt="QQ 群二维码"
                       class="h-full w-full object-contain"
+                      loading="lazy"
                       @error="qrLoadFailed = true"
                     />
                     <div v-else class="flex flex-col items-center gap-2 text-xs text-gray-400 dark:text-dark-500">
                       <Icon name="grid" size="lg" />
                       <span>二维码待上传</span>
-                      <span class="font-mono text-[10px]">frontend/public/announcement/qq-group.jpg</span>
+                      <span class="font-mono text-[10px]">frontend/public/announcement/qq-group.png</span>
                     </div>
                   </div>
                   <p class="text-xs text-gray-500 dark:text-dark-400">
@@ -361,7 +362,7 @@ const unreadCount = computed(() => announcementStore.unreadCount)
 const isModalOpen = ref(false)
 const activeTab = ref<'notifications' | 'announcement'>('notifications')
 const qrLoadFailed = ref(false)
-const qrImageUrl = '/announcement/qq-group.jpg'
+const qrImageUrl = '/announcement/qq-group.png'
 const ANNOUNCEMENT_DISMISS_KEY = 'announcement_center_dismissed_date'
 
 function localDateKey(): string {
