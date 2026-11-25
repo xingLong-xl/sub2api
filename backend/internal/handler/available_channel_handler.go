@@ -1,10 +1,15 @@
 package handler
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"math"
 	"net/http"
 	"net/url"
+	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -78,7 +83,40 @@ type providerPricingResponse struct {
 
 // ProviderPricing exposes the public hvoy Provider Pricing API.
 // GET /api/provider/pricing
+func (h *AvailableChannelHandler) providerPricingAuthorized(c *gin.Context) bool {
+	secret := strings.TrimSpace(os.Getenv("PROVIDER_PRICING_SECRET"))
+	if secret == "" {
+		return true
+	}
+	tsRaw := strings.TrimSpace(c.GetHeader("X-Hvoy-Ts"))
+	signRaw := strings.TrimSpace(c.GetHeader("X-Hvoy-Sign"))
+	ts, err := strconv.ParseInt(tsRaw, 10, 64)
+	if err != nil || tsRaw == "" || signRaw == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"schema_version": "1.1", "success": false, "message": "signature required"})
+		c.Abort()
+		return false
+	}
+	now := time.Now().Unix()
+	if ts < now-60 || ts > now+60 {
+		c.JSON(http.StatusUnauthorized, gin.H{"schema_version": "1.1", "success": false, "message": "timestamp expired"})
+		c.Abort()
+		return false
+	}
+	mac := hmac.New(sha256.New, []byte(secret))
+	_, _ = mac.Write([]byte(tsRaw))
+	expected := hex.EncodeToString(mac.Sum(nil))
+	if !hmac.Equal([]byte(strings.ToLower(signRaw)), []byte(expected)) {
+		c.JSON(http.StatusUnauthorized, gin.H{"schema_version": "1.1", "success": false, "message": "invalid signature"})
+		c.Abort()
+		return false
+	}
+	return true
+}
+
 func (h *AvailableChannelHandler) ProviderPricing(c *gin.Context) {
+	if !h.providerPricingAuthorized(c) {
+		return
+	}
 	channels, err := h.channelService.ListAvailable(c.Request.Context())
 	if err != nil {
 		response.ErrorFrom(c, err)
