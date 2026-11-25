@@ -370,11 +370,11 @@
         <div class="border-y border-solid border-gray-200 py-12 dark:border-dark-700">
           <div class="grid gap-10 lg:grid-cols-12 lg:gap-8">
             <div class="lg:col-span-5">
-              <router-link to="/home" class="flex items-center gap-3 transition-opacity hover:opacity-80" aria-label="返回首页">
+              <router-link to="/home" class="group flex items-center gap-3 transition-opacity hover:opacity-90" aria-label="返回首页">
                 <div class="h-9 w-9 overflow-hidden rounded-lg">
                   <img :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
                 </div>
-                <p class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                <p class="text-xl font-semibold tracking-tight text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
                   TokenPilot
                 </p>
               </router-link>

@@ -101,11 +101,11 @@
         <div class="mx-auto max-w-6xl px-6">
           <div class="grid gap-10 lg:grid-cols-12 lg:gap-8">
             <div class="lg:col-span-5">
-              <router-link to="/home" class="flex items-center gap-3 transition-opacity hover:opacity-80" aria-label="返回首页">
+              <router-link to="/home" class="group flex items-center gap-3 transition-opacity hover:opacity-90" aria-label="返回首页">
                 <div class="h-9 w-9 overflow-hidden rounded-lg">
                   <img :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
                 </div>
-                <p class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">TokenPilot</p>
+                <p class="text-xl font-semibold tracking-tight text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">TokenPilot</p>
               </router-link>
               <p class="mt-3 max-w-sm text-sm leading-6 text-gray-500 dark:text-dark-400">
                 统一入口 · 高速稳定 · 可观测可控。为你的产品与团队接入多模型能力。
