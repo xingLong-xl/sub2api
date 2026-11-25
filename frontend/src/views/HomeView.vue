@@ -370,14 +370,14 @@
         <div class="border-y border-solid border-gray-200 py-12 dark:border-dark-700">
           <div class="grid gap-10 lg:grid-cols-12 lg:gap-8">
             <div class="lg:col-span-5">
-              <div class="flex items-center gap-3">
+              <router-link to="/home" class="flex items-center gap-3 transition-opacity hover:opacity-80" aria-label="返回首页">
                 <div class="h-9 w-9 overflow-hidden rounded-lg">
                   <img :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
                 </div>
                 <p class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
                   TokenPilot
                 </p>
-              </div>
+              </router-link>
               <p class="mt-3 max-w-sm text-sm leading-6 text-gray-500 dark:text-dark-400">
                 统一入口 · 高速稳定 · 可观测可控。为你的产品与团队接入多模型能力。
               </p>
