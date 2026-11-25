@@ -164,7 +164,7 @@
                       <span class="font-mono text-[10px]">frontend/public/announcement/qq-group.png</span>
                     </div>
                   </div>
-                  <p class="text-xs text-gray-500 dark:text-dark-400">
+                  <p class="text-[13px] text-gray-500 dark:text-dark-400">
                     官网：<a href="https://tokenpilot.site" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:underline dark:text-primary-400">tokenpilot.site</a>
                   </p>
                 </div>
