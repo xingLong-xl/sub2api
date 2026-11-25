@@ -195,6 +195,33 @@ const routes: RouteRecordRaw[] = [
       titleKey: 'docs.title'
     }
   },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('@/views/StaticPageView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: '关于我们'
+    }
+  },
+  {
+    path: '/privacy-policy',
+    name: 'PrivacyPolicy',
+    component: () => import('@/views/StaticPageView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: '隐私政策'
+    }
+  },
+  {
+    path: '/user-agreement',
+    name: 'UserAgreement',
+    component: () => import('@/views/StaticPageView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: '用户协议'
+    }
+  },
 
   // ==================== User Routes ====================
   {
