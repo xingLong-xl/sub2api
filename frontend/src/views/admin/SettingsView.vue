@@ -6701,6 +6701,24 @@
                 </p>
               </div>
 
+              <!-- Legal contact email -->
+              <div>
+                <label
+                  class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ t("admin.settings.site.legalContactEmail") }}
+                </label>
+                <input
+                  v-model="form.legal_contact_email"
+                  type="email"
+                  class="input"
+                  :placeholder="t('admin.settings.site.legalContactEmailPlaceholder')"
+                />
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  {{ t("admin.settings.site.legalContactEmailHint") }}
+                </p>
+              </div>
+
               <!-- Doc URL -->
               <div>
                 <label
