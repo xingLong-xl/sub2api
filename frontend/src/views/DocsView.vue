@@ -8,13 +8,13 @@
       class="sticky top-0 z-30 border-b border-gray-200/70 bg-white/80 backdrop-blur-xl dark:border-dark-800/80 dark:bg-dark-950/80"
     >
       <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <router-link to="/home" class="flex min-w-0 items-center gap-2.5">
+        <router-link to="/home" class="group flex min-w-0 items-center gap-2.5">
           <span
             class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-dark-700 dark:bg-dark-900"
           >
             <img :src="siteLogo || '/logo.svg'" alt="" class="h-full w-full object-contain" />
           </span>
-          <span class="truncate text-[15px] font-semibold tracking-tight text-gray-900 dark:text-white">
+          <span class="truncate text-[15px] font-semibold tracking-tight text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
             {{ siteName }}
           </span>
           <span
