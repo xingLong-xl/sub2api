@@ -84,14 +84,13 @@ func (h *AvailableChannelHandler) ProviderPricing(c *gin.Context) {
 		response.ErrorFrom(c, err)
 		return
 	}
-	rate := 7.2
+	// Internal channel/group prices are already CNY. Do not apply USD/CNY
+	// conversion here; USDCNYRate is only for usage display conversion.
+	rate := 1.0
 	siteName := "TokenPilot"
 	siteDomain := ""
 	if h.settingService != nil {
 		if settings, err := h.settingService.GetPublicSettings(c.Request.Context()); err == nil {
-			if settings.USDCNYRate > 0 {
-				rate = settings.USDCNYRate
-			}
 			if strings.TrimSpace(settings.SiteName) != "" {
 				siteName = strings.TrimSpace(settings.SiteName)
 			}
