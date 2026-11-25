@@ -25,10 +25,19 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
   const diffHours = Math.floor(diffMins / 60)
   const diffDays = Math.floor(diffHours / 24)
 
-  if (diffDays > 0) return i18n.global.t('common.time.daysAgo', { n: diffDays })
-  if (diffHours > 0) return i18n.global.t('common.time.hoursAgo', { n: diffHours })
-  if (diffMins > 0) return i18n.global.t('common.time.minutesAgo', { n: diffMins })
-  return i18n.global.t('common.time.justNow')
+  const isZh = getLocale().toLowerCase().startsWith('zh')
+  const relative = (key: string, n: number, zh: string, en: string): string => {
+    const translated = i18n.global.t(key, { n })
+    // Some async-loaded locales can briefly miss common keys. Never render the
+    // raw i18n key in the notification center.
+    if (translated === key) return isZh ? zh : en
+    return translated
+  }
+  if (diffDays > 0) return relative('common.time.daysAgo', diffDays, `${diffDays}天前`, `${diffDays}d ago`)
+  if (diffHours > 0) return relative('common.time.hoursAgo', diffHours, `${diffHours}小时前`, `${diffHours}h ago`)
+  if (diffMins > 0) return relative('common.time.minutesAgo', diffMins, `${diffMins}分钟前`, `${diffMins}m ago`)
+  const justNow = i18n.global.t('common.time.justNow')
+  return justNow === 'common.time.justNow' ? (isZh ? '刚刚' : 'just now') : justNow
 }
 
 /**
