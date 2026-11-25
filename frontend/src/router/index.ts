@@ -198,7 +198,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/about',
     name: 'About',
-    component: () => import('@/views/StaticPageView.vue'),
+    component: () => import('@/views/AboutView.vue'),
     meta: {
       requiresAuth: false,
       title: '关于我们'
@@ -207,7 +207,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/privacy-policy',
     name: 'PrivacyPolicy',
-    component: () => import('@/views/StaticPageView.vue'),
+    component: () => import('@/views/LegalPageView.vue'),
     meta: {
       requiresAuth: false,
       title: '隐私政策'
@@ -216,7 +216,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/user-agreement',
     name: 'UserAgreement',
-    component: () => import('@/views/StaticPageView.vue'),
+    component: () => import('@/views/LegalPageView.vue'),
     meta: {
       requiresAuth: false,
       title: '用户协议'
