@@ -45,9 +45,6 @@
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {{ t('announcements.notificationCenter') }}
                   </h2>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-dark-400">
-                    {{ t('announcements.notificationCenterHint') }}
-                  </p>
                 </div>
               </div>
               <button
@@ -178,9 +175,7 @@
 
             <!-- Footer -->
             <div class="flex items-center justify-between border-t border-gray-100 bg-gray-50/60 px-6 py-4 dark:border-dark-700 dark:bg-dark-900/20">
-              <p class="text-xs text-gray-400 dark:text-dark-500">
-                {{ t('announcements.notificationCenterHint') }}
-              </p>
+              <span></span>
               <div class="flex items-center gap-2">
                 <button
                   class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:border-dark-600 dark:bg-dark-700 dark:text-dark-300 dark:hover:bg-dark-600 dark:hover:text-white"

@@ -87,8 +87,7 @@ export default {
 
   // Announcements Page
   announcements: {
-    notificationCenter: '通知中心',
-    notificationCenterHint: '系统通知与站点公告',
+    notificationCenter: '系统通知/公告',
     systemNotifications: '系统通知',
     siteAnnouncement: '公告',
     officialGroup: '官方社群',
