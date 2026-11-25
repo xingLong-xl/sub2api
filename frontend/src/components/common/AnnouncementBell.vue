@@ -32,7 +32,7 @@
           @click="closeModal"
         >
           <div
-            class="flex max-h-[86vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 dark:bg-dark-800 dark:ring-white/10"
+            class="flex h-[78vh] max-h-[780px] min-h-[520px] w-full max-w-[720px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 dark:bg-dark-800 dark:ring-white/10"
             @click.stop
           >
             <!-- Header -->
