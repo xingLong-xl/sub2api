@@ -220,11 +220,12 @@
           <!-- Left: Text Content -->
           <div class="w-full text-center">
             <h1
-              class="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl lg:text-6xl"
+              class="mb-4 bg-gradient-to-r from-primary-600 via-indigo-600 to-purple-600 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent dark:from-primary-300 dark:via-indigo-300 dark:to-purple-300 md:text-5xl lg:text-6xl"
             >
               {{ siteName }}
             </h1>
-            <p class="mb-8 text-lg text-gray-600 dark:text-dark-300 md:text-xl">
+            <div class="mx-auto mb-5 h-1 w-24 rounded-full bg-gradient-to-r from-primary-500 via-indigo-500 to-purple-500 opacity-80"></div>
+            <p class="mb-8 bg-gradient-to-r from-gray-700 via-gray-600 to-primary-600 bg-clip-text text-lg font-medium text-transparent dark:from-dark-200 dark:via-dark-300 dark:to-primary-300 md:text-xl">
               {{ siteSubtitle }}
             </p>
 
