@@ -391,6 +391,9 @@ function renderMarkdown(content: string): string {
 
 function openModal() {
   isModalOpen.value = true
+  // Always refresh when the notification center opens; the store otherwise
+  // throttles list requests for 20 minutes and keeps deleted notices visible.
+  void announcementStore.fetchAnnouncements(true)
 }
 
 function closeModal() {
@@ -444,6 +447,7 @@ onMounted(() => {
   document.addEventListener('keydown', handleEscape)
   if (shouldAutoOpen()) {
     isModalOpen.value = true
+    void announcementStore.fetchAnnouncements(true)
   }
 })
 
