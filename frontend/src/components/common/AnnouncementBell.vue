@@ -57,12 +57,12 @@
             </div>
 
             <!-- Tabs -->
-            <div class="grid w-full grid-cols-2 gap-2 border-b border-gray-100 p-2 dark:border-dark-700">
+            <div class="grid w-full grid-cols-2 border-b border-gray-200 dark:border-dark-700">
               <button
-                class="relative flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+                class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
                 :class="activeTab === 'notifications'
-                  ? 'border-primary-200 bg-primary-50 text-primary-700 shadow-sm dark:border-primary-800/70 dark:bg-primary-900/25 dark:text-primary-300'
-                  : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-700 dark:hover:text-white'"
+                  ? 'border-b-primary-500 text-primary-600 dark:border-b-primary-400 dark:text-primary-400'
+                  : 'border-b-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-800/60 dark:hover:text-white'"
                 @click="activeTab = 'notifications'"
               >
                 {{ t('announcements.systemNotifications') }}
@@ -71,10 +71,10 @@
                 </span>
               </button>
               <button
-                class="relative flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+                class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
                 :class="activeTab === 'announcement'
-                  ? 'border-primary-200 bg-primary-50 text-primary-700 shadow-sm dark:border-primary-800/70 dark:bg-primary-900/25 dark:text-primary-300'
-                  : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-700 dark:hover:text-white'"
+                  ? 'border-b-primary-500 text-primary-600 dark:border-b-primary-400 dark:text-primary-400'
+                  : 'border-b-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-800/60 dark:hover:text-white'"
                 @click="activeTab = 'announcement'"
               >
                 {{ t('announcements.siteAnnouncement') }}
