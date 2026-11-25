@@ -364,11 +364,61 @@
     </main>
 
     <!-- Footer -->
-    <footer class="relative z-10 border-t border-gray-200/50 px-6 py-8 dark:border-dark-800/50">
-      <div
-        class="mx-auto flex max-w-6xl flex-col items-center justify-center gap-4 text-center sm:flex-row sm:text-left"
-      >
-        <p class="text-sm text-gray-500 dark:text-dark-400">
+    <footer class="relative z-10 px-6">
+      <div class="mx-auto max-w-6xl">
+        <!-- Two solid rules with the site footer content between them. -->
+        <div class="border-y border-solid border-gray-200 py-12 dark:border-dark-700">
+          <div class="grid gap-10 lg:grid-cols-12 lg:gap-8">
+            <div class="lg:col-span-5">
+              <p class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                TokenPilot
+              </p>
+              <p class="mt-3 max-w-sm text-sm leading-6 text-gray-500 dark:text-dark-400">
+                统一入口 · 高速稳定 · 可观测可控。为你的产品与团队接入多模型能力。
+              </p>
+              <a
+                href="mailto:1728656004@qq.com"
+                class="mt-4 inline-flex items-center gap-1.5 text-sm text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                <Icon name="mail" size="sm" />
+                1728656004@qq.com
+              </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-7">
+              <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">产品</h3>
+                <ul class="mt-4 space-y-2.5 text-sm">
+                  <li><router-link to="/model-plaza" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">模型价格</router-link></li>
+                  <li><a :href="docUrl || '/docs'" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">配置文档</a></li>
+                  <li><router-link :to="dashboardPath" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">控制台</router-link></li>
+                  <li><router-link to="/keys" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">API Key</router-link></li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">资源</h3>
+                <ul class="mt-4 space-y-2.5 text-sm">
+                  <li><router-link to="/docs#claude-code" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Claude Code</router-link></li>
+                  <li><router-link to="/docs#codex" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">Codex</router-link></li>
+                  <li><router-link to="/docs#openai-api" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">OpenAI 兼容 API</router-link></li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">公司</h3>
+                <ul class="mt-4 space-y-2.5 text-sm">
+                  <li><a href="https://sudocode.chat/about" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">关于我们</a></li>
+                  <li><span class="text-gray-500 dark:text-dark-400">Skyora International Co., Limited</span></li>
+                  <li><a href="https://sudocode.chat/privacy-policy" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">隐私政策</a></li>
+                  <li><a href="https://sudocode.chat/user-agreement" target="_blank" rel="noopener noreferrer" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">用户协议</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="py-6 text-center text-sm text-gray-500 dark:text-dark-400">
           &copy; {{ currentYear }} {{ siteName }}. {{ t('home.footer.allRightsReserved') }}
         </p>
       </div>
