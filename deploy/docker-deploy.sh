@@ -22,6 +22,12 @@
 
 set -e
 
+# Always operate from the directory containing this script so `.env`,
+# `.env.example`, data/ and compose files are the ones next to the script,
+# regardless of the caller's current working directory.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
