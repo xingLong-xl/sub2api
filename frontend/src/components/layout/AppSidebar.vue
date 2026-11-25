@@ -19,7 +19,7 @@
       <div class="sidebar-brand" :class="{ 'sidebar-brand-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
         <router-link
           :to="homePath"
-          class="sidebar-brand-title bg-gradient-to-r from-purple-900 via-purple-700 to-indigo-600 bg-clip-text text-[19px] font-extrabold tracking-tight text-transparent transition-all hover:brightness-110 dark:from-purple-200 dark:via-purple-300 dark:to-indigo-300"
+          class="sidebar-brand-title sidebar-brand-rounded text-[19px] font-extrabold tracking-tight text-gray-900 transition-colors hover:text-primary-600 dark:text-white dark:hover:text-primary-400"
           @click="handleMenuItemClick(homePath)"
         >
           {{ siteName }}
@@ -1161,6 +1161,11 @@ onBeforeUnmount(() => {
 .sidebar-logo {
   flex: 0 0 2.25rem;
   min-width: 2.25rem;
+}
+
+.sidebar-brand-rounded {
+  font-family: "Arial Rounded MT Bold", "Nunito", "Quicksand", "Varela Round", ui-rounded, "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: -0.025em;
 }
 
 .sidebar-header-collapsed {
