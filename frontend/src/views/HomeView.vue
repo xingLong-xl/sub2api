@@ -220,10 +220,13 @@
           <!-- Left: Text Content -->
           <div class="w-full text-center">
             <h1
-              class="mb-4 bg-gradient-to-r from-purple-900 via-purple-700 to-indigo-700 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent dark:from-purple-200 dark:via-purple-300 dark:to-indigo-300 md:text-5xl lg:text-6xl"
+              class="mb-3 break-words bg-gradient-to-r from-purple-900 via-purple-700 to-indigo-700 bg-clip-text text-6xl font-extrabold leading-none tracking-tight text-transparent dark:from-purple-200 dark:via-purple-300 dark:to-indigo-300 sm:text-7xl md:text-8xl lg:text-[7.5rem]"
             >
               {{ siteName }}
             </h1>
+            <p class="mb-4 text-3xl font-semibold tracking-tight text-gray-700 dark:text-dark-200 sm:text-4xl md:text-5xl lg:text-6xl">
+              一键接入全球最强<span class="bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-500 bg-clip-text text-transparent dark:from-purple-300 dark:via-purple-200 dark:to-indigo-300">AI</span>
+            </p>
             <div class="mx-auto mb-5 h-1 w-24 rounded-full bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-500 opacity-80"></div>
             <p class="mb-8 bg-gradient-to-r from-gray-700 via-purple-900 to-purple-600 bg-clip-text text-lg font-medium text-transparent dark:from-dark-200 dark:via-purple-300 dark:to-purple-200 md:text-xl">
               {{ siteSubtitle }}
