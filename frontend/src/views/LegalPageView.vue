@@ -14,7 +14,28 @@
     </header>
 
     <main class="mx-auto max-w-6xl px-6 py-12 sm:py-16">
-      <section class="mb-8 rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-dark-800 dark:bg-dark-900 sm:p-8">
+
+
+      <div class="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <aside class="lg:sticky lg:top-8 lg:self-start">
+          <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">目录</p>
+          <nav class="flex gap-2 overflow-x-auto pb-2 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
+            <button
+              v-for="(item, index) in toc"
+              :key="item"
+              class="whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm transition-colors lg:block lg:w-full"
+              :class="activeSection === index
+                ? 'bg-primary-50 font-medium text-primary-700 dark:bg-primary-900/20 dark:text-primary-300'
+                : 'text-gray-500 hover:bg-white hover:text-primary-600 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-primary-400'"
+              @click="scrollToSection(index)"
+            >
+              {{ item }}
+            </button>
+          </nav>
+        </aside>
+
+        <div class="min-w-0 space-y-5">
+      <section class="rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-dark-800 dark:bg-dark-900 sm:p-8">
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary-500">法律文档</p>
         <h1 class="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">TokenPilot {{ current.title }}</h1>
         <p class="mt-3 max-w-2xl text-sm leading-7 text-gray-500 dark:text-dark-400">
@@ -48,28 +69,11 @@
         </div>
       </section>
 
-      <div class="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <aside class="lg:sticky lg:top-8 lg:self-start">
-          <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">目录</p>
-          <nav class="flex gap-2 overflow-x-auto pb-2 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
-            <button
-              v-for="(item, index) in toc"
-              :key="item"
-              class="whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm transition-colors lg:block lg:w-full"
-              :class="activeSection === index
-                ? 'bg-primary-50 font-medium text-primary-700 dark:bg-primary-900/20 dark:text-primary-300'
-                : 'text-gray-500 hover:bg-white hover:text-primary-600 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-primary-400'"
-              @click="scrollToSection(index)"
-            >
-              {{ item }}
-            </button>
-          </nav>
-        </aside>
-
         <article
           class="legal-content markdown-body prose prose-sm max-w-none rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-dark-800 dark:bg-dark-900 sm:p-10 dark:prose-invert"
           v-html="rendered"
         ></article>
+        </div>
       </div>
     </main>
 
