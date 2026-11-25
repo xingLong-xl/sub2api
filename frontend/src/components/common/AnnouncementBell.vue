@@ -160,7 +160,7 @@
                     <div v-else class="flex flex-col items-center gap-2 text-xs text-gray-400 dark:text-dark-500">
                       <Icon name="grid" size="lg" />
                       <span>二维码待上传</span>
-                      <span class="font-mono text-[10px]">frontend/public/announcement/qq-group.png</span>
+                      <span class="font-mono text-[10px]">frontend/public/announcement/qq-group.jpg</span>
                     </div>
                   </div>
                   <p class="text-xs text-gray-500 dark:text-dark-400">
@@ -361,7 +361,7 @@ const unreadCount = computed(() => announcementStore.unreadCount)
 const isModalOpen = ref(false)
 const activeTab = ref<'notifications' | 'announcement'>('notifications')
 const qrLoadFailed = ref(false)
-const qrImageUrl = '/announcement/qq-group.png'
+const qrImageUrl = '/announcement/qq-group.jpg'
 const ANNOUNCEMENT_DISMISS_KEY = 'announcement_center_dismissed_date'
 
 function localDateKey(): string {
