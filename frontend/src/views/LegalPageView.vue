@@ -14,6 +14,40 @@
     </header>
 
     <main class="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+      <section class="mb-8 rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-dark-800 dark:bg-dark-900 sm:p-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary-500">法律文档</p>
+        <h1 class="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">TokenPilot {{ current.title }}</h1>
+        <p class="mt-3 max-w-2xl text-sm leading-7 text-gray-500 dark:text-dark-400">
+          {{ current.description }}
+        </p>
+        <div class="mt-6 overflow-hidden rounded-xl border border-gray-200 dark:border-dark-700">
+          <table class="w-full text-left text-sm">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-700">
+              <tr>
+                <th class="w-32 bg-gray-50 px-4 py-3 font-medium text-gray-500 dark:bg-dark-800/60 dark:text-dark-400">文档名称</th>
+                <td class="px-4 py-3 text-gray-700 dark:text-dark-200">TokenPilot {{ current.title }}</td>
+              </tr>
+              <tr>
+                <th class="bg-gray-50 px-4 py-3 font-medium text-gray-500 dark:bg-dark-800/60 dark:text-dark-400">文档版本</th>
+                <td class="px-4 py-3 font-medium text-gray-700 dark:text-dark-200">{{ current.version }}</td>
+              </tr>
+              <tr>
+                <th class="bg-gray-50 px-4 py-3 font-medium text-gray-500 dark:bg-dark-800/60 dark:text-dark-400">最后更新</th>
+                <td class="px-4 py-3 text-gray-700 dark:text-dark-200">{{ current.updated }}</td>
+              </tr>
+              <tr>
+                <th class="bg-gray-50 px-4 py-3 font-medium text-gray-500 dark:bg-dark-800/60 dark:text-dark-400">生效日期</th>
+                <td class="px-4 py-3 text-gray-700 dark:text-dark-200">{{ current.effective }}</td>
+              </tr>
+              <tr>
+                <th class="bg-gray-50 px-4 py-3 font-medium text-gray-500 dark:bg-dark-800/60 dark:text-dark-400">运营主体</th>
+                <td class="px-4 py-3 text-gray-700 dark:text-dark-200">Novyra Technology Limited</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <div class="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
         <aside class="lg:sticky lg:top-8 lg:self-start">
           <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">目录</p>
@@ -135,7 +169,8 @@ const current = computed(() => {
 })
 
 const rendered = computed(() => {
-  return DOMPurify.sanitize(marked.parse(current.value.content) as string)
+  const body = current.value.content.replace(/^# .+\n+/, '')
+  return DOMPurify.sanitize(marked.parse(body) as string)
 })
 
 const toc = computed(() =>
