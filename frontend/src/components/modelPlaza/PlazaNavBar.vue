@@ -21,21 +21,21 @@
         </template>
       </RouterLink>
 
-      <!-- 右:登录 / 回到后台 -->
-      <RouterLink
-        v-if="isAuthenticated"
-        :to="backTarget"
-        class="inline-flex flex-shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary-500/25 transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-lg hover:shadow-primary-500/30 active:scale-[0.98] dark:shadow-primary-500/20"
-      >
-        {{ t('modelPlaza.nav.backToDashboard') }}
-      </RouterLink>
-      <RouterLink
-        v-else
-        :to="{ path: '/login', query: { redirect: '/model-plaza' } }"
-        class="inline-flex flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary-500/25 transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-lg hover:shadow-primary-500/30 active:scale-[0.98] dark:shadow-primary-500/20"
-      >
-        {{ t('modelPlaza.nav.login') }}
-      </RouterLink>
+      <!-- 右: 固定导航按钮 -->
+      <div class="flex flex-shrink-0 items-center gap-1">
+        <RouterLink to="/docs" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white">
+          {{ t('nav.docs') }}
+        </RouterLink>
+        <RouterLink to="/model-plaza" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white">
+          {{ t('nav.modelPlaza') }}
+        </RouterLink>
+        <RouterLink
+          :to="isAuthenticated ? backTarget : { path: '/login', query: { redirect: '/model-plaza' } }"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white"
+        >
+          {{ t('nav.console') }}
+        </RouterLink>
+      </div>
     </div>
   </header>
 </template>

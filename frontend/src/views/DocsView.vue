@@ -25,29 +25,15 @@
         </router-link>
 
         <div class="flex items-center gap-1">
-          <router-link
-            to="/model-plaza"
-            class="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 sm:flex dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white"
-          >
-            <Icon name="grid" size="sm" />
+          <router-link to="/docs" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white">
+            {{ t('nav.docs') }}
+          </router-link>
+          <router-link to="/model-plaza" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white">
             {{ t('nav.modelPlaza') }}
           </router-link>
-          <button
-            type="button"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-white"
-            :title="isDark ? '切换到浅色模式' : '切换到深色模式'"
-            :aria-label="isDark ? '切换到浅色模式' : '切换到深色模式'"
-            @click="toggleTheme"
-          >
-            <Icon :name="isDark ? 'sun' : 'moon'" size="sm" />
-          </button>
-          <router-link
-            :to="isAuthenticated ? dashboardPath : '/login'"
-            class="ml-1 inline-flex items-center rounded-lg bg-gray-900 px-3.5 py-2 text-[13px] font-medium text-white shadow-sm transition-colors hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-          >
-            {{ isAuthenticated ? t('home.dashboard') : t('home.login') }}
+          <router-link :to="isAuthenticated ? dashboardPath : '/login'" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white">
+            {{ t('nav.console') }}
           </router-link>
-        </div>
       </div>
     </header>
 
@@ -174,11 +160,6 @@ const isDark = ref(document.documentElement.classList.contains('dark'))
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const dashboardPath = computed(() => (authStore.isAdmin ? '/admin/dashboard' : '/dashboard'))
 
-function toggleTheme() {
-  isDark.value = !isDark.value
-  document.documentElement.classList.toggle('dark', isDark.value)
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-}
 
 function initTheme() {
   const savedTheme = localStorage.getItem('theme')
