@@ -57,9 +57,9 @@
             </div>
 
             <!-- Tabs -->
-            <div class="flex gap-2 border-b border-gray-100 px-6 dark:border-dark-700">
+            <div class="grid w-full grid-cols-2 border-b border-gray-100 dark:border-dark-700">
               <button
-                class="relative flex items-center gap-2 px-1 py-3 text-sm font-medium transition-colors"
+                class="relative flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
                 :class="activeTab === 'notifications'
                   ? 'text-primary-600 dark:text-primary-400'
                   : 'text-gray-500 hover:text-gray-800 dark:text-dark-400 dark:hover:text-white'"
@@ -72,7 +72,7 @@
                 <span v-if="activeTab === 'notifications'" class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary-500"></span>
               </button>
               <button
-                class="relative flex items-center gap-2 px-1 py-3 text-sm font-medium transition-colors"
+                class="relative flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
                 :class="activeTab === 'announcement'
                   ? 'text-primary-600 dark:text-primary-400'
                   : 'text-gray-500 hover:text-gray-800 dark:text-dark-400 dark:hover:text-white'"
