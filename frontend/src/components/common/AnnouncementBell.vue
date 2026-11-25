@@ -135,7 +135,7 @@
                       </p>
                     </div>
                     <span class="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary-100 dark:bg-dark-800/80 dark:text-primary-300 dark:ring-primary-900/50">
-                      QQ 群：1030742788
+                      QQ 群：584779326
                     </span>
                   </div>
 
