@@ -224,10 +224,9 @@
             >
               {{ siteName }}
             </h1>
-            <p class="mb-4 text-3xl font-semibold tracking-tight text-gray-700 dark:text-dark-200 sm:text-4xl md:text-5xl lg:text-6xl">
+            <p class="mb-5 text-2xl font-semibold tracking-tight text-gray-700 dark:text-dark-200 sm:text-3xl md:text-4xl lg:text-5xl">
               一键接入全球最强<span class="bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-500 bg-clip-text text-transparent dark:from-purple-300 dark:via-purple-200 dark:to-indigo-300">AI</span>
             </p>
-            <div class="mx-auto mb-5 h-1 w-24 rounded-full bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-500 opacity-80"></div>
             <p class="mb-8 bg-gradient-to-r from-gray-700 via-purple-900 to-purple-600 bg-clip-text text-lg font-medium text-transparent dark:from-dark-200 dark:via-purple-300 dark:to-purple-200 md:text-xl">
               {{ siteSubtitle }}
             </p>
