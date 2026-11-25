@@ -34,6 +34,7 @@
           <router-link :to="isAuthenticated ? dashboardPath : '/login'" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-300 dark:hover:bg-dark-800 dark:hover:text-white">
             {{ t('nav.console') }}
           </router-link>
+        </div>
       </div>
     </header>
 
