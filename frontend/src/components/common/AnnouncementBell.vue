@@ -57,29 +57,27 @@
             </div>
 
             <!-- Tabs -->
-            <div class="grid w-full grid-cols-2 border-b border-gray-100 dark:border-dark-700">
+            <div class="grid w-full grid-cols-2 gap-2 border-b border-gray-100 p-2 dark:border-dark-700">
               <button
-                class="relative flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
+                class="relative flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
                 :class="activeTab === 'notifications'
-                  ? 'text-primary-600 dark:text-primary-400'
-                  : 'text-gray-500 hover:text-gray-800 dark:text-dark-400 dark:hover:text-white'"
+                  ? 'border-primary-200 bg-primary-50 text-primary-700 shadow-sm dark:border-primary-800/70 dark:bg-primary-900/25 dark:text-primary-300'
+                  : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-700 dark:hover:text-white'"
                 @click="activeTab = 'notifications'"
               >
                 {{ t('announcements.systemNotifications') }}
                 <span v-if="unreadCount > 0" class="rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] font-semibold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
                   {{ unreadCount }}
                 </span>
-                <span v-if="activeTab === 'notifications'" class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary-500"></span>
               </button>
               <button
-                class="relative flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
+                class="relative flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
                 :class="activeTab === 'announcement'
-                  ? 'text-primary-600 dark:text-primary-400'
-                  : 'text-gray-500 hover:text-gray-800 dark:text-dark-400 dark:hover:text-white'"
+                  ? 'border-primary-200 bg-primary-50 text-primary-700 shadow-sm dark:border-primary-800/70 dark:bg-primary-900/25 dark:text-primary-300'
+                  : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-700 dark:hover:text-white'"
                 @click="activeTab = 'announcement'"
               >
                 {{ t('announcements.siteAnnouncement') }}
-                <span v-if="activeTab === 'announcement'" class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary-500"></span>
               </button>
             </div>
 
