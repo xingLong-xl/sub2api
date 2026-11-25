@@ -156,6 +156,7 @@ type SystemSettings struct {
 	UsageCurrency               string           `json:"usage_currency"`
 	USDCNYRate                  float64          `json:"usd_cny_rate"`
 	ContactInfo                 string           `json:"contact_info"`
+	LegalContactEmail           string           `json:"legal_contact_email"`
 	DocURL                      string           `json:"doc_url"`
 	HomeContent                 string           `json:"home_content"`
 	CompactHomeEnabled          bool             `json:"compact_home_enabled"`
@@ -403,6 +404,7 @@ type PublicSettings struct {
 	UsageCurrency                       string                   `json:"usage_currency"`
 	USDCNYRate                          float64                  `json:"usd_cny_rate"`
 	ContactInfo                         string                   `json:"contact_info"`
+	LegalContactEmail                   string                   `json:"legal_contact_email"`
 	DocURL                              string                   `json:"doc_url"`
 	HomeContent                         string                   `json:"home_content"`
 	CompactHomeEnabled                  bool                     `json:"compact_home_enabled"`

@@ -9894,6 +9894,7 @@ const form = reactive<SettingsForm>({
   usage_currency: "CNY" as "CNY" | "USD",
   usd_cny_rate: 7.2,
   contact_info: "",
+  legal_contact_email: "",
   doc_url: "",
   home_content: "",
   compact_home_enabled: false,
@@ -11609,6 +11610,7 @@ async function saveSettings() {
         ? Number(form.usd_cny_rate)
         : 7.2,
       contact_info: form.contact_info,
+      legal_contact_email: form.legal_contact_email,
       doc_url: form.doc_url,
       home_content: form.home_content,
       compact_home_enabled: form.compact_home_enabled,

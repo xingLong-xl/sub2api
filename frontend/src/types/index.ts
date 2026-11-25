@@ -239,6 +239,7 @@ export interface PublicSettings {
   usage_currency?: 'CNY' | 'USD'
   usd_cny_rate?: number
   contact_info: string
+  legal_contact_email: string
   doc_url: string
   home_content: string
   compact_home_enabled: boolean

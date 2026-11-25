@@ -187,6 +187,7 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SettingKeyUsageCurrency,
 		SettingKeyUSDCNYRate,
 		SettingKeyContactInfo,
+		SettingKeyLegalContactEmail,
 		SettingKeyDocURL,
 		SettingKeyHomeContent,
 		SettingKeyCompactHomeEnabled,
@@ -336,6 +337,7 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		UsageCurrency:                       normalizeUsageCurrency(settings[SettingKeyUsageCurrency]),
 		USDCNYRate:                          parsePositiveFloatDefault(settings[SettingKeyUSDCNYRate], 7.2),
 		ContactInfo:                         settings[SettingKeyContactInfo],
+		LegalContactEmail:                   settings[SettingKeyLegalContactEmail],
 		DocURL:                              settings[SettingKeyDocURL],
 		HomeContent:                         settings[SettingKeyHomeContent],
 		CompactHomeEnabled:                  settings[SettingKeyCompactHomeEnabled] == "true",
@@ -601,6 +603,7 @@ type PublicSettingsInjectionPayload struct {
 	UsageCurrency                       string                   `json:"usage_currency"`
 	USDCNYRate                          float64                  `json:"usd_cny_rate"`
 	ContactInfo                         string                   `json:"contact_info"`
+	LegalContactEmail                   string                   `json:"legal_contact_email"`
 	DocURL                              string                   `json:"doc_url"`
 	HomeContent                         string                   `json:"home_content"`
 	CompactHomeEnabled                  bool                     `json:"compact_home_enabled"`
@@ -700,6 +703,7 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		UsageCurrency:                       settings.UsageCurrency,
 		USDCNYRate:                          settings.USDCNYRate,
 		ContactInfo:                         settings.ContactInfo,
+		LegalContactEmail:                   settings.LegalContactEmail,
 		DocURL:                              settings.DocURL,
 		HomeContent:                         settings.HomeContent,
 		CompactHomeEnabled:                  settings.CompactHomeEnabled,

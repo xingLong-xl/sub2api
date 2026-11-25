@@ -372,6 +372,7 @@ func (s *SettingService) parseSettings(settings map[string]string) *SystemSettin
 		UsageCurrency:                          normalizeUsageCurrency(settings[SettingKeyUsageCurrency]),
 		USDCNYRate:                             parsePositiveFloatDefault(settings[SettingKeyUSDCNYRate], 7.2),
 		ContactInfo:                            settings[SettingKeyContactInfo],
+		LegalContactEmail:                      settings[SettingKeyLegalContactEmail],
 		DocURL:                                 settings[SettingKeyDocURL],
 		HomeContent:                            settings[SettingKeyHomeContent],
 		CompactHomeEnabled:                     settings[SettingKeyCompactHomeEnabled] == "true",

@@ -75,6 +75,7 @@ func (h *SettingHandler) GetPublicSettings(c *gin.Context) {
 		UsageCurrency:                       settings.UsageCurrency,
 		USDCNYRate:                          settings.USDCNYRate,
 		ContactInfo:                         settings.ContactInfo,
+		LegalContactEmail:                   settings.LegalContactEmail,
 		DocURL:                              settings.DocURL,
 		HomeContent:                         settings.HomeContent,
 		CompactHomeEnabled:                  settings.CompactHomeEnabled,

@@ -343,6 +343,7 @@ func (s *SettingService) buildSystemSettingsUpdates(ctx context.Context, setting
 	updates[SettingKeyUsageCurrency] = normalizeUsageCurrency(settings.UsageCurrency)
 	updates[SettingKeyUSDCNYRate] = strconv.FormatFloat(normalizeUSDCNYRate(settings.USDCNYRate), 'f', 4, 64)
 	updates[SettingKeyContactInfo] = settings.ContactInfo
+	updates[SettingKeyLegalContactEmail] = settings.LegalContactEmail
 	updates[SettingKeyDocURL] = settings.DocURL
 	updates[SettingKeyHomeContent] = settings.HomeContent
 	updates[SettingKeyCompactHomeEnabled] = strconv.FormatBool(settings.CompactHomeEnabled)

@@ -148,6 +148,7 @@ const appStore = useAppStore()
 const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || 'TokenPilot')
 const siteLogo = computed(() => appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || '')
 const currentYear = new Date().getFullYear()
+const contactEmail = computed(() => appStore.cachedPublicSettings?.legal_contact_email?.trim() || '待企业配置')
 const activeSection = ref(0)
 
 const current = computed(() => {
@@ -172,7 +173,7 @@ const current = computed(() => {
 })
 
 const rendered = computed(() => {
-  const body = current.value.content.replace(/^# .+\n+/, '')
+  const body = current.value.content.replace(/^# .+\n+/, '').split('1728656004@qq.com').join(contactEmail.value)
   return DOMPurify.sanitize(marked.parse(body) as string)
 })
 

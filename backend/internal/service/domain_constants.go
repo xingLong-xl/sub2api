@@ -380,6 +380,7 @@ const (
 	SettingKeyUsageCurrency               = "usage_currency"                // 用量展示币种：CNY / USD
 	SettingKeyUSDCNYRate                  = "usd_cny_rate"                  // 1 USD 对应的人民币金额
 	SettingKeyContactInfo                 = "contact_info"                  // 客服联系方式
+	SettingKeyLegalContactEmail           = "legal_contact_email"           // 法律文档联系邮箱
 	SettingKeyDocURL                      = "doc_url"                       // 文档链接
 	SettingKeyHomeContent                 = "home_content"                  // 首页内容（支持 Markdown/HTML，或 URL 作为 iframe src）
 	SettingKeyCompactHomeEnabled          = "compact_home_enabled"          // 是否启用内置简洁首页

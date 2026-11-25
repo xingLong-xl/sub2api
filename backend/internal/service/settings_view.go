@@ -156,6 +156,7 @@ type SystemSettings struct {
 	UsageCurrency               string
 	USDCNYRate                  float64
 	ContactInfo                 string
+	LegalContactEmail           string
 	DocURL                      string
 	HomeContent                 string
 	CompactHomeEnabled          bool
@@ -365,6 +366,7 @@ type PublicSettings struct {
 	UsageCurrency                       string
 	USDCNYRate                          float64
 	ContactInfo                         string
+	LegalContactEmail                   string
 	DocURL                              string
 	HomeContent                         string
 	CompactHomeEnabled                  bool
