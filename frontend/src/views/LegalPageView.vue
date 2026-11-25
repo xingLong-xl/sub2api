@@ -92,7 +92,7 @@
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">公司</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
                   <li><router-link to="/about" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">关于我们</router-link></li>
-                  <li><span class="text-gray-500 dark:text-dark-400">Nexora AI Limited</span></li>
+                  <li><span class="text-gray-500 dark:text-dark-400">Novyra Technology Limited</span></li>
                   <li><router-link to="/privacy-policy" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">隐私政策</router-link></li>
                   <li><router-link to="/user-agreement" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">用户协议</router-link></li>
                 </ul>

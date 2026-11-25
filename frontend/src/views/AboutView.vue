@@ -24,7 +24,7 @@
           TokenPilot 是面向开发者、独立产品和团队的多模型统一接入平台。我们把 API Base、模型价格、API Key、用量记录和常见开发工具配置放到同一个入口，让 Claude Code、Codex 与 OpenAI 兼容客户端可以更快、更稳地接入你的工作流。
         </p>
         <p class="mt-3 text-sm text-gray-500 dark:text-dark-400">
-          TokenPilot 由 Nexora AI Limited 运营。
+          TokenPilot 由 Novyra Technology Limited 运营。
         </p>
         <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
           <router-link to="/docs" class="btn btn-primary px-6 py-3 text-sm shadow-lg shadow-primary-500/25">
@@ -68,7 +68,7 @@
             </div>
             <div class="flex items-start justify-between gap-4 border-b border-gray-100 pb-3 dark:border-dark-700">
               <dt class="text-gray-400 dark:text-dark-500">运营主体</dt>
-              <dd class="text-right font-medium">Nexora AI Limited</dd>
+              <dd class="text-right font-medium">Novyra Technology Limited</dd>
             </div>
             <div class="flex items-start justify-between gap-4 border-b border-gray-100 pb-3 dark:border-dark-700">
               <dt class="text-gray-400 dark:text-dark-500">注册地</dt>
@@ -80,7 +80,7 @@
             </div>
           </dl>
           <p class="mt-5 text-xs leading-6 text-gray-500 dark:text-dark-400">
-            Nexora AI Limited 负责 TokenPilot 的服务运营、账户、计费与支持。
+            Novyra Technology Limited 负责 TokenPilot 的服务运营、账户、计费与支持。
           </p>
         </div>
 
@@ -136,7 +136,7 @@
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-dark-500">公司</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
                   <li><router-link to="/about" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">关于我们</router-link></li>
-                  <li><span class="text-gray-500 dark:text-dark-400">Nexora AI Limited</span></li>
+                  <li><span class="text-gray-500 dark:text-dark-400">Novyra Technology Limited</span></li>
                   <li><router-link to="/privacy-policy" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">隐私政策</router-link></li>
                   <li><router-link to="/user-agreement" class="text-gray-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400">用户协议</router-link></li>
                 </ul>
