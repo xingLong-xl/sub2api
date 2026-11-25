@@ -99,9 +99,9 @@
       </section>
     </main>
 
-    <footer class="relative z-10 px-6">
-      <div class="mx-auto max-w-6xl">
-        <div class="border-y border-solid border-gray-200 py-12 dark:border-dark-700">
+    <footer class="relative z-10">
+      <div class="border-y border-solid border-gray-200 py-12 dark:border-dark-700">
+        <div class="mx-auto max-w-6xl px-6">
           <div class="grid gap-10 lg:grid-cols-12 lg:gap-8">
             <div class="lg:col-span-5">
               <div class="flex items-center gap-3">
@@ -147,11 +147,11 @@
             </div>
           </div>
         </div>
-
-        <p class="py-6 text-center text-sm text-gray-500 dark:text-dark-400">
-          &copy; {{ currentYear }} {{ siteName }}. 保留所有权利。
-        </p>
       </div>
+
+      <p class="mx-auto max-w-6xl px-6 py-6 text-center text-sm text-gray-500 dark:text-dark-400">
+        &copy; {{ currentYear }} {{ siteName }}. 保留所有权利。
+      </p>
     </footer>
   </div>
 </template>
