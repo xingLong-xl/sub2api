@@ -17,10 +17,7 @@
 
     <main class="mx-auto max-w-5xl px-6 py-14 sm:py-20">
       <section class="mx-auto max-w-3xl text-center">
-        <span class="inline-flex rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:border-primary-800/70 dark:bg-primary-900/25 dark:text-primary-300">
-          关于 {{ siteName }}
-        </span>
-        <h1 class="mt-5 text-4xl font-bold tracking-tight md:text-5xl">
+        <h1 class="text-4xl font-bold tracking-tight md:text-5xl">
           让开发者更简单地接入多模型能力
         </h1>
         <p class="mx-auto mt-6 max-w-2xl text-base leading-8 text-gray-600 dark:text-dark-300">
