@@ -61,11 +61,12 @@
               <button
                 class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
                 :class="activeTab === 'notifications'
-                  ? 'border-b-primary-500 text-primary-600 dark:border-b-primary-400 dark:text-primary-400'
+                  ? 'border-b-transparent text-primary-600 dark:text-primary-400'
                   : 'border-b-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-800/60 dark:hover:text-white'"
                 @click="activeTab = 'notifications'"
               >
                 {{ t('announcements.systemNotifications') }}
+                <span v-if="activeTab === 'notifications'" class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary-500"></span>
                 <span v-if="unreadCount > 0" class="rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] font-semibold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
                   {{ unreadCount }}
                 </span>
@@ -73,11 +74,12 @@
               <button
                 class="relative flex items-center justify-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors first:border-r first:border-gray-100 dark:first:border-dark-700"
                 :class="activeTab === 'announcement'
-                  ? 'border-b-primary-500 text-primary-600 dark:border-b-primary-400 dark:text-primary-400'
+                  ? 'border-b-transparent text-primary-600 dark:text-primary-400'
                   : 'border-b-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-dark-400 dark:hover:bg-dark-800/60 dark:hover:text-white'"
                 @click="activeTab = 'announcement'"
               >
                 {{ t('announcements.siteAnnouncement') }}
+                <span v-if="activeTab === 'announcement'" class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary-500"></span>
               </button>
             </div>
 
