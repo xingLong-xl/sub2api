@@ -33,7 +33,7 @@
 
       <article
         v-else
-        class="markdown-body prose prose-sm max-w-none dark:prose-invert"
+        class="markdown-body prose prose-sm max-w-none rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-dark-800 dark:bg-dark-900 sm:p-10 dark:prose-invert"
         v-html="rendered"
       ></article>
     </main>
