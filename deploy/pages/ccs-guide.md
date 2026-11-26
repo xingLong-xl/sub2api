@@ -8,7 +8,7 @@
 | 你的网络情况 | 推荐客户端 | 接入方式 |
 |---|---|---|
 | 可以访问外网，能打开 OpenAI 官网并下载 Codex | **Codex** | 在 TokenPilot 点击「导入到 CCS」，由 CC-Switch 自动填入供应商配置 |
-| 无法访问外网或打不开 OpenAI 官网 | **DeepSeek Harness（DSH）** | 在 DSH 里手动添加自定义模型 API，确保电脑能访问 DSH 下载页和 TokenPilot 服务 |
+| 无法访问外网或打不开 OpenAI 官网 | **DeepSeek Harness（DSH）** | 在 CC-Switch 的 DeepSeek Harness 页签手动添加供应商，或直接在 DSH 页面添加自定义模型 API。确保电脑能访问 DSH 下载页和 TokenPilot 服务 |
 
 任选一条路线即可。已有 OpenAI 分组的密钥（例如绑定 `codex0.4` 的密钥），可以用同一把密钥接入 DSH。
 
@@ -69,15 +69,38 @@
 
 ## DeepSeek Harness（DSH）· 手动接入
 
-### 1. 下载并打开 DSH
+### 下载并打开 DSH
 
 打开官方页面，点击「Download Desktop」，选择适合你电脑的安装包，安装后启动 DeepSeek Harness。[DeepSeek Harness 官网](https://www.deepseek.com/en/harness/)
 
-> TokenPilot 的「导入到 CCS」会把 OpenAI 分组的配置导入 CC-Switch 的 Codex 页签。在 CC-Switch 切到 DeepSeek Harness 页签也不会改变导入目标。请直接在 **DeepSeek Harness 桌面客户端**里完成下面的配置，无需安装 CC-Switch。
+DSH 有两种手动接入方式，任选一种即可。以下用 `codex0.4` 这类 OpenAI 分组举例。
 
-### 2. 手动添加 TokenPilot 供应商
+### 方式一 · 在 CC-Switch 中添加 DSH 供应商
 
-打开 **设置 → 模型 → 添加模型提供商**，切换到 **自定义模型 API**。以下用 `codex0.4` 这类 OpenAI 分组举例。
+如果你已经使用 CC-Switch，可以在里面统一管理 DSH 的供应商。需要安装时，可前往 [CC-Switch 下载页](https://ccswitch.io/zh/download)。
+
+1. 打开 CC-Switch，选择 **DeepSeek Harness** 选项。
+2. 点击 **添加供应商**，选择 **自定义配置 · 手动填写所有字段**。
+3. 按下表填写配置。
+
+| CC-Switch 字段 | 填写内容 |
+|---|---|
+| 供应商标识 | `tokenpilot-codex04`。必须唯一，只能使用小写字母、数字和连字符 |
+| 名称 | `TokenPilot · codex0.4`，方便在 DSH 中识别 |
+| 备注 | 可选，例如「日常编程」 |
+| 官网链接 | 可选，可填 `https://tokenpilot.site` |
+| 接口格式 | 选择 **OpenAI Responses**，与当前 OpenAI 分组匹配 |
+| API Key | 粘贴 TokenPilot 中绑定目标分组的密钥，下方配置会自动填充 |
+| Base URL | `https://tokenpilot.site/v1` |
+| 请求头 | 按默认设置留空即可 |
+| 额外选项 | 按默认设置留空即可 |
+| 模型配置 | 点击 **获取模型列表**，选择该分组支持的模型。获取失败时可手动填写模型 ID，在 [模型广场](/model-plaza) 核对 |
+
+至少配置一个模型，然后保存供应商，完成 DSH 配置写入。接着打开 DSH 客户端页面，在模型选择器中选择刚添加的供应商和模型。已经打开 DSH 的用户，可以刷新页面后再选择。
+
+### 方式二 · 直接在 DSH 页面添加供应商
+
+打开 DSH 的 **设置 → 模型 → 添加模型提供商**，切换到 **自定义模型 API**。
 
 | DSH 字段 | 填写内容 |
 |---|---|
@@ -87,19 +110,25 @@
 | API 协议 | **OpenAI Responses** |
 | API 密钥 | 粘贴 TokenPilot 中绑定目标分组的密钥 |
 
-API 地址填到 `/v1` 即可，DSH 会追加 `/responses`。
-
-### 3. 添加模型并测试
-
-1. 在 **模型目录**里点「获取可用模型」。勾选要用的模型，再点「更新列表」。如果获取失败或没有返回，手动添加该分组支持的模型 ID，可在 [模型广场](/model-plaza) 核对。
+1. 在 **模型目录**里点「获取可用模型」，勾选要用的模型，再点「更新列表」。如果获取失败或没有返回，手动添加该分组支持的模型 ID，可在 [模型广场](/model-plaza) 核对。
 2. 至少添加一个模型，然后保存提供商。
-3. 新建会话，在输入框的模型选择器中找到刚添加的 `TokenPilot · codex0.4`，选择一个模型，发送「你好，请回复接入成功」。
+3. 回到会话页面，在模型选择器中选择刚配置的供应商和模型。
+
+两种方式的 Base URL 都填到 `/v1`，DSH 会追加 `/responses`。
+
+### 发送第一条消息
+
+新建会话，确认已选择 `TokenPilot · codex0.4` 下的可用模型，发送「你好，请回复接入成功」。
 
 ## 常见问题
 
-### CC-Switch 显示导入成功，DSH 里却没有配置？
+### 点击 TokenPilot「导入到 CCS」后，如何在 DSH 使用同一把密钥？
 
-打开 CC-Switch 的 Codex 页签可以看到自动导入的供应商。使用同一把 TokenPilot 密钥，按上面的 DSH 步骤手动添加即可。
+TokenPilot 当前会把 OpenAI 分组的自动导入配置发送到 CC-Switch 的 Codex 页签。要接入 DSH，可以在 CC-Switch 中选择 **DeepSeek Harness → 添加供应商 → 自定义配置**，使用同一把密钥填写上面的字段并保存。也可以直接在 DSH 页面添加自定义模型 API。
+
+### 在 CC-Switch 的 DeepSeek Harness 中保存后，DSH 里找不到模型？
+
+先确认该供应商的模型配置里已经添加模型并保存，再刷新 DSH 页面，打开模型选择器查看。
 
 ### 点击「导入到 CCS」没有反应？
 
