@@ -117,6 +117,7 @@
                     <div
                       class="markdown-body prose prose-sm mt-3 max-w-none text-sm leading-6 text-gray-700 dark:prose-invert dark:text-dark-200"
                       v-html="renderMarkdown(item.content)"
+                      @click="handleMarkdownLinkClick"
                     ></div>
                   </article>
                 </div>
@@ -439,15 +440,36 @@ async function markAsReadAndClose(id: number) {
 }
 
 
-// Deep link support: ?announcements=1 opens the notification centre, and
-// ?announcements=group opens it straight on the group QR-code tab, so an
-// announcement elsewhere can send users directly to the community QR code.
+// Announcement bodies may link to the group QR code with ?announcements=group.
+// Inside the dialog that link must only switch the tab: navigating away would
+// close the notification centre the reader is already looking at.
 const ANNOUNCEMENT_QUERY_PARAM = 'announcements'
 const GROUP_TAB_QUERY_VALUES = ['group', 'qr', 'announcement']
 
 function announcementQueryValue(raw: unknown): string {
   const value = Array.isArray(raw) ? raw[0] : raw
   return typeof value === 'string' ? value.trim().toLowerCase() : ''
+}
+
+function handleMarkdownLinkClick(event: MouseEvent) {
+  // Leave modified clicks and middle clicks to the browser/new tab.
+  if (event.defaultPrevented || event.button !== 0) return
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  const anchor = (event.target as HTMLElement | null)?.closest?.('a[href]')
+  if (!anchor) return
+  const href = anchor.getAttribute('href')
+  if (!href) return
+  let url: URL
+  try {
+    url = new URL(href, window.location.origin)
+  } catch {
+    return
+  }
+  if (url.origin !== window.location.origin) return
+  const value = announcementQueryValue(url.searchParams.get(ANNOUNCEMENT_QUERY_PARAM))
+  if (!value) return
+  event.preventDefault()
+  activeTab.value = GROUP_TAB_QUERY_VALUES.includes(value) ? 'announcement' : 'notifications'
 }
 
 function consumeAnnouncementQuery(): boolean {

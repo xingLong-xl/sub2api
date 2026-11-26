@@ -58,6 +58,29 @@ describe('notification centre', () => {
   })
 })
 
+describe('links inside an announcement body', () => {
+  it('switches to the group tab instead of navigating away', async () => {
+    listMock.mockResolvedValue([
+      {
+        id: 2,
+        title: 'Promo',
+        content: '<p>想再领 5 元？<a href="/home?announcements=group">点此入群</a></p>',
+        notify_mode: 'silent',
+        created_at: '2026-09-30',
+        updated_at: '2026-09-30'
+      }
+    ])
+    const { wrapper, router } = await mountBell('/dashboard')
+    await wrapper.get('button').trigger('click')
+    await flushPromises()
+    await wrapper.get('.markdown-body a').trigger('click')
+    await flushPromises()
+    expect(wrapper.find('img[src="/announcement/qq-group.png"]').exists()).toBe(true)
+    // No navigation: the reader stays on the page behind the dialog.
+    expect(router.currentRoute.value.path).toBe('/dashboard')
+  })
+})
+
 describe('announcement deep link', () => {
   it('opens the notification centre from ?announcements=1 and clears the parameter', async () => {
     const { wrapper, router } = await mountBell('/home?announcements=1')
