@@ -73,7 +73,7 @@
 
 打开官方页面，点击「Download Desktop」，选择适合你电脑的安装包，安装后启动 DeepSeek Harness。[DeepSeek Harness 官网](https://www.deepseek.com/en/harness/)
 
-DSH 有两种手动接入方式，任选一种即可。以下用 `codex0.4` 这类 OpenAI 分组举例。
+DSH 有两种手动接入方式，**任选一种即可**。推荐方式一，通过 CC-Switch 手动导入。以下用 `codex0.4` 这类 OpenAI 分组举例。
 
 ### 方式一 · 在 CC-Switch 中添加 DSH 供应商
 
@@ -85,8 +85,8 @@ DSH 有两种手动接入方式，任选一种即可。以下用 `codex0.4` 这�
 
 | CC-Switch 字段 | 填写内容 |
 |---|---|
-| 供应商标识 | `tokenpilot-codex04`。必须唯一，只能使用小写字母、数字和连字符 |
-| 名称 | `TokenPilot · codex0.4`，方便在 DSH 中识别 |
+| 供应商标识 | 可自定义，例如 `tokenpilot-codex04`。必须唯一，只能使用小写字母、数字和连字符 |
+| 名称 | 可自定义，例如 `TokenPilot · codex0.4`。选一个方便在 DSH 中识别的名称 |
 | 备注 | 可选，例如「日常编程」 |
 | 官网链接 | 可选，可填 `https://tokenpilot.site` |
 | 接口格式 | 选择 **OpenAI Responses**，与当前 OpenAI 分组匹配 |
@@ -118,7 +118,7 @@ DSH 有两种手动接入方式，任选一种即可。以下用 `codex0.4` 这�
 
 ### 发送第一条消息
 
-新建会话，确认已选择 `TokenPilot · codex0.4` 下的可用模型，发送「你好，请回复接入成功」。
+新建会话，在你刚添加的供应商（例如 `TokenPilot · codex0.4`）下选择一个可用模型，发送「你好，请回复接入成功」。
 
 ## 常见问题
 
