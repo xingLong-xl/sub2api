@@ -1,8 +1,6 @@
-import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { createMemoryHistory, createRouter } from 'vue-router'
 import AnnouncementBell from '../AnnouncementBell.vue'
 import { useAnnouncementStore } from '@/stores/announcements'
 
@@ -18,24 +16,17 @@ vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
 vi.mock('@/utils/format', () => ({ formatRelativeTime: () => 'now', formatRelativeWithDateTime: () => 'now' }))
 enableAutoUnmount(afterEach)
 
-function createTestRouter() {
-  return createRouter({
-    history: createMemoryHistory(),
-    routes: [{ path: '/:pathMatch(.*)*', component: { template: '<div />' } }]
+// Attach to the document so click events bubble up to document-level listeners
+// (that is what the assertions on defaultPrevented observe).
+function mountBell() {
+  return mount(AnnouncementBell, {
+    attachTo: document.body,
+    global: { stubs: { Teleport: true, Transition: true, Icon: true } }
   })
 }
 
-async function mountBell(path = '/') {
-  const router = createTestRouter()
-  await router.push(path)
-  await router.isReady()
-  const wrapper = mount(AnnouncementBell, {
-    global: { plugins: [router], stubs: { Teleport: true, Transition: true, Icon: true } }
-  })
-  // Only flush the render queue: awaiting the list request would drop the
-  // seeded announcements before a test can assert on them.
-  await nextTick()
-  return { wrapper, router }
+function announcementWithLink(content: string) {
+  return [{ id: 2, title: 'Promo', content, notify_mode: 'silent', created_at: '2026-09-30', updated_at: '2026-09-30' }]
 }
 
 beforeEach(() => {
@@ -49,7 +40,7 @@ afterEach(() => { vi.restoreAllMocks(); document.body.style.overflow = '' })
 
 describe('notification centre', () => {
   it('opens from the bell and renders the fetched announcements', async () => {
-    const { wrapper } = await mountBell()
+    const wrapper = mountBell()
     await wrapper.get('button').trigger('click')
     await flushPromises()
     expect(listMock).toHaveBeenCalled()
@@ -60,46 +51,33 @@ describe('notification centre', () => {
 
 describe('links inside an announcement body', () => {
   it('switches to the group tab instead of navigating away', async () => {
-    listMock.mockResolvedValue([
-      {
-        id: 2,
-        title: 'Promo',
-        content: '<p>想再领 5 元？<a href="/home?announcements=group">点此入群</a></p>',
-        notify_mode: 'silent',
-        created_at: '2026-09-30',
-        updated_at: '2026-09-30'
-      }
-    ])
-    const { wrapper, router } = await mountBell('/dashboard')
+    listMock.mockResolvedValue(announcementWithLink('<p><a href="/home?announcements=group">点此入群</a></p>'))
+    const wrapper = mountBell()
     await wrapper.get('button').trigger('click')
     await flushPromises()
+
+    const preventDefault = vi.spyOn(Event.prototype, 'preventDefault')
+
     await wrapper.get('.markdown-body a').trigger('click')
     await flushPromises()
+
+    expect(preventDefault).toHaveBeenCalled()
     expect(wrapper.find('img[src="/announcement/qq-group.png"]').exists()).toBe(true)
-    // No navigation: the reader stays on the page behind the dialog.
-    expect(router.currentRoute.value.path).toBe('/dashboard')
   })
-})
 
-describe('announcement deep link', () => {
-  it('opens the notification centre from ?announcements=1 and clears the parameter', async () => {
-    const { wrapper, router } = await mountBell('/home?announcements=1')
+  it('leaves ordinary links untouched', async () => {
+    // A hash link keeps jsdom from attempting a real cross-document navigation.
+    listMock.mockResolvedValue(announcementWithLink('<p><a href="#docs">文档</a></p>'))
+    const wrapper = mountBell()
+    await wrapper.get('button').trigger('click')
     await flushPromises()
-    expect(wrapper.text()).toContain('announcements.systemNotifications')
-    expect(wrapper.text()).toContain('announcements.siteAnnouncement')
-    expect(router.currentRoute.value.query.announcements).toBeUndefined()
-    expect(router.currentRoute.value.path).toBe('/home')
-  })
 
-  it('opens the group QR-code tab from ?announcements=group', async () => {
-    const { wrapper } = await mountBell('/home?announcements=group')
-    expect(wrapper.find('img[src="/announcement/qq-group.png"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('扫码加入 QQ 群')
-  })
+    const preventDefault = vi.spyOn(Event.prototype, 'preventDefault')
 
-  it('ignores a disabled parameter value', async () => {
-    const { wrapper } = await mountBell('/home?announcements=0')
+    await wrapper.get('.markdown-body a').trigger('click')
     await flushPromises()
+
+    expect(preventDefault).not.toHaveBeenCalled()
     expect(wrapper.find('img[src="/announcement/qq-group.png"]').exists()).toBe(false)
   })
 })

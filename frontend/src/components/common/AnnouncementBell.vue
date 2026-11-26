@@ -337,7 +337,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -349,8 +348,6 @@ import Icon from '@/components/icons/Icon.vue'
 import '@/styles/announcement-markdown.css'
 
 const { t } = useI18n()
-const route = useRoute()
-const router = useRouter()
 const appStore = useAppStore()
 const announcementStore = useAnnouncementStore()
 
@@ -440,15 +437,14 @@ async function markAsReadAndClose(id: number) {
 }
 
 
-// Announcement bodies may link to the group QR code with ?announcements=group.
-// Inside the dialog that link must only switch the tab: navigating away would
-// close the notification centre the reader is already looking at.
-const ANNOUNCEMENT_QUERY_PARAM = 'announcements'
-const GROUP_TAB_QUERY_VALUES = ['group', 'qr', 'announcement']
+// An announcement body can link to the group QR code with ?announcements=group.
+// Inside the dialog that link only switches the tab: navigating away would close
+// the notification centre the reader is already looking at.
+const ANNOUNCEMENT_LINK_PARAM = 'announcements'
+const GROUP_TAB_LINK_VALUES = ['group', 'qr', 'announcement']
 
-function announcementQueryValue(raw: unknown): string {
-  const value = Array.isArray(raw) ? raw[0] : raw
-  return typeof value === 'string' ? value.trim().toLowerCase() : ''
+function linkParamValue(raw: string | null): string {
+  return typeof raw === 'string' ? raw.trim().toLowerCase() : ''
 }
 
 function handleMarkdownLinkClick(event: MouseEvent) {
@@ -466,24 +462,10 @@ function handleMarkdownLinkClick(event: MouseEvent) {
     return
   }
   if (url.origin !== window.location.origin) return
-  const value = announcementQueryValue(url.searchParams.get(ANNOUNCEMENT_QUERY_PARAM))
+  const value = linkParamValue(url.searchParams.get(ANNOUNCEMENT_LINK_PARAM))
   if (!value) return
   event.preventDefault()
-  activeTab.value = GROUP_TAB_QUERY_VALUES.includes(value) ? 'announcement' : 'notifications'
-}
-
-function consumeAnnouncementQuery(): boolean {
-  const value = announcementQueryValue(route.query[ANNOUNCEMENT_QUERY_PARAM])
-  if (!value || value === '0' || value === 'false') return false
-  if (GROUP_TAB_QUERY_VALUES.includes(value)) {
-    activeTab.value = 'announcement'
-  }
-  openModal()
-  // Drop the parameter so closing the dialog and refreshing does not reopen it.
-  const restQuery = { ...route.query }
-  delete restQuery[ANNOUNCEMENT_QUERY_PARAM]
-  void router.replace({ path: route.path, query: restQuery, hash: route.hash })
-  return true
+  activeTab.value = GROUP_TAB_LINK_VALUES.includes(value) ? 'announcement' : 'notifications'
 }
 
 function handleEscape(e: KeyboardEvent) {
@@ -498,7 +480,6 @@ function handleEscape(e: KeyboardEvent) {
 
 onMounted(() => {
   document.addEventListener('keydown', handleEscape)
-  if (consumeAnnouncementQuery()) return
   if (shouldAutoOpen()) {
     isModalOpen.value = true
     void announcementStore.fetchAnnouncements(true)
@@ -509,15 +490,6 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleEscape)
   document.body.style.overflow = ''
 })
-
-// The header stays mounted across routes, so an in-app navigation to the deep
-// link must be picked up here as well.
-watch(
-  () => route.query[ANNOUNCEMENT_QUERY_PARAM],
-  () => {
-    consumeAnnouncementQuery()
-  }
-)
 
 watch(
   [isModalOpen, detailModalOpen, () => announcementStore.currentPopup],
