@@ -1104,7 +1104,7 @@
     <UseKeyModal
       :show="showUseKeyModal"
       :api-key="selectedKey?.key || ''"
-      :base-url="useKeyBaseUrl"
+      :base-url="ACCELERATED_API_BASE_URL"
       :platform="selectedKey?.group?.platform || null"
       :claude-code-only="selectedKey?.group?.claude_code_only || false"
       :allow-messages-dispatch="selectedKey?.group?.allow_messages_dispatch || false"
@@ -1296,8 +1296,8 @@ const { formatUsageMoney } = useUsageCurrency()
 
 const CANONICAL_SITE_URL = 'https://tokenpilot.site'
 /**
- * API 加速地址：独立入口域名，只承载 API 流量，作为推荐接入点。
- * antigravity 使用的 /antigravity 路径目前只在主站开放，因此该平台仍走主站。
+ * API 加速地址：独立入口域名，只承载 API 流量，作为所有平台的推荐接入点。
+ * 网关已放行 /v1、/v1beta、/antigravity、/backend-api/codex。
  */
 const ACCELERATED_API_BASE_URL = 'https://api.tokenpilot.site'
 
@@ -1525,13 +1525,6 @@ const selectedKeyForGroup = computed(() => {
   if (groupSelectorKeyId.value === null) return null
   return apiKeys.value.find((k) => k.id === groupSelectorKeyId.value) || null
 })
-
-/** 「使用密钥」弹窗生成的配置同样使用加速地址（antigravity 除外）。 */
-const useKeyBaseUrl = computed(() =>
-  selectedKey.value?.group?.platform === 'antigravity'
-    ? apiAccessBase.value
-    : ACCELERATED_API_BASE_URL
-)
 
 const setGroupButtonRef = (keyId: number, el: Element | ComponentPublicInstance | null) => {
   if (el instanceof HTMLElement) {
@@ -2147,8 +2140,8 @@ const importToCcswitch = (row: ApiKey) => {
 
 const executeCcsImport = (row: ApiKey, clientType: CcSwitchClientType) => {
   const platform = row.group?.platform || 'anthropic'
-  // 导入默认使用加速地址；antigravity 的 /antigravity 路径尚未在加速域名开放，仍走主站。
-  const baseUrl = platform === 'antigravity' ? apiAccessBase.value : ACCELERATED_API_BASE_URL
+  // 导入默认使用加速地址，网关已放行 OpenAI / Anthropic / Codex / Gemini / antigravity 所需路径。
+  const baseUrl = ACCELERATED_API_BASE_URL
 
   const usageScript = CC_SWITCH_USAGE_SCRIPT
   const providerName = (publicSettings.value?.site_name || 'sub2api').trim() || 'sub2api'

@@ -150,6 +150,6 @@ TokenPilot 当前会把 OpenAI 分组的自动导入配置发送到 CC-Switch �
 | Codex / DSH（OpenAI Responses） | `https://api.tokenpilot.site/v1` | `https://tokenpilot.site/v1` |
 | Claude Code（Anthropic Messages） | `https://api.tokenpilot.site` | `https://tokenpilot.site` |
 | Grok | `https://api.tokenpilot.site/v1` | `https://tokenpilot.site/v1` |
-| Gemini CLI | 待开放，暂用主站 | `https://tokenpilot.site` |
+| Gemini CLI | `https://api.tokenpilot.site` | `https://tokenpilot.site` |
 
 请妥善保管 API Key，避免发到聊天、截图或公开仓库。如果密钥泄露，请在 [API 密钥](/keys) 页面停用旧密钥并重新创建。
