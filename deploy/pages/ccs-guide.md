@@ -1,402 +1,126 @@
 <div class="guide-hero">
-  <div class="guide-eyebrow">QUICK START · 约 10 分钟</div>
-  <h1>零基础接入 CC-Switch</h1>
-  <p>从选择客户端、安装软件，到导入 TokenPilot 密钥、配置模型和余额查询，按顺序完成第一次接入。</p>
-  <div class="guide-meta"><span>推荐 Codex</span><span>Windows / macOS / Linux</span></div>
+  <h1>零基础接入教程</h1>
+  <p>用 TokenPilot 的 API 密钥配置 Codex 或 DeepSeek Harness，发送第一条消息。</p>
 </div>
 
-> 这份教程面向第一次使用 CC-Switch 的同学。建议从第一步开始按顺序操作，不要跳步。
+## 先选客户端
 
-## 先选客户端：推荐 Codex
-
-CC-Switch 支持多种 AI 编程客户端，但接入成本不同：
-
-| 客户端 | 是否推荐 | 说明 |
+| 你的网络情况 | 推荐客户端 | 接入方式 |
 |---|---|---|
-| **Codex** | **推荐** | 使用 OpenAI 账号即可，接入门槛低，适合大多数人 |
-| Claude Code | 谨慎 | 需要自己购买 Anthropic 账号或订阅，成本较高 |
-| Gemini CLI | 可选 | 需要 Gemini 相关账号 |
-| Grok | 可选 | 需要对应账号和分组 |
+| 可以访问外网，能打开 OpenAI 官网并下载 Codex | **Codex** | 在 TokenPilot 点击「导入到 CCS」，由 CC-Switch 自动填入供应商配置 |
+| 无法访问外网或打不开 OpenAI 官网 | **DeepSeek Harness（DSH）** | 在 DSH 里手动添加自定义模型 API，确保电脑能访问 DSH 下载页和 TokenPilot 服务 |
 
-如果你是第一次使用，建议直接选择 **Codex**。
+任选一条路线即可。已有 OpenAI 分组的密钥（例如绑定 `codex0.4` 的密钥），可以用同一把密钥接入 DSH。
 
-> **为什么不优先推荐 Claude？**
->
-> Claude Code 需要你自己的 Anthropic 账号或订阅，账号注册和付费门槛更高。Codex 的接入和使用成本更低，更适合先跑通流程。
+## 准备 TokenPilot API 密钥
 
-## 第一步：安装你要使用的客户端
+1. 登录 TokenPilot，打开 [API 密钥](/keys)。已经有绑定目标分组的密钥，可以直接使用。
+2. 需要新建时，点击「创建密钥」，选择 **OpenAI** 平台下你要用的分组，例如 `codex0.4`（以账号显示的分组为准）。
+3. 手动配置 DSH 时，在密钥列表点击该密钥旁边的复制图标，备用。
+4. 在 [模型广场](/model-plaza) 核对该分组实际支持的模型。配置时填写模型的 **ID**。`codex0.4` 是分组名称。
 
-### 选择 Codex
+## Codex · 通过 CC-Switch 自动导入
 
-打开官方页面：
+### 1. 安装 Codex 和 CC-Switch
 
-<a href="https://openai.com/zh-Hans-CN/codex/" target="_blank" rel="noopener noreferrer">openai.com/zh-Hans-CN/codex/</a>
+按官方页面提示安装 Codex 桌面客户端，也可以使用已有的 Codex CLI。[Codex 官网](https://openai.com/zh-Hans-CN/codex/)
 
-按照页面提示安装 Codex 桌面客户端，或者使用你已有的 Codex CLI。
-
-### 选择 Claude Code
-
-打开官方文档：
-
-<a href="https://code.claude.com/docs/en/desktop" target="_blank" rel="noopener noreferrer">code.claude.com/docs/en/desktop</a>
-
-按照文档安装 Claude Desktop / Claude Code。
-
-> 安装完客户端后先不用登录或配置 API，下一步会用 CC-Switch 接管配置。
-
-## 第二步：安装 CC-Switch
-
-打开官方下载页：
-
-<a href="https://ccswitch.io/zh/download" target="_blank" rel="noopener noreferrer">ccswitch.io/zh/download</a>
-
-根据系统选择安装包：
+根据自己的系统下载并安装 CC-Switch。安装完成后先启动一次，让系统注册 `ccswitch://` 协议。[CC-Switch 下载页](https://ccswitch.io/zh/download)
 
 | 系统 | 安装包 |
 |---|---|
-| Windows | `Windows.msi` |
-| macOS | `macOS.dmg` |
-| Linux Debian/Ubuntu | `.deb` |
-| 其他 Linux | `.AppImage` |
+| Windows | `.msi` |
+| macOS | `.dmg` |
+| Linux | 按发行版选 `.deb`、`.AppImage` 等可用版本 |
 
-安装完成后先启动一次 CC-Switch，让系统注册 `ccswitch://` 协议。
+### 2. 从 TokenPilot 导入供应商
 
-> **注意**
->
-> 请使用安装版，不要使用 Portable 便携版。便携版通常不会注册协议，点击「导入到 CCS」时会提示未安装。
+1. 在 TokenPilot 的 [API 密钥](/keys) 列表中，找到绑定目标 OpenAI 分组的密钥。
+2. 点击 **「导入到 CCS」**，在浏览器弹窗中允许打开 CC-Switch，并在 CC-Switch 中确认导入。
+3. 在 CC-Switch 的 **Codex** 页签里找到刚导入的供应商。导入链接根据密钥所属分组的平台指定客户端，OpenAI 分组固定导入到 Codex。
 
-## 第三步：在 CC-Switch 里先选客户端
+供应商名称、API 地址、API Key 和用量查询脚本会随链接传入。
 
-打开 CC-Switch，在顶部或主界面先选择你要使用的客户端：
+### 3. 选择模型并发送第一条消息
 
-```text
-Codex → 选择 Codex
-Claude Code → 选择 Claude
-Gemini CLI → 选择 Gemini
-```
+1. 在 CC-Switch 里编辑刚导入的供应商，点击「获取模型列表」。
+2. 从返回的列表中选一个模型。预填的模型可能与分组不一致，以你实际可用的模型为准。
+3. 保存并启用该供应商。若 Codex 已打开，请完全退出后重新启动。
+4. 打开 Codex 新会话，选中刚配置的模型，发送「你好，请回复接入成功」。使用 CLI 时，可以输入 `/model` 查看并切换模型。
 
-**先选客户端，再去 TokenPilot 导入密钥。**
+### 余额和用量查询（可选）
 
-这样做的原因是：CC-Switch 会按当前客户端决定把供应商写入哪一份配置。顺序反了，可能出现密钥导入到了错误客户端的情况。
+导入时会带上用量查询脚本。若余额查询失败，在 CC-Switch 中打开该供应商的用量查询配置，选择 **Sub2API**，核对 API 地址和密钥后保存。
 
-## 第四步：在 TokenPilot 创建 API 密钥
+### 在 CC-Switch 中手动添加 Codex 供应商（可选）
 
-登录 TokenPilot，进入：
+在 Codex 页签新建供应商，填写以下字段。如果已经自动导入，可直接编辑已有供应商。
 
-**<a href="/keys" target="_blank" rel="noopener noreferrer">API 密钥</a> → 创建密钥**
-
-根据刚才选择的客户端选择分组：
-
-| 客户端 | 分组平台 |
+| 字段 | 填写内容 |
 |---|---|
-| Codex | OpenAI |
-| Claude Code | Anthropic |
-| Gemini CLI | Gemini |
-| Grok | Grok |
+| 名称 | `TokenPilot-Codex`，也可以自定义 |
+| 备注 / 官网链接 | 可选。官网链接可填 `https://tokenpilot.site` |
+| API Key | TokenPilot 创建的密钥，CC-Switch 会据此生成认证配置 |
+| API 请求地址 | `https://tokenpilot.site/v1`（手动填写 Codex 的 OpenAI Responses Base URL 时使用） |
+| 管理与测速 | 使用同一个 API 地址 |
+| 模型列表 / 默认模型 | 点击「获取模型列表」，从该分组可用的模型中选默认模型 |
+| 子代理模型 / 默认强度 / 并发上限 | 初次接入可以留空，使用客户端默认设置 |
+| 自动审批模型 | 仅在使用 Codex 的自动审批功能时按需设置，选择当前模型列表里的模型 |
 
-填写一个容易识别的名称，例如：
+## DeepSeek Harness（DSH）· 手动接入
 
-```text
-Codex 日常
-```
+### 1. 下载并打开 DSH
 
-然后创建。
+打开官方页面，点击「Download Desktop」，选择适合你电脑的安装包，安装后启动 DeepSeek Harness。[DeepSeek Harness 官网](https://www.deepseek.com/en/harness/)
 
-> **提示**
->
-> 密钥只显示一次，创建后请立即复制保存。丢失后只能重新创建。
+> TokenPilot 的「导入到 CCS」会把 OpenAI 分组的配置导入 CC-Switch 的 Codex 页签。在 CC-Switch 切到 DeepSeek Harness 页签也不会改变导入目标。请直接在 **DeepSeek Harness 桌面客户端**里完成下面的配置，无需安装 CC-Switch。
 
-## 第五步：导入到 CC-Switch
+### 2. 手动添加 TokenPilot 供应商
 
-在 <a href="/keys" target="_blank" rel="noopener noreferrer">API 密钥列表</a>里找到刚创建的密钥，点击：
+打开 **设置 → 模型 → 添加模型提供商**，切换到 **自定义模型 API**。以下用 `codex0.4` 这类 OpenAI 分组举例。
 
-**导入到 CCS**
-
-浏览器会询问是否打开 CC-Switch，选择「允许」。
-
-CC-Switch 会自动填入：
-
-- 供应商名称
-- API 请求地址
-- API Key
-- 对应的客户端类型
-- 用量查询脚本
-
-> **如果提示「CC-Switch 未安装或协议处理程序未注册」**
->
-> 1. 确认 CC-Switch 已经安装并启动过
-> 2. 重启浏览器后重试
-> 3. 不要使用 Portable 便携版
-> 4. Windows 可在「默认应用」里搜索 `ccswitch` 检查协议
-
-## 第六步：编辑供应商并获取模型列表
-
-导入成功后，**不要直接开始使用**。
-
-在 CC-Switch 里找到刚导入的供应商，点击「编辑」，然后点击：
-
-**获取模型列表**
-
-等待模型列表拉取完成。
-
-这一步会通过你填写的 API 请求地址和 API Key 查询可用模型。成功后，模型会出现在 Codex 的 `/model` 列表里。
-
-> 如果获取失败，先检查 API Key、API 请求地址和分组平台是否正确，再重试。
-
-### 选择默认模型
-
-模型列表拉取成功后：
-
-1. 从列表中选择你要使用的模型
-2. 列表第一行通常就是默认模型
-3. 保存配置
-
-Codex 导入时默认会填：
-
-```text
-gpt-5.5
-```
-
-如果你的分组里配置了其他模型，以「获取模型列表」实际返回的模型为准。
-
-> **模型列表说明**
->
-> 名字是官方 GPT 模型的行，会按官方条目生成。行里的显示名、上下文窗口和思考等级不生效，以官方定义为准。
-
-## 第七步：配置余额和用量查询
-
-CC-Switch 可以查询 TokenPilot 的余额和用量。
-
-在 CC-Switch 里找到当前供应商的用量查询/余额查询配置，点击配置：
-
-1. 选择 **Sub2API**
-2. 确认 API 请求地址和 API Key
-3. 保存
-
-保存后，CC-Switch 就会显示当前密钥的余额和用量。
-
-> 导入时通常已经自动带上了用量查询脚本。如果余额显示失败，重新按上面的步骤选择 Sub2API 并保存一次。
-
-## 第八步：重启客户端，开始使用
-
-**每次在 CC-Switch 中修改配置并保存后，都要重启对应的客户端。**
-
-包括修改：
-
-- API 请求地址
-- API Key
-- 模型列表
-- 默认模型
-- 子代理模型
-- 自动审批模型
-- 用量查询配置
-
-重启方式：
-
-```text
-Codex → 完全退出 Codex，再重新打开
-Claude Code → 完全退出 Claude Desktop / Claude Code，再重新打开
-```
-
-只关闭窗口不算重启，要确保进程完全退出。
-
-然后打开客户端，选择刚配置的供应商即可。
-
-## 手动添加供应商
-
-除了从 TokenPilot 导入，也可以在 CC-Switch 里手动新建供应商。
-
-下面是 Codex 的配置字段说明。
-
-### 名称
-
-必填，用于区分不同供应商。
-
-```text
-示例：TokenPilot-Codex
-```
-
-### 备注
-
-可选，只用于自己识别。
-
-```text
-示例：公司专用账号
-```
-
-### 官网链接
-
-可选，填写你的站点地址：
-
-```text
-https://tokenpilot.site
-```
-
-### API Key
-
-填写 TokenPilot 创建的密钥：
-
-```text
-sk-...
-```
-
-只需要填这里，下方 `auth.json` 会自动填充。
-
-### API 请求地址
-
-填写兼容 OpenAI Response 格式的服务端点：
-
-```text
-https://tokenpilot.site/v1
-```
-
-注意：
-
-- Codex / OpenAI 使用 `/v1`
-- Claude Code 使用：
-
-```text
-https://tokenpilot.site
-```
-
-不要给 Claude 的地址加 `/v1`。
-
-### 管理与测速
-
-填写同一个 API 地址，用于管理和测速：
-
-```text
-https://tokenpilot.site/v1
-```
-
-### 模型列表
-
-点击「获取模型列表」，从 TokenPilot 拉取可用模型。
-
-也可以手动添加。模型会出现在 Codex 的 `/model` 列表里，第一行是默认模型。
-
-### 默认模型
-
-Codex 默认请求的模型，必须来自上面的模型列表。
-
-```text
-示例：gpt-5.5
-```
-
-具体以你所在分组实际返回的模型为准。
-
-### 子代理模型
-
-Codex 派出的子代理默认使用的模型和推理强度。
-
-建议：
-
-```text
-留空，跟随主模型
-```
-
-只填模型、不填强度时，使用该模型自己的默认强度。
-
-### 默认强度
-
-子代理的默认推理强度。
-
-建议：
-
-```text
-留空，使用模型默认强度
-```
-
-### 子代理并发上限
-
-一个 Codex 会话里最多同时开启多少个子代理，不含主代理。
-
-建议：
-
-```text
-留空，使用 Codex 默认值
-```
-
-最小为 1，不支持不限。新对话才会生效。
-
-### 自动审批模型
-
-Codex 开启「Approve for me」自动审批时，用来判断操作能否放行的模型。
-
-注意：
-
-- 只能选择当前模型列表里的模型
-- 审批请求和主对话发给同一家供应商
-- 修改后需要重启 Codex
-
-如果不使用自动审批，可以留空。
-
-## 地址速查
-
-| 客户端 | API 请求地址 |
+| DSH 字段 | 填写内容 |
 |---|---|
-| Codex / OpenAI | `https://tokenpilot.site/v1` |
-| Claude Code | `https://tokenpilot.site`，不要带 `/v1` |
-| Gemini CLI | `https://tokenpilot.site` |
-| Grok | `https://tokenpilot.site/v1` |
+| Provider ID | `tokenpilot`（小写，保存后固定。添加多个分组时，每个配置使用不同 ID，例如 `tokenpilot-codex04`） |
+| 显示名称 | `TokenPilot · codex0.4`，也可以自定义 |
+| API 地址（Base URL） | `https://tokenpilot.site/v1` |
+| API 协议 | **OpenAI Responses** |
+| API 密钥 | 粘贴 TokenPilot 中绑定目标分组的密钥 |
 
-从 TokenPilot 点击「导入到 CCS」时，系统会自动按分组平台填好地址，一般不需要手动改。
+API 地址填到 `/v1` 即可，DSH 会追加 `/responses`。
+
+### 3. 添加模型并测试
+
+1. 在 **模型目录**里点「获取可用模型」。勾选要用的模型，再点「更新列表」。如果获取失败或没有返回，手动添加该分组支持的模型 ID，可在 [模型广场](/model-plaza) 核对。
+2. 至少添加一个模型，然后保存提供商。
+3. 新建会话，在输入框的模型选择器中找到刚添加的 `TokenPilot · codex0.4`，选择一个模型，发送「你好，请回复接入成功」。
 
 ## 常见问题
 
-### 点击导入没有反应？
+### CC-Switch 显示导入成功，DSH 里却没有配置？
 
-浏览器拦截了自定义协议。检查地址栏右侧是否有弹窗提示，允许打开 CC-Switch。
+打开 CC-Switch 的 Codex 页签可以看到自动导入的供应商。使用同一把 TokenPilot 密钥，按上面的 DSH 步骤手动添加即可。
 
-### 导入后请求失败？
+### 点击「导入到 CCS」没有反应？
 
-按顺序检查：
+确认 CC-Switch 已安装并启动过，检查浏览器是否拦截了打开应用的提示。用便携版时，如果系统没有注册 `ccswitch://`，请换用安装版再试。
 
-1. 密钥状态是否为「启用」
-2. 分组平台是否和客户端一致
-3. 分组是否绑定了渠道
-4. 渠道是否配置了对应模型
-5. 账号是否有可用额度
-6. API 请求地址是否符合上面的地址速查
+### 获取模型失败，或者测试消息发不出去？
 
-### 获取模型列表失败？
+1. 确认客户端能访问 TokenPilot，API 地址和协议与教程一致。若报 `404`，检查是否重复填写了 `/v1`，或在 Base URL 末尾填了 `/responses`。
+2. 确认密钥已启用、绑定了正确的分组，并且账号有可用额度。
+3. 核对模型 ID 是否属于该分组。模型列表获取失败时，可以在客户端手动填写模型 ID，再发送测试消息。
+4. 使用 Codex 时，在 CC-Switch 中确认供应商已启用，完全退出 Codex 后再重新打开。
 
-1. 确认 API 请求地址带不带 `/v1` 正确
-2. 确认 API Key 有权限
-3. 确认分组绑定了渠道
-4. 确认渠道支持 `/v1/models`
-5. 保存后重启客户端再试
+### 如何接入其他客户端？
 
-### 余额不显示？
+从 API 密钥列表触发导入时，TokenPilot 会按密钥所属的平台选择目标。Anthropic 分组通常导入 Claude Code，Gemini 分组导入 Gemini，Grok 分组导入 Grok。需要手动配置 Claude Code 或 Codex CLI 时，可查阅 [配置文档](/docs)。
 
-1. 打开 CC-Switch 的用量查询配置
-2. 选择 Sub2API
-3. 确认 API Key 和地址
-4. 保存
-5. 重启客户端
+| 客户端 | 常用手动配置地址 |
+|---|---|
+| Codex / DSH（OpenAI Responses） | `https://tokenpilot.site/v1` |
+| Claude Code（Anthropic Messages） | `https://tokenpilot.site` |
+| Gemini CLI | `https://tokenpilot.site` |
+| Grok | `https://tokenpilot.site/v1` |
 
-### 修改配置后不生效？
-
-这是最常见的问题。
-
-```text
-在 CC-Switch 保存配置 → 完全退出客户端 → 重新打开客户端
-```
-
-不要只关闭窗口，要确保后台进程也退出。
-
-### 想换一个客户端？
-
-不要重复创建密钥。回到 <a href="/keys" target="_blank" rel="noopener noreferrer">API 密钥页</a>，重新点击「导入到 CCS」，选择另一个客户端即可。
-
-## 完成
-
-到这里就接好了。
-
-以后再修改 CC-Switch 配置时，记住这个顺序：
-
-```text
-选择客户端 → 修改配置 → 保存 → 重启客户端
-```
-
-祝你使用顺利。
+请妥善保管 API Key，避免发到聊天、截图或公开仓库。如果密钥泄露，请在 [API 密钥](/keys) 页面停用旧密钥并重新创建。
