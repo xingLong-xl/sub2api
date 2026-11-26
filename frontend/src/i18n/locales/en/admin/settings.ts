@@ -688,7 +688,7 @@ export default {
         contactInfoPlaceholder: 'e.g., QQ: 123456789',
         contactInfoHint: 'Customer support contact info, displayed on redeem page, profile, etc.',
         legalContactEmail: 'Legal Contact Email',
-        legalContactEmailPlaceholder: 'e.g., support@example.com',
+        legalContactEmailPlaceholder: "e.g., support{'@'}example.com",
         legalContactEmailHint: 'Shown in the privacy policy and user agreement; displays “Pending configuration” when empty.',
         docUrl: 'Documentation URL',
         docUrlPlaceholder: 'https://docs.example.com',

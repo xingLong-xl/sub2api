@@ -680,7 +680,7 @@ export default {
         contactInfoPlaceholder: '例如：QQ: 123456789',
         contactInfoHint: '填写客服联系方式，将展示在兑换页面、个人资料等位置',
         legalContactEmail: '法律文档联系邮箱',
-        legalContactEmailPlaceholder: '例如：support@example.com',
+        legalContactEmailPlaceholder: "例如：support{'@'}example.com",
         legalContactEmailHint: '展示在隐私政策和用户协议中；留空时显示「待企业配置」。',
         docUrl: '文档链接',
         docUrlHint: '文档网站的链接。留空则隐藏文档链接。',
