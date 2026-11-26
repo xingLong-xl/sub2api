@@ -61,7 +61,7 @@
 | 名称 | `TokenPilot-Codex`，也可以自定义 |
 | 备注 / 官网链接 | 可选。官网链接可填 `https://tokenpilot.site` |
 | API Key | TokenPilot 创建的密钥，CC-Switch 会据此生成认证配置 |
-| API 请求地址 | `https://tokenpilot.site/v1`（手动填写 Codex 的 OpenAI Responses Base URL 时使用） |
+| API 请求地址 | `https://api.tokenpilot.site/v1`（api加速地址，推荐；手动填写 Codex 的 OpenAI Responses Base URL 时使用） |
 | 管理与测速 | 使用同一个 API 地址 |
 | 模型列表 / 默认模型 | 点击「获取模型列表」，从该分组可用的模型中选默认模型 |
 | 子代理模型 / 默认强度 / 并发上限 | 初次接入可以留空，使用客户端默认设置 |
@@ -91,7 +91,7 @@ DSH 有两种手动接入方式，**任选一种即可**。推荐方式一，通
 | 官网链接 | 可选，可填 `https://tokenpilot.site` |
 | 接口格式 | 选择 **OpenAI Responses**，与当前 OpenAI 分组匹配 |
 | API Key | 粘贴 TokenPilot 中绑定目标分组的密钥，下方配置会自动填充 |
-| Base URL | `https://tokenpilot.site/v1` |
+| Base URL | `https://api.tokenpilot.site/v1`（api加速地址，推荐） |
 | 请求头 | 按默认设置留空即可 |
 | 额外选项 | 按默认设置留空即可 |
 | 模型配置 | 点击 **获取模型列表**，选择该分组支持的模型。获取失败时可手动填写模型 ID，在 [模型广场](/model-plaza) 核对 |
@@ -106,7 +106,7 @@ DSH 有两种手动接入方式，**任选一种即可**。推荐方式一，通
 |---|---|
 | Provider ID | `tokenpilot`（小写，保存后固定。添加多个分组时，每个配置使用不同 ID，例如 `tokenpilot-codex04`） |
 | 显示名称 | `TokenPilot · codex0.4`，也可以自定义 |
-| API 地址（Base URL） | `https://tokenpilot.site/v1` |
+| API 地址（Base URL） | `https://api.tokenpilot.site/v1`（api加速地址，推荐） |
 | API 协议 | **OpenAI Responses** |
 | API 密钥 | 粘贴 TokenPilot 中绑定目标分组的密钥 |
 
@@ -145,11 +145,11 @@ TokenPilot 当前会把 OpenAI 分组的自动导入配置发送到 CC-Switch �
 
 从 API 密钥列表触发导入时，TokenPilot 会按密钥所属的平台选择目标。Anthropic 分组通常导入 Claude Code，Gemini 分组导入 Gemini，Grok 分组导入 Grok。需要手动配置 Claude Code 或 Codex CLI 时，可查阅 [配置文档](/docs)。
 
-| 客户端 | 常用手动配置地址 |
-|---|---|
-| Codex / DSH（OpenAI Responses） | `https://tokenpilot.site/v1` |
-| Claude Code（Anthropic Messages） | `https://tokenpilot.site` |
-| Gemini CLI | `https://tokenpilot.site` |
-| Grok | `https://tokenpilot.site/v1` |
+| 客户端 | 常用手动配置地址（api加速地址，推荐） | 主站备用地址 |
+|---|---|---|
+| Codex / DSH（OpenAI Responses） | `https://api.tokenpilot.site/v1` | `https://tokenpilot.site/v1` |
+| Claude Code（Anthropic Messages） | `https://api.tokenpilot.site` | `https://tokenpilot.site` |
+| Grok | `https://api.tokenpilot.site/v1` | `https://tokenpilot.site/v1` |
+| Gemini CLI | 待开放，暂用主站 | `https://tokenpilot.site` |
 
 请妥善保管 API Key，避免发到聊天、截图或公开仓库。如果密钥泄露，请在 [API 密钥](/keys) 页面停用旧密钥并重新创建。

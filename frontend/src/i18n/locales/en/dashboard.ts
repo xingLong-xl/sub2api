@@ -68,9 +68,14 @@ export default {
   keys: {
     apiAccess: {
       title: 'API Access',
+      accelerated: 'Accelerated Endpoint',
+      acceleratedTag: 'api加速地址',
+      acceleratedDesc: 'Recommended, faster. Use this endpoint for OpenAI-format requests.',
+      acceleratedClaude: 'Accelerated Claude Endpoint',
+      acceleratedClaudeDesc: 'Recommended, faster. Do not append /v1 for Claude requests.',
       main: 'Main Endpoint',
-      mainTag: 'Fast · Low latency',
-      mainDesc: 'Recommended default endpoint for OpenAI-format requests.',
+      mainTag: 'Main site',
+      mainDesc: 'Main-site endpoint. Switch to it temporarily if the accelerated endpoint fails.',
       claude: 'Claude Endpoint',
       claudeTag: 'Claude only',
       claudeDesc: 'Do not append /v1 for Claude requests.',

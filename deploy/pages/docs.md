@@ -1,9 +1,16 @@
 ## 基础信息
 
-| 客户端 | Base URL | 协议 |
+| 客户端 | Base URL（推荐） | 协议 |
 | --- | --- | --- |
-| Claude Code | `https://tokenpilot.site` | Anthropic Messages |
-| Codex CLI | `https://tokenpilot.site/v1` | OpenAI Responses |
+| Claude Code | `https://api.tokenpilot.site` | Anthropic Messages |
+| Codex CLI | `https://api.tokenpilot.site/v1` | OpenAI Responses |
+
+上面是 **api加速地址**，推荐使用，速度更快。下面两个主站地址保留可用，加速地址异常时可临时切换：
+
+| 客户端 | Base URL（备用） |
+| --- | --- |
+| Claude Code | `https://tokenpilot.site` |
+| Codex CLI | `https://tokenpilot.site/v1` |
 
 注意：
 
@@ -50,14 +57,14 @@ npm install -g @anthropic-ai/claude-code
 
 ```powershell
 setx ANTHROPIC_AUTH_TOKEN "sk-你的密钥"
-setx ANTHROPIC_BASE_URL "https://tokenpilot.site"
+setx ANTHROPIC_BASE_URL "https://api.tokenpilot.site"
 ```
 
 ##### 可选：写入当前 PowerShell 会话
 
 ```powershell
 $env:ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
-$env:ANTHROPIC_BASE_URL="https://tokenpilot.site"
+$env:ANTHROPIC_BASE_URL="https://api.tokenpilot.site"
 ```
 
 ##### 可选：写入持久配置
@@ -68,7 +75,7 @@ New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
 {
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
-    "ANTHROPIC_BASE_URL": "https://tokenpilot.site"
+    "ANTHROPIC_BASE_URL": "https://api.tokenpilot.site"
   }
 }
 '@ | Set-Content "$env:USERPROFILE\.claude\settings.json"
@@ -92,7 +99,7 @@ npm install -g @anthropic-ai/claude-code
 
 ```bash
 export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
-export ANTHROPIC_BASE_URL="https://tokenpilot.site"
+export ANTHROPIC_BASE_URL="https://api.tokenpilot.site"
 ```
 
 ##### 可选：写入持久配置
@@ -103,7 +110,7 @@ cat > ~/.claude/settings.json <<'EOF'
 {
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
-    "ANTHROPIC_BASE_URL": "https://tokenpilot.site"
+    "ANTHROPIC_BASE_URL": "https://api.tokenpilot.site"
   }
 }
 EOF
@@ -127,7 +134,7 @@ npm install -g @anthropic-ai/claude-code
 
 ```bash
 export ANTHROPIC_AUTH_TOKEN="sk-你的密钥"
-export ANTHROPIC_BASE_URL="https://tokenpilot.site"
+export ANTHROPIC_BASE_URL="https://api.tokenpilot.site"
 ```
 
 ##### 可选：写入持久配置
@@ -138,7 +145,7 @@ cat > ~/.claude/settings.json <<'EOF'
 {
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "sk-你的密钥",
-    "ANTHROPIC_BASE_URL": "https://tokenpilot.site"
+    "ANTHROPIC_BASE_URL": "https://api.tokenpilot.site"
   }
 }
 EOF
@@ -187,7 +194,7 @@ model_reasoning_effort = "xhigh"
 
 [model_providers.tokenpilot]
 name = "TokenPilot"
-base_url = "https://tokenpilot.site/v1"
+base_url = "https://api.tokenpilot.site/v1"
 wire_api = "responses"
 env_key = "OPENAI_API_KEY"
 requires_openai_auth = false
@@ -232,7 +239,7 @@ model_reasoning_effort = "xhigh"
 
 [model_providers.tokenpilot]
 name = "TokenPilot"
-base_url = "https://tokenpilot.site/v1"
+base_url = "https://api.tokenpilot.site/v1"
 wire_api = "responses"
 env_key = "OPENAI_API_KEY"
 requires_openai_auth = false
@@ -278,7 +285,7 @@ model_reasoning_effort = "xhigh"
 
 [model_providers.tokenpilot]
 name = "TokenPilot"
-base_url = "https://tokenpilot.site/v1"
+base_url = "https://api.tokenpilot.site/v1"
 wire_api = "responses"
 env_key = "OPENAI_API_KEY"
 requires_openai_auth = false
@@ -307,8 +314,8 @@ codex
 
 ## 配置检查
 
-- Claude Code 的 `ANTHROPIC_BASE_URL` 是 `https://tokenpilot.site`，不要带 `/v1`。
-- Codex 的 `base_url` 是 `https://tokenpilot.site/v1`，要带 `/v1`。
+- Claude Code 的 `ANTHROPIC_BASE_URL` 是 `https://api.tokenpilot.site`，不要带 `/v1`。
+- Codex 的 `base_url` 是 `https://api.tokenpilot.site/v1`，要带 `/v1`。
 - Claude Code 使用 `ANTHROPIC_AUTH_TOKEN`，Codex 使用 `OPENAI_API_KEY`。
 - 修改环境变量或配置文件后，需要重新打开终端或重启对应 CLI。
 - 如果提示模型不存在，检查 Key 分组和模型名是否与模型广场一致。
@@ -330,7 +337,7 @@ codex
 
 ### Claude Code 连不上
 
-1. `ANTHROPIC_BASE_URL` 应为 `https://tokenpilot.site`，不要带 `/v1` 或 `/v1/messages`。
+1. `ANTHROPIC_BASE_URL` 应为 `https://api.tokenpilot.site`，不要带 `/v1` 或 `/v1/messages`。
 2. `ANTHROPIC_AUTH_TOKEN` 应是完整的 `sk-...`，没有多余空格或引号。
 3. 当前 Key 分组要包含 Claude 模型。
 4. 修改配置后重启终端和 Claude Code。

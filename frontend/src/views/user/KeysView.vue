@@ -1104,7 +1104,7 @@
     <UseKeyModal
       :show="showUseKeyModal"
       :api-key="selectedKey?.key || ''"
-      :base-url="publicSettings?.api_base_url || ''"
+      :base-url="useKeyBaseUrl"
       :platform="selectedKey?.group?.platform || null"
       :claude-code-only="selectedKey?.group?.claude_code_only || false"
       :allow-messages-dispatch="selectedKey?.group?.allow_messages_dispatch || false"
@@ -1295,6 +1295,11 @@ const { copyToClipboard: clipboardCopy } = useClipboard()
 const { formatUsageMoney } = useUsageCurrency()
 
 const CANONICAL_SITE_URL = 'https://tokenpilot.site'
+/**
+ * API 加速地址：独立入口域名，只承载 API 流量，作为推荐接入点。
+ * antigravity 使用的 /antigravity 路径目前只在主站开放，因此该平台仍走主站。
+ */
+const ACCELERATED_API_BASE_URL = 'https://api.tokenpilot.site'
 
 /** localhost / 回环 / 内网地址不是有效的对外接入地址。 */
 function isPublicHttpUrl(value: string): boolean {
@@ -1319,7 +1324,22 @@ const apiAccessBase = computed(() => {
   return CANONICAL_SITE_URL
 })
 
+/**
+ * 加速地址排在最前：它是推荐接入点。主站地址保留，便于加速地址异常时临时切换。
+ */
 const apiEndpoints = computed(() => [
+  {
+    label: t('keys.apiAccess.accelerated'),
+    tag: t('keys.apiAccess.acceleratedTag'),
+    desc: t('keys.apiAccess.acceleratedDesc'),
+    url: `${ACCELERATED_API_BASE_URL}/v1`,
+  },
+  {
+    label: t('keys.apiAccess.acceleratedClaude'),
+    tag: t('keys.apiAccess.acceleratedTag'),
+    desc: t('keys.apiAccess.acceleratedClaudeDesc'),
+    url: ACCELERATED_API_BASE_URL,
+  },
   {
     label: t('keys.apiAccess.main'),
     tag: t('keys.apiAccess.mainTag'),
@@ -1505,6 +1525,13 @@ const selectedKeyForGroup = computed(() => {
   if (groupSelectorKeyId.value === null) return null
   return apiKeys.value.find((k) => k.id === groupSelectorKeyId.value) || null
 })
+
+/** 「使用密钥」弹窗生成的配置同样使用加速地址（antigravity 除外）。 */
+const useKeyBaseUrl = computed(() =>
+  selectedKey.value?.group?.platform === 'antigravity'
+    ? apiAccessBase.value
+    : ACCELERATED_API_BASE_URL
+)
 
 const setGroupButtonRef = (keyId: number, el: Element | ComponentPublicInstance | null) => {
   if (el instanceof HTMLElement) {
@@ -2119,9 +2146,9 @@ const importToCcswitch = (row: ApiKey) => {
 }
 
 const executeCcsImport = (row: ApiKey, clientType: CcSwitchClientType) => {
-  // 与 API 接入信息一致：localhost / 内网访问时回退正式域名，避免导入 localhost。
-  const baseUrl = apiAccessBase.value
   const platform = row.group?.platform || 'anthropic'
+  // 导入默认使用加速地址；antigravity 的 /antigravity 路径尚未在加速域名开放，仍走主站。
+  const baseUrl = platform === 'antigravity' ? apiAccessBase.value : ACCELERATED_API_BASE_URL
 
   const usageScript = CC_SWITCH_USAGE_SCRIPT
   const providerName = (publicSettings.value?.site_name || 'sub2api').trim() || 'sub2api'

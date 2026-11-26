@@ -68,9 +68,14 @@ export default {
   keys: {
     apiAccess: {
       title: 'API 接入信息',
+      accelerated: '加速请求地址',
+      acceleratedTag: 'api加速地址',
+      acceleratedDesc: '推荐使用，速度更快。OpenAI 格式请求请使用此地址。',
+      acceleratedClaude: 'Claude 加速地址',
+      acceleratedClaudeDesc: '推荐使用，速度更快。Claude 接口请勿携带 /v1 后缀。',
       main: '主请求地址',
-      mainTag: '高速 · 低延迟',
-      mainDesc: '默认推荐接入点，OpenAI 格式请求请使用此地址。',
+      mainTag: '主站',
+      mainDesc: '主站接入点，加速地址异常时可临时切换。',
       claude: 'Claude 请求地址',
       claudeTag: 'Claude 专用',
       claudeDesc: 'Claude 接口请勿携带 /v1 后缀。',
