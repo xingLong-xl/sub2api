@@ -336,6 +336,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -347,6 +348,8 @@ import Icon from '@/components/icons/Icon.vue'
 import '@/styles/announcement-markdown.css'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const appStore = useAppStore()
 const announcementStore = useAnnouncementStore()
 
@@ -436,6 +439,31 @@ async function markAsReadAndClose(id: number) {
 }
 
 
+// Deep link support: ?announcements=1 opens the notification centre, and
+// ?announcements=group opens it straight on the group QR-code tab, so an
+// announcement elsewhere can send users directly to the community QR code.
+const ANNOUNCEMENT_QUERY_PARAM = 'announcements'
+const GROUP_TAB_QUERY_VALUES = ['group', 'qr', 'announcement']
+
+function announcementQueryValue(raw: unknown): string {
+  const value = Array.isArray(raw) ? raw[0] : raw
+  return typeof value === 'string' ? value.trim().toLowerCase() : ''
+}
+
+function consumeAnnouncementQuery(): boolean {
+  const value = announcementQueryValue(route.query[ANNOUNCEMENT_QUERY_PARAM])
+  if (!value || value === '0' || value === 'false') return false
+  if (GROUP_TAB_QUERY_VALUES.includes(value)) {
+    activeTab.value = 'announcement'
+  }
+  openModal()
+  // Drop the parameter so closing the dialog and refreshing does not reopen it.
+  const restQuery = { ...route.query }
+  delete restQuery[ANNOUNCEMENT_QUERY_PARAM]
+  void router.replace({ path: route.path, query: restQuery, hash: route.hash })
+  return true
+}
+
 function handleEscape(e: KeyboardEvent) {
   if (e.key === 'Escape') {
     if (detailModalOpen.value) {
@@ -448,6 +476,7 @@ function handleEscape(e: KeyboardEvent) {
 
 onMounted(() => {
   document.addEventListener('keydown', handleEscape)
+  if (consumeAnnouncementQuery()) return
   if (shouldAutoOpen()) {
     isModalOpen.value = true
     void announcementStore.fetchAnnouncements(true)
@@ -458,6 +487,15 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleEscape)
   document.body.style.overflow = ''
 })
+
+// The header stays mounted across routes, so an in-app navigation to the deep
+// link must be picked up here as well.
+watch(
+  () => route.query[ANNOUNCEMENT_QUERY_PARAM],
+  () => {
+    consumeAnnouncementQuery()
+  }
+)
 
 watch(
   [isModalOpen, detailModalOpen, () => announcementStore.currentPopup],
